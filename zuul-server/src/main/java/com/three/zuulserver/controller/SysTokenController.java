@@ -140,7 +140,7 @@ public class SysTokenController {
      * @return
      */
     @PostMapping("/sys/refresh_token")
-    public Map<String, Object> refresh_token(String refresh_token) {
+    public Map<String, Object> refresh_token(String access_token, String refresh_token) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "refresh_token");
         parameters.put(CLIENT_ID, SystemClientConstant.CLIENT_ID);
@@ -148,7 +148,12 @@ public class SysTokenController {
         parameters.put(SCOPE, SystemClientConstant.CLIENT_SCOPE);
         parameters.put("refresh_token", refresh_token);
 
-        return oauth2Client.postAccessToken(parameters);
+        Map<String, Object> refreshTokenMap = oauth2Client.postAccessToken(parameters);
+
+        if (refreshTokenMap != null) {
+            oauth2Client.removeToken(access_token);
+        }
+        return refreshTokenMap;
     }
 
     /**

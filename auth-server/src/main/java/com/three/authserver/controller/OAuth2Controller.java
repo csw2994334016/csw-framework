@@ -89,14 +89,6 @@ public class OAuth2Controller {
     @Autowired
     private ConsumerTokenServices tokenServices;
 
-//    @Autowired
-//    private StringRedisTemplate stringRedisTemplate;
-//
-//    private RedisTokenStoreSerializationStrategy serializationStrategy = new JdkSerializationStrategy();
-//
-//    private static final String ACCESS = "access:";
-//    private static final String AUTH_TO_ACCESS = "auth_to_access:";
-
     /**
      * 注销登陆/退出
      * 移除access_token和refresh_token<br>
@@ -108,12 +100,6 @@ public class OAuth2Controller {
     public void removeToken(String access_token) {
 
         boolean flag = tokenServices.revokeToken(access_token);
-
-
-//        byte[] accessKey = serializationStrategy.serialize(ACCESS + access_token);
-//        byte[] authToAccessKey = serializationStrategy.serialize(AUTH_TO_ACCESS + key);
-
-//        stringRedisTemplate.boundHashOps(new String(accessKey)).delete();
 
         if (flag) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
