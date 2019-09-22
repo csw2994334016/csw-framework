@@ -1,0 +1,55 @@
+spring:
+  mvc:
+    servlet:
+      load-on-startup: 1
+  zipkin:
+    base-url: http://localhost:9411
+    enabled: true
+    sender:
+      type: web
+logging:
+  level:
+    root: info
+    com.three: debug
+    org.springframework.security: debug
+  file: logs/${spring.application.name}.log
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://localhost:8084/three-auth-server/user-me
+      prefer-token-info: false
+zuul:
+  ignored-services: '*'
+  sensitiveHeaders:
+  routes:
+    three-auth-server:
+      path: /three-auth-server/**
+      serviceId: auth-server
+    three-log-server:
+      path: /three-log-server/**
+      serviceId: log-server
+    three-develop-server:
+      path: /three-develop-server/**
+      serviceId: develop-server
+    three-user-server:
+      path: /three-user-server/**
+      serviceId: user-server
+  host:
+    connect-timeout-millis: 600000
+    socket-timeout-millis: 600000
+  add-proxy-headers: true
+  ribbon:
+    eager-load:
+      enabled: true
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+cron:
+  black-ip: 0 0/5 * * * ?
