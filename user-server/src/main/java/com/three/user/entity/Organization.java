@@ -59,6 +59,11 @@ public class Organization implements Serializable {
     @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 1 comment '排序'")
     private Integer sort = 1; // 排序
 
+    @Column(name = "attn_list", columnDefinition = "varchar(1000) comment '初审人'")
+    private String attnList; // 初审人
+
+    @Column(name = "audit_list", columnDefinition = "varchar(1000) comment '终审人'")
+    private String auditList; // 终审人
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
