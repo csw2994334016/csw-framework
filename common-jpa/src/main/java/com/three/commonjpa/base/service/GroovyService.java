@@ -41,23 +41,24 @@ public class GroovyService {
      * @return Object       方法返回值
      */
     public Object exec(String scriptName, String methodName, Object... params) {
-        Object res = null;
+        Object res;
+
+        Script script = getScriptByName(scriptName);
 
         try {
-
-            Script script = getScriptByName(scriptName);
-
             Class clazz = getClass(scriptName, script.getCode(), script.getVersion());
             GroovyObject instance = (GroovyObject) clazz.newInstance();
 
             try {
                 res = instance.invokeMethod(methodName, params);
             } catch (Exception e) {
-                log.error("执行方法" + methodName + "出现异常", e);
+                log.error("执行方法[{}]出现异常：{}", methodName, e.getMessage());
+                throw new RuntimeException("执行方法[" + methodName + "]出现异常：" + e.getMessage());
             }
 
         } catch (Exception e1) {
-            log.error("加载脚本[" + scriptName + "]出现异常", e1);
+            log.error("加载脚本[{}]出现异常：{}", scriptName, e1.getMessage());
+            throw new RuntimeException("加载脚本[" + scriptName + "]出现异常：" + e1.getMessage());
         }
 
         return res;

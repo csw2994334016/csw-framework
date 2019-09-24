@@ -84,15 +84,16 @@ public class QuartzJobService extends BaseService<QuartzJob, Long> {
     }
 
     @Transactional
-    public void updateIsPause(QuartzJob quartzJob) {
-        if (quartzJob.getJobStatus() == JobStatusEnum.PAUSE.getCode()) {
-            quartzManager.resumeJob(quartzJob);
-            quartzJob.setJobStatus(JobStatusEnum.RUNNING.getCode());
-        } else {
-            quartzManager.pauseJob(quartzJob);
-            quartzJob.setJobStatus(JobStatusEnum.PAUSE.getCode());
-        }
-//        QuartzJob quartzJob1 = quartzJobRepository.findById(1L).get();
+    public void updateByResume(QuartzJob quartzJob) {
+        quartzManager.resumeJob(quartzJob);
+        quartzJob.setJobStatus(JobStatusEnum.RUNNING.getCode());
+        quartzJobRepository.save(quartzJob);
+    }
+
+    @Transactional
+    public void updateByPause(QuartzJob quartzJob) {
+        quartzManager.pauseJob(quartzJob);
+        quartzJob.setJobStatus(JobStatusEnum.PAUSE.getCode());
         quartzJobRepository.save(quartzJob);
     }
 
@@ -100,7 +101,11 @@ public class QuartzJobService extends BaseService<QuartzJob, Long> {
         Set<Long> idSet = StringUtil.getStrToIdSet(ids);
         for (Long id : idSet) {
             QuartzJob quartzJob = getEntityById(quartzJobRepository, id);
-            updateIsPause(quartzJob);
+            if (status == JobStatusEnum.PAUSE.getCode()) {
+                updateByPause(quartzJob);
+            } else {
+                updateByResume(quartzJob);
+            }
         }
     }
 

@@ -66,4 +66,8 @@ public class QuartzJobLog implements Serializable {
 
     @LastModifiedDate
     private Date updateDate;
+
+    public void addMessage(String msg) {
+        message += msg + "/n";
+    }
 }

@@ -39,7 +39,7 @@ public class QuartzJobLogService extends BaseService<QuartzJobLog, Long> {
     }
 
     public PageResult<QuartzJobLog> query(PageQuery pageQuery, int code, String searchKey, String searchValue, String startDate, String endDate) {
-        Sort sort = new Sort(Sort.Direction.ASC, "createDate");
+        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         return query(quartzJobLogRepository, pageQuery, sort, code, searchKey, searchValue, startDate, endDate);
     }
 }

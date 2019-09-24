@@ -80,7 +80,7 @@ public class QuartzJobController {
         return JsonResult.ok();
     }
 
-    @LogAnnotation(module = "执行定时任务")
+//    @LogAnnotation(module = "执行定时任务")
     @ApiOperation(value = "执行定时任务", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "任务ids", required = true, dataType = "String")

@@ -1,8 +1,10 @@
 package com.three.develop.utils;
 
 import com.three.common.enums.LogEnum;
+import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.utils.SpringContextHolder;
 import com.three.common.utils.ThrowableUtil;
+import com.three.commonjpa.base.service.GroovyService;
 import com.three.develop.constants.Job;
 import com.three.develop.entity.QuartzJob;
 import com.three.develop.entity.QuartzJobLog;
@@ -30,8 +32,8 @@ public class ExecutionJob extends QuartzJobBean {
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
-    protected void executeInternal(JobExecutionContext context) {
-        QuartzJob quartzJob = (QuartzJob) context.getMergedJobDataMap().get(Job.JOB_KEY);
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
+        QuartzJob quartzJob = (QuartzJob) jobExecutionContext.getMergedJobDataMap().get(Job.JOB_KEY);
         // 获取spring bean
         QuartzJobLogRepository quartzJobLogRepository = (QuartzJobLogRepository) SpringContextHolder.getBean("quartzJobLogRepository");
         QuartzJobService quartzJobService = (QuartzJobService) SpringContextHolder.getBean("quartzJobService");
@@ -47,6 +49,17 @@ public class ExecutionJob extends QuartzJobBean {
         try {
             // 执行任务
             logger.info("任务准备执行，任务名称：{}", quartzJob.getJobName());
+            try {
+                QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
+                Future<?> future = executorService.submit(task);
+                future.get();
+                log.setMessage("成功执行JavaBean任务");
+            } catch (Exception e) {
+                logger.info("定时任务[{}]在SpringContextHolder中不存在：{}，继续查找groovy脚本执行任务", quartzJob.getJobName(), e.getMessage());
+                log.setMessage("定时任务[" + quartzJob.getJobName() + "]在SpringContextHolder中不存在：" + e.getMessage() + "，继续查找groovy脚本执行任务");
+                GroovyService groovyService = (GroovyService) SpringContextHolder.getBean("groovyService");
+                groovyService.exec(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
+            }
             QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
             Future<?> future = executorService.submit(task);
             future.get();
@@ -54,18 +67,19 @@ public class ExecutionJob extends QuartzJobBean {
             log.setTime(times);
             // 任务状态
             log.setLogType(LogEnum.INFO.getCode());
-            logger.info("任务执行完毕，任务名称：{} 总共耗时：{} 毫秒", quartzJob.getJobName(), times);
+            logger.info("任务执行完毕，任务名称：{} 总共耗时：{} ms", quartzJob.getJobName(), times);
         } catch (Exception e) {
-            logger.error("任务执行失败，任务名称：{}" + quartzJob.getJobName(), e);
+            logger.error("任务执行失败，任务名称：{}，异常信息：{}", quartzJob.getJobName(), e.getMessage());
             long times = System.currentTimeMillis() - startTime;
             log.setTime(times);
             // 任务状态 1：成功 2：失败
             log.setLogType(LogEnum.ERROR.getCode());
+            log.addMessage(e.getMessage());
             log.setExceptionDetail(ThrowableUtil.getStackTrace(e));
             // 出错就暂停任务
             quartzManager.pauseJob(quartzJob);
-            // 更新状态
-            quartzJobService.updateIsPause(quartzJob);
+            // 出错，定时任务改成暂停状态
+            quartzJobService.updateByPause(quartzJob);
         } finally {
             quartzJobLogRepository.save(log);
         }

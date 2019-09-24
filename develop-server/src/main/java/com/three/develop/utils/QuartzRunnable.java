@@ -39,7 +39,7 @@ public class QuartzRunnable implements Runnable {
                 method.invoke(target);
             }
         } catch (Exception e) {
-            log.error("定时任务执行失败", e);
+            log.error("定时任务执行失败：{}", e.getMessage());
         }
     }
 }

@@ -52,7 +52,7 @@ public class QuartzManager {
                 pauseJob(quartzJob);
             }
         } catch (Exception e) {
-            log.error("创建定时任务失败", e);
+            log.error("创建定时任务失败：{}", e);
             throw new BusinessException("创建定时任务失败");
         }
     }
@@ -84,7 +84,7 @@ public class QuartzManager {
                 pauseJob(quartzJob);
             }
         } catch (Exception e) {
-            log.error("更新定时任务失败", e);
+            log.error("更新定时任务失败：{}", e);
             throw new BusinessException("更新定时任务失败");
         }
 
@@ -102,7 +102,7 @@ public class QuartzManager {
             scheduler.pauseJob(jobKey);
             scheduler.deleteJob(jobKey);
         } catch (Exception e) {
-            log.error("删除定时任务失败", e);
+            log.error("删除定时任务失败：{}", e);
             throw new BusinessException("删除定时任务失败");
         }
     }
@@ -123,7 +123,7 @@ public class QuartzManager {
             JobKey jobKey = JobKey.jobKey(JOB_NAME + quartzJob.getId());
             scheduler.resumeJob(jobKey);
         } catch (Exception e) {
-            log.error("恢复定时任务失败", e);
+            log.error("恢复定时任务失败：{}", e);
             throw new BusinessException("恢复定时任务失败");
         }
     }
@@ -146,7 +146,7 @@ public class QuartzManager {
             JobKey jobKey = JobKey.jobKey(JOB_NAME + quartzJob.getId());
             scheduler.triggerJob(jobKey, dataMap);
         } catch (Exception e) {
-            log.error("定时任务执行失败", e);
+            log.error("定时任务执行失败：{}", e);
             throw new BusinessException("定时任务执行失败");
         }
     }
@@ -162,7 +162,7 @@ public class QuartzManager {
             JobKey jobKey = JobKey.jobKey(JOB_NAME + quartzJob.getId());
             scheduler.pauseJob(jobKey);
         } catch (Exception e) {
-            log.error("定时任务暂停失败", e);
+            log.error("定时任务暂停失败：{}", e);
             throw new BusinessException("定时任务暂停失败");
         }
     }
