@@ -1,7 +1,6 @@
 package com.three.user.entity;
 
 import com.three.common.enums.StatusEnum;
-import io.swagger.models.auth.In;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -38,8 +37,8 @@ public class Organization implements Serializable {
     @Column(name = "org_code", nullable = false, unique = true, columnDefinition = "varchar(100) comment '组织机构编码'")
     private String orgCode; // 组织机构编码
 
-    @Column(name = "org_type", nullable = false, columnDefinition = "int(2) default 2 comment '组织机构类型'")
-    private String orgType; // 组织机构类型，1=公司；2=部门
+    @Column(name = "org_type", columnDefinition = "int(2) default 2 comment '组织机构类型'")
+    private Integer orgType = 2; // 组织机构类型，1=公司；2=部门
 
     @Column(name = "company_id", columnDefinition = "varchar(36) comment '公司ID(公司详细信息)'")
     private String companyId; // 公司ID(公司详细信息)

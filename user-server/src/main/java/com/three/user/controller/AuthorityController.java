@@ -88,7 +88,7 @@ public class AuthorityController {
 
     @ApiOperation(value = "查询所有权限")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchKey", value = "筛选条件字段(船名)", dataType = "String"),
+            @ApiImplicitParam(name = "searchKey", value = "筛选条件字段", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String"),
             @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
     })

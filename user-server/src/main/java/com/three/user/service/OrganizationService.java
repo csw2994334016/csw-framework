@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by csw on 2019-09-22.
+ * Created by csw on 2019-09-25.
  * Description:
  */
 
 @Service
-public class OrganizationService extends BaseService<Organization,  String> {
+public class OrganizationService extends BaseService<Organization, String> {
 
     @Autowired
     private OrganizationRepository organizationRepository;
@@ -68,4 +68,8 @@ public class OrganizationService extends BaseService<Organization,  String> {
         return query(organizationRepository, pageQuery, sort, code, searchKey, searchValue);
     }
 
+    public PageResult<Organization> findAll(int code, String searchKey, String searchValue) {
+        Sort sort = new Sort(Sort.Direction.ASC, "sort");
+        return findAll(organizationRepository, sort, code, searchKey, searchValue);
+    }
 }
