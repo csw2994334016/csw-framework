@@ -46,14 +46,14 @@ public class Organization implements Serializable {
     @Column(name = "dept_id", columnDefinition = "varchar(36) comment '部门ID(部门详细信息)'")
     private String deptId; // 部门ID(部门详细信息)
 
-    @Column(name = "p_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '父级机构ID'")
-    private String pId = "-1"; // 父级机构ID
+    @Column(name = "parent_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '父级机构ID'")
+    private String parentId = "0"; // 父级机构ID
 
-    @Column(name = "p_name", columnDefinition = "varchar(100) comment '父级机构名称'")
-    private String pName; // 父级机构名称
+    @Column(name = "parent_name", columnDefinition = "varchar(100) comment '父级机构名称'")
+    private String parentName; // 父级机构名称
 
-    @Column(name = "p_ids", columnDefinition = "varchar(800) comment '所有父级ID'")
-    private String pIds; // 所有父级ID
+    @Column(name = "parent_ids", columnDefinition = "varchar(800) comment '所有父级ID'")
+    private String parentIds; // 所有父级ID
 
     @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 1 comment '排序'")
     private Integer sort = 1; // 排序

@@ -95,8 +95,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
 //            throw new IllegalArgumentException("非法请求");
 //        }
 //
-//        String value = smsClient.matcheCodeAndGetPhone(key, code, false, 30);
-//        if (!StringUtils.equals(phone, value)) {
+//        String id = smsClient.matcheCodeAndGetPhone(key, code, false, 30);
+//        if (!StringUtils.equals(phone, id)) {
 //            throw new IllegalArgumentException("验证码错误");
 //        }
 //

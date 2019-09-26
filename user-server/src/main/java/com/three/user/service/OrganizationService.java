@@ -7,17 +7,15 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.commonjpa.base.service.BaseService;
+import com.three.user.vo.OrgVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csw on 2019-09-25.
@@ -71,5 +69,33 @@ public class OrganizationService extends BaseService<Organization, String> {
     public PageResult<Organization> findAll(int code, String searchKey, String searchValue) {
         Sort sort = new Sort(Sort.Direction.ASC, "sort");
         return findAll(organizationRepository, sort, code, searchKey, searchValue);
+    }
+
+    public List<OrgVo> findAllWithTree(int code) {
+        List<Organization> organizationList = organizationRepository.findAllByStatus(code);
+
+        List<OrgVo> parentList = new ArrayList<>();
+        List<OrgVo> orgVoList = new ArrayList<>();
+        for (Organization organization : organizationList) {
+            OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).parentId(organization.getParentId()).build();
+            orgVoList.add(orgVo);
+            if (orgVo.getParentId().equals("-1")) { // 根节点
+                parentList.add(orgVo);
+            }
+        }
+        for (OrgVo parent : parentList) {
+            generateTree(parent, orgVoList);
+        }
+        // 排序
+        return parentList;
+    }
+
+    private void generateTree(OrgVo parent, List<OrgVo> orgVoList) {
+        for (OrgVo orgVo : orgVoList) {
+            if (parent.getId().equals(orgVo.getParentId())) {
+                generateTree(orgVo, orgVoList);
+                parent.getChildren().add(orgVo);
+            }
+        }
     }
 }

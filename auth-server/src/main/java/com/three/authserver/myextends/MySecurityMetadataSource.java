@@ -39,7 +39,7 @@ public class MySecurityMetadataSource implements FilterInvocationSecurityMetadat
                 cfg = new SecurityConfig(sysAuthority.getAuthorityUrl());
                 // 此处只添加了权限url，其实还可以添加更多权限的信息，比如树形的权限，map根据url作为key值，可以对应权限的集合
                 array.add(cfg);
-                // 用权限的getUrl() 作为map的key，用ConfigAttribute的集合作为 value，
+                // 用权限的getUrl() 作为map的key，用ConfigAttribute的集合作为 id，
                 map.put(sysAuthority.getAuthorityUrl(), array);
             }
         }

@@ -259,7 +259,7 @@ public class ExcelUtil {
                             // 字典值转换
                             String dict = excel.dict();
                             if (!dict.isEmpty()) {
-//                                value = DictUtil.keyValue(dict, String.valueOf(value));
+//                                id = DictUtil.keyValue(dict, String.valueOf(id));
                             }
 
                             // 获取关联对象指定的值

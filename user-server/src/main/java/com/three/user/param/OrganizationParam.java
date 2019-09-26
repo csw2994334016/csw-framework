@@ -26,9 +26,10 @@ public class OrganizationParam {
     private String orgType; // 组织机构类型，1=部门；2=公司
 
     @NotBlank(message = "父级编号不可以为空")
-    private String pId; // 父级编号
+    @Builder.Default
+    private String parentId = "-1"; // 父级编号
 
-    private String pName; // 父级名称
+    private String parentName; // 父级名称
 
     private Integer sort; // 排序
 

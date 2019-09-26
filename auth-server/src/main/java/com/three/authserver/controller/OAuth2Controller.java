@@ -70,7 +70,7 @@ public class OAuth2Controller {
 //	 *
 //	 * @param access_token
 //	 */
-//	@DeleteMapping(value = "/remove_token", params = "access_token")
+//	@DeleteMapping(id = "/remove_token", params = "access_token")
 //	public void removeToken(Principal principal, String access_token) {
 //		OAuth2AccessToken accessToken = tokenStore.readAccessToken(access_token);
 //		if (accessToken != null) {

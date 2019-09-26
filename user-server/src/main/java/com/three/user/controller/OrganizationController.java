@@ -81,4 +81,10 @@ public class OrganizationController {
     public PageResult<Organization> findAll(String searchKey, String searchValue) {
         return organizationService.findAll(StatusEnum.OK.getCode(), searchKey, searchValue);
     }
+
+    @ApiOperation(value = "查询所有组织机构(树形结构)")
+    @GetMapping("/tree")
+    public JsonResult findAllWithTree() {
+        return JsonResult.ok("查找成功").put("data", organizationService.findAllWithTree(StatusEnum.OK.getCode()));
+    }
 }
