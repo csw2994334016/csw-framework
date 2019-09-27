@@ -6,7 +6,7 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.develop.entity.QuartzJob;
 import com.three.develop.enums.JobStatusEnum;
 import com.three.develop.param.QuartzJobParam;

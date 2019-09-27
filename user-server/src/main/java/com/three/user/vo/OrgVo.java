@@ -22,4 +22,6 @@ public class OrgVo {
 
     @Builder.Default
     private List<OrgVo> children = new ArrayList<>();
+
+    private Integer sort;
 }

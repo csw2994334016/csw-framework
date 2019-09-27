@@ -1,8 +1,7 @@
 package com.three.develop;
 
+import com.three.resource_jpa.EnableCommonResourceJpa;
 import com.three.commonclient.EnableCommonClient;
-import com.three.commonjpa.EnableCommonJpa;
-import com.three.resource_security.EnableResourceSecurity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -12,8 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableCommonClient
-@EnableCommonJpa
-@EnableResourceSecurity
+@EnableCommonResourceJpa
 @EnableAsync
 @EnableSwagger2
 @EnableJpaRepositories("com.three.develop")

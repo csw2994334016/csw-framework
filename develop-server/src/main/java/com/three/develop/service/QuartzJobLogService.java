@@ -3,7 +3,7 @@ package com.three.develop.service;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.develop.entity.QuartzJobLog;
 import com.three.develop.repository.QuartzJobLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;

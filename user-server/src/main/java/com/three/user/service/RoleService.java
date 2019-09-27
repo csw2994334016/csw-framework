@@ -1,7 +1,7 @@
 package com.three.user.service;
 
 import com.three.common.enums.AdminEnum;
-import com.three.resource_security.utils.LoginUserUtil;
+import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
@@ -9,7 +9,7 @@ import com.three.user.param.RoleParam;
 import com.three.user.repository.AuthorityRepository;
 import com.three.user.repository.RoleRepository;
 import com.three.user.repository.UserRepository;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.exception.BusinessException;

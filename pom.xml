@@ -13,8 +13,7 @@
         <module>eureka-server</module>
         <module>common</module>
         <module>common-client</module>
-        <module>common-resource-security</module>
-        <module>common-jpa</module>
+        <module>common-resource-jpa</module>
         <module>log-server</module>
         <module>auth-server</module>
         <module>develop-server</module>

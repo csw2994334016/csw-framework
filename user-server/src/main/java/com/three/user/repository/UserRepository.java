@@ -2,7 +2,7 @@ package com.three.user.repository;
 
 
 import com.three.user.entity.User;
-import com.three.commonjpa.base.repository.BaseRepository;
+import com.three.resource_jpa.jpa.base.repository.BaseRepository;
 
 /**
  * Created by csw on 2019/03/27.

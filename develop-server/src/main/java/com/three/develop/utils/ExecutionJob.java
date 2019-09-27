@@ -1,10 +1,9 @@
 package com.three.develop.utils;
 
 import com.three.common.enums.LogEnum;
-import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.utils.SpringContextHolder;
 import com.three.common.utils.ThrowableUtil;
-import com.three.commonjpa.base.service.GroovyService;
+import com.three.resource_jpa.jpa.base.service.GroovyService;
 import com.three.develop.constants.Job;
 import com.three.develop.entity.QuartzJob;
 import com.three.develop.entity.QuartzJobLog;

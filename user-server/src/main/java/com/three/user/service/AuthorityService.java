@@ -9,7 +9,7 @@ import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.common.vo.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

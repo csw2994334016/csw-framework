@@ -5,7 +5,7 @@ import com.three.common.auth.SysAuthority;
 import com.three.common.auth.SysRole;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
-import com.three.resource_security.utils.LoginUserUtil;
+import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;

@@ -7,9 +7,8 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by csw on 2019-09-22.
+ * Created by csw on 2019-09-27.
  * Description:
  */
 

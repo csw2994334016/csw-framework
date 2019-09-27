@@ -17,11 +17,6 @@
 
     <dependencies>
 
-        <!--<dependency>-->
-            <!--<groupId>com.three</groupId>-->
-            <!--<artifactId>log-starter</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>com.three</groupId>

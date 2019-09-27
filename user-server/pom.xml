@@ -22,16 +22,9 @@
 
         <dependency>
             <groupId>com.three</groupId>
-            <artifactId>common-resource-security</artifactId>
+            <artifactId>common-resource-jpa</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.three</groupId>
-            <artifactId>common-jpa</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
 
     <build>

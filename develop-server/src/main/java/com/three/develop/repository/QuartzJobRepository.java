@@ -1,6 +1,6 @@
 package com.three.develop.repository;
 
-import com.three.commonjpa.base.repository.BaseRepository;
+import com.three.resource_jpa.jpa.base.repository.BaseRepository;
 import com.three.develop.entity.QuartzJob;
 
 import java.util.List;

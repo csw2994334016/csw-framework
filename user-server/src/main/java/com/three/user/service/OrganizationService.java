@@ -8,7 +8,7 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.user.vo.OrgVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,20 +74,39 @@ public class OrganizationService extends BaseService<Organization, String> {
     public List<OrgVo> findAllWithTree(int code) {
         List<Organization> organizationList = organizationRepository.findAllByStatus(code);
 
-        List<OrgVo> parentList = new ArrayList<>();
-        List<OrgVo> orgVoList = new ArrayList<>();
+        Map<String, OrgVo> orgVoMap = new HashMap<>();
         for (Organization organization : organizationList) {
-            OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).parentId(organization.getParentId()).build();
-            orgVoList.add(orgVo);
-            if (orgVo.getParentId().equals("-1")) { // 根节点
-                parentList.add(orgVo);
+            OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).parentId(organization.getParentId()).sort(organization.getSort()).build();
+            orgVoMap.put(orgVo.getId(), orgVo);
+        }
+        List<OrgVo> parentOrgVoList = new ArrayList<>();
+        for (OrgVo orgVo : orgVoMap.values()) {
+            OrgVo parentOrg = orgVoMap.get(orgVo.getParentId());
+            if (parentOrg != null) {
+                parentOrg.getChildren().add(orgVo);
+            } else {
+                parentOrgVoList.add(orgVo);
             }
         }
-        for (OrgVo parent : parentList) {
-            generateTree(parent, orgVoList);
-        }
         // 排序
-        return parentList;
+        sortBySort(parentOrgVoList);
+
+
+//        List<OrgVo> parentList = new ArrayList<>();
+//        List<OrgVo> orgVoList = new ArrayList<>();
+//        for (Organization organization : organizationList) {
+//            OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).parentId(organization.getParentId()).build();
+//            orgVoList.add(orgVo);
+//            if (orgVo.getParentId().equals("-1")) { // 根节点
+//                parentList.add(orgVo);
+//            }
+//        }
+//        for (OrgVo parent : parentList) {
+//            generateTree(parent, orgVoList);
+//        }
+//        // 排序
+//        sortBySort(parentOrgVoList);
+        return parentOrgVoList;
     }
 
     private void generateTree(OrgVo parent, List<OrgVo> orgVoList) {
@@ -95,6 +114,15 @@ public class OrganizationService extends BaseService<Organization, String> {
             if (parent.getId().equals(orgVo.getParentId())) {
                 generateTree(orgVo, orgVoList);
                 parent.getChildren().add(orgVo);
+            }
+        }
+    }
+
+    private void sortBySort(List<OrgVo> orgVoList) {
+        orgVoList.sort(Comparator.comparing(OrgVo::getSort));
+        for (OrgVo orgVo : orgVoList) {
+            if (orgVo.getChildren().size() > 0) {
+                sortBySort(orgVo.getChildren());
             }
         }
     }

@@ -20,12 +20,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.three</groupId>-->
-            <!--<artifactId>log-starter</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-
         <!--客户端-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

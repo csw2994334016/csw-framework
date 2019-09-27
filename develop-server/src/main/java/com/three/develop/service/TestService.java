@@ -1,6 +1,6 @@
 package com.three.develop.service;
 
-import com.three.commonjpa.base.service.GroovyService;
+import com.three.resource_jpa.jpa.base.service.GroovyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

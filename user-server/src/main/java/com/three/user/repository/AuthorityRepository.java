@@ -1,7 +1,7 @@
 package com.three.user.repository;
 
 import com.three.user.entity.Authority;
-import com.three.commonjpa.base.repository.BaseRepository;
+import com.three.resource_jpa.jpa.base.repository.BaseRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
