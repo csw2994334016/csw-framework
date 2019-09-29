@@ -155,4 +155,8 @@ public class RoleService extends BaseService<Role, String> {
 
         userRepository.saveAll(userSet);
     }
+
+    public Role getEntityById(String roleId) {
+        return getEntityById(roleRepository, roleId);
+    }
 }

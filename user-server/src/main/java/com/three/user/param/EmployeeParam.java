@@ -16,22 +16,30 @@ public class EmployeeParam {
 
     private String id;
 
+    @NotBlank(message = "用户名不可以为空")
+    private String username; // 用户名
 
-    private String companyId; // 公司ID，外键关联sys_company.id
-
+    @NotBlank(message = "姓名不可以为空")
     private String fullName; // 姓名
+
+    @NotBlank(message = "手机号不可以为空")
+    private String cellNum; // 手机号
 
     private String empNum; // 员工工号
 
     private String idCardNum; // 身份证号码
+
+    @NotBlank(message = "所在组织机构不可以为空")
+    private String organizationId; // 所在组织
+
+    private String roleIds;
+
 
     private String gender; // 性别
 
     private Date birthday; // 出生日期
 
     private String nation; // 民族
-
-    private String cellNum; // 手机号
 
     private String tellNum; // 固定电话
 

@@ -1,7 +1,5 @@
 package com.three.common.auth;
 
-import com.three.common.auth.SysAuthority;
-import com.three.common.auth.SysRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,21 +18,20 @@ public class LoginUser {
     private Long id;
     private String username;
     private String password;
-    private String nickname;
-    private String headImgUrl;
-    private String phone;
-    private Integer sex;
+    private String fullName; // 姓名
+    private String cellNum; // 手机号
     private Integer isAdmin;
     /**
      * 状态
      */
     private Integer status;
     private Boolean enabled;
-    private String type;
     private Date createDate;
     private Date updateDate;
 
     private Set<SysRole> sysRoles = new HashSet<>();
 
     private Set<SysAuthority> sysAuthorities = new HashSet<>();
+
+    private SysOrganization sysOrganization;
 }

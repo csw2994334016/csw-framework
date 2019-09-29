@@ -1,5 +1,6 @@
 package com.three.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.three.common.enums.StatusEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +9,12 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by csw on 2019-09-22.
@@ -30,14 +34,16 @@ public class Employee implements Serializable {
     @Column(name = "id", columnDefinition = "varchar(36) comment '主键ID'")
     private String id;
 
+    @Column(nullable = false, unique = true, columnDefinition = "varchar(36) comment '账号'")
+    private String username; // 账号
 
-    @Column(name = "organization_id", columnDefinition = "varchar(36) comment '组织机构ID，关联sys_organization.id'")
-    private String organizationId; // 组织机构ID，关联sys_organization.id
-
-    @Column(name = "full_name", columnDefinition = "varchar(50) comment '姓名'")
+    @Column(name = "full_name", nullable = false, columnDefinition = "varchar(50) comment '姓名'")
     private String fullName; // 姓名
 
-    @Column(name = "emp_num", unique = true, columnDefinition = "varchar(100) comment '员工工号'")
+    @Column(name = "cell_num", unique = true, columnDefinition = "varchar(30) comment '手机号'")
+    private String cellNum; // 手机号
+
+    @Column(name = "emp_num", columnDefinition = "varchar(100) comment '员工工号'")
     private String empNum; // 员工工号
 
     @Column(name = "id_card_num", unique = true, columnDefinition = "varchar(255) comment '身份证号码'")
@@ -54,9 +60,6 @@ public class Employee implements Serializable {
 
     @Column(name = "nation", columnDefinition = "varchar(30) comment '民族'")
     private String nation; // 民族
-
-    @Column(name = "cell_num", unique = true, columnDefinition = "varchar(30) comment '手机号'")
-    private String cellNum; // 手机号
 
     @Column(name = "tell_num", columnDefinition = "varchar(30) comment '固定电话'")
     private String tellNum; // 固定电话
@@ -130,6 +133,17 @@ public class Employee implements Serializable {
     @Column(name = "last_edit_user_name", columnDefinition = "varchar(255) comment '最后编辑用户姓名'")
     private String lastEditUserName; // 最后编辑用户姓名
 
+    @OneToOne()
+    @JoinColumn(name = "organization_id", referencedColumnName = "id")
+    private Organization organization; // 组织机构
+
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.MERGE, optional = false) // 关联关系被谁维护，非必填，只有关系维护方才能操作两者的关系，被维护方即使设置了维护方的属性进行存储也不会更新外键关联
+    @JsonIgnore
+    private User user;
+
+    @Transient
+    private Set<Role> roles;
+
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
     private String remark; // 描述/备注
@@ -143,5 +157,8 @@ public class Employee implements Serializable {
     @LastModifiedDate
     private Date updateDate; // 修改时间
 
+    public Set<Role> getRoles() {
+        return user.getRoles();
+    }
 
 }

@@ -1,5 +1,8 @@
 package com.three.user.service;
 
+import com.three.common.auth.LoginUser;
+import com.three.common.enums.StatusEnum;
+import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Organization;
 import com.three.user.repository.OrganizationRepository;
 import com.three.user.param.OrganizationParam;
@@ -74,6 +77,12 @@ public class OrganizationService extends BaseService<Organization, String> {
     public List<OrgVo> findAllWithTree(int code) {
         List<Organization> organizationList = organizationRepository.findAllByStatus(code);
 
+        LoginUser loginUser = LoginUserUtil.getLoginUser();
+        if (loginUser != null && loginUser.getSysOrganization() != null && !"-1".equals(loginUser.getSysOrganization().getFirstParentId())) {
+            organizationList = organizationRepository.findAllByFirstParentIdAndStatus(loginUser.getSysOrganization().getFirstParentId(), code);
+            organizationList.add(getEntityById(loginUser.getSysOrganization().getFirstParentId()));
+        }
+
         Map<String, OrgVo> orgVoMap = new HashMap<>();
         for (Organization organization : organizationList) {
             OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).parentId(organization.getParentId()).sort(organization.getSort()).build();
@@ -124,6 +133,35 @@ public class OrganizationService extends BaseService<Organization, String> {
             if (orgVo.getChildren().size() > 0) {
                 sortBySort(orgVo.getChildren());
             }
+        }
+    }
+
+    public Organization getEntityById(String organizationId) {
+        return getEntityById(organizationRepository, organizationId);
+    }
+
+    public List<Organization> getOrganizationListByParentId(String parentId) {
+        List<Organization> organizationList = new ArrayList<>();
+        List<Organization> organizationList1 = organizationRepository.findAllByStatus(StatusEnum.OK.getCode());
+        Map<String, Organization> organizationMap = new HashMap<>();
+        for (Organization organization : organizationList1) {
+            organizationMap.put(organization.getId(), organization);
+        }
+        for (Organization organization : organizationList1) {
+            Organization parentOrg = organizationMap.get(organization.getParentId());
+            if (parentOrg != null) {
+                parentOrg.getChildren().add(organization);
+            }
+        }
+        getChildren(parentId, organizationMap, organizationList);
+        organizationList.add(organizationMap.get(parentId));
+        return organizationList;
+    }
+
+    private void getChildren(String parentId, Map<String, Organization> organizationMap, List<Organization> organizationList) {
+        for (Organization organization : organizationMap.get(parentId).getChildren()) {
+            organizationList.add(organization);
+            getChildren(organization.getId(), organizationMap, organizationList);
         }
     }
 }

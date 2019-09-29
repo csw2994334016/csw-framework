@@ -2,6 +2,7 @@ package com.three.user.controller;
 
 import com.three.common.auth.LoginUser;
 import com.three.common.auth.SysAuthority;
+import com.three.common.auth.SysOrganization;
 import com.three.common.auth.SysRole;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
@@ -68,6 +69,12 @@ public class SysController {
                 sysAuthority = (SysAuthority) BeanCopyUtil.copyBean(authority, sysAuthority);
                 loginUser.getSysAuthorities().add(sysAuthority);
             }
+        }
+
+        if (user.getEmployee() != null) { // 除非admin用户，不然一般都会有员工信息
+            SysOrganization sysOrganization = new SysOrganization();
+            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(user.getEmployee().getOrganization(), sysOrganization);
+            loginUser.setSysOrganization(sysOrganization);
         }
         return loginUser;
     }

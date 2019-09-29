@@ -150,9 +150,9 @@ public class SysTokenController {
 
         Map<String, Object> refreshTokenMap = oauth2Client.postAccessToken(parameters);
 
-        if (refreshTokenMap != null) {
-            oauth2Client.removeToken(access_token);
-        }
+//        if (refreshTokenMap != null) {
+//            oauth2Client.removeToken(access_token);
+//        }
         return refreshTokenMap;
     }
 

@@ -10,7 +10,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by  on 2019-09-22.
@@ -47,7 +49,10 @@ public class Organization implements Serializable {
     private String deptId; // 部门ID(部门详细信息)
 
     @Column(name = "parent_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '父级机构ID'")
-    private String parentId = "0"; // 父级机构ID
+    private String parentId = "-1"; // 父级机构ID
+
+    @Column(name = "first_parent_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '一级父级机构ID'")
+    private String firstParentId = "-1"; // 父级机构ID
 
     @Column(name = "parent_name", columnDefinition = "varchar(100) comment '父级机构名称'")
     private String parentName; // 父级机构名称
@@ -55,8 +60,8 @@ public class Organization implements Serializable {
     @Column(name = "parent_ids", columnDefinition = "varchar(800) comment '所有父级ID'")
     private String parentIds; // 所有父级ID
 
-    @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 1 comment '排序'")
-    private Integer sort = 1; // 排序
+    @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 100 comment '排序'")
+    private Integer sort = 100; // 排序
 
     @Column(name = "attn_list", columnDefinition = "varchar(1000) comment '初审人'")
     private String attnList; // 初审人
@@ -76,6 +81,9 @@ public class Organization implements Serializable {
 
     @LastModifiedDate
     private Date updateDate; // 修改时间
+
+    @Transient
+    private List<Organization> children = new ArrayList<>();
 
 
 }

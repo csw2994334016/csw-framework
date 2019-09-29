@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -69,5 +70,54 @@ public class EmployeeController {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);
         return employeeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+    }
+
+    @LogAnnotation(module = "分配角色")
+    @ApiOperation(value = "分配角色", notes = "")
+    @ApiImplicitParam(name = "EmployeeParam", value = "员工信息", required = true, dataType = "employeeParam")
+    @PutMapping("/assignRole")
+    public JsonResult assignRole(@RequestBody EmployeeParam employeeParam) {
+        employeeService.assignRole(employeeParam);
+        return JsonResult.ok("修改成功");
+    }
+
+    @LogAnnotation(module = "修改员工状态")
+    @ApiOperation(value = "修改员工状态", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "员工信息ids", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "状态：1正常，2冻结，3删除", required = true, dataType = "Integer")
+    })
+    @PutMapping("/status")
+    public JsonResult updateState(String ids, Integer status) {
+        employeeService.updateState(ids, status);
+        return JsonResult.ok();
+    }
+
+    @LogAnnotation(module = "修改密码")
+    @ApiOperation(value = "修改密码", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "oldPsw", value = "原密码", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "newPsw", value = "新密码", required = true, dataType = "String")
+    })
+    @PutMapping("/psw")
+    public JsonResult updatePsw(String oldPsw, String newPsw) {
+        String finalSecret = new BCryptPasswordEncoder().encode(oldPsw);
+        employeeService.updatePsw(finalSecret, newPsw);
+        return JsonResult.ok("密码修改成功");
+    }
+
+    @ApiOperation(value = "查找所有员工(按角色)", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "searchKey", value = "筛选条件字段", dataType = "String"),
+            @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String"),
+            @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
+    })
+    @PostMapping("/findByRole")
+    public PageResult<Employee> queryByRole(Integer page, Integer limit, String roleId, String searchKey, String searchValue) {
+        PageQuery pageQuery = new PageQuery(page, limit);
+        return employeeService.findByRole(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue, roleId);
     }
 }

@@ -29,9 +29,14 @@ public class OrganizationParam {
     @Builder.Default
     private String parentId = "-1"; // 父级编号
 
+    private String parentIds; //
+
+    private String firstParentId; // 父级机构ID
+
     private String parentName; // 父级名称
 
-    private Integer sort; // 排序
+    @Builder.Default
+    private Integer sort = 100; // 排序
 
 
     private String remark;

@@ -27,6 +27,8 @@ public class SysUserService {
         sysUser.setSysRoles(sysUser.getSysRoles());
         sysUser.setSysAuthorities(sysUser.getSysAuthorities());
 
+        sysUser.setSysOrganization(loginUser.getSysOrganization());
+
         return sysUser;
     }
 

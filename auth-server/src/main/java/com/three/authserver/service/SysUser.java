@@ -2,6 +2,7 @@ package com.three.authserver.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.three.common.auth.SysAuthority;
+import com.three.common.auth.SysOrganization;
 import com.three.common.auth.SysRole;
 import com.three.common.enums.StatusEnum;
 import lombok.Getter;
@@ -44,6 +45,8 @@ public class SysUser implements UserDetails {
     private Set<SysRole> sysRoles;
 
     private Set<SysAuthority> sysAuthorities;
+
+    private SysOrganization sysOrganization;
 
     @JsonIgnore
     @Override
