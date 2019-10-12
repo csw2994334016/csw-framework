@@ -3,6 +3,7 @@ package com.three.authserver.controller;
 import com.three.authserver.feign.LogClient;
 import com.three.common.log.Log;
 import com.three.common.utils.LogUtil;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
+@Api(value = "系统管理", tags = "系统管理")
 @RestController
 @RequestMapping
 public class OAuth2Controller {

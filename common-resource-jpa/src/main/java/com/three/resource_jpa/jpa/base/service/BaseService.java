@@ -54,6 +54,7 @@ public class BaseService<T, ID> {
         return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
     }
 
+
     // 分页，添加查询条件
     public PageResult<T> query(BaseRepository baseRepository, PageQuery pageQuery, Sort sort, Specification<T> specification) {
         Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), sort);

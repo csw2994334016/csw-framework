@@ -89,10 +89,10 @@ public class UserService extends BaseService<User, String> {
         Sort sort = new Sort(Sort.Direction.ASC, "createDate");
         Specification<User> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
-            SetJoin<User, Role> roles = root.join(root.getModel().getSet("roles", Role.class), JoinType.LEFT);
-            predicateList.add(roles.in(getEntityById(roleRepository, roleId)));
             Specification<User> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
             predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
+            SetJoin<User, Role> roles = root.join(root.getModel().getSet("roles", Role.class), JoinType.LEFT);
+            predicateList.add(roles.in(getEntityById(roleRepository, roleId)));
             Predicate[] predicates = new Predicate[predicateList.size()];
             return criteriaBuilder.and(predicateList.toArray(predicates));
         };

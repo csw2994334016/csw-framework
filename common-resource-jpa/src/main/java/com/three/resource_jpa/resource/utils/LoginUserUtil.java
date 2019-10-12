@@ -2,6 +2,7 @@ package com.three.resource_jpa.resource.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.three.common.auth.LoginUser;
+import com.three.common.enums.AdminEnum;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,5 +41,18 @@ public class LoginUserUtil {
             return loginUser.getUsername();
         }
         return null;
+    }
+
+    public static String getLoginUserFirstOrganizationId() {
+        LoginUser loginUser = getLoginUser();
+        if (loginUser != null && loginUser.getSysOrganization() != null) {
+            return loginUser.getSysOrganization().getFirstParentId();
+        }
+        return null;
+    }
+
+    public static boolean isAdmin() {
+        LoginUser loginUser = getLoginUser();
+        return loginUser != null && AdminEnum.YES.getCode() == loginUser.getIsAdmin();
     }
 }

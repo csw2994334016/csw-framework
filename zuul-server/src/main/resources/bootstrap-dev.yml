@@ -34,6 +34,9 @@ zuul:
     three-user-server:
       path: /three-user-server/**
       serviceId: user-server
+    three-points-server:
+      path: /three-points-server/**
+      serviceId: points-server
   host:
     connect-timeout-millis: 600000
     socket-timeout-millis: 600000

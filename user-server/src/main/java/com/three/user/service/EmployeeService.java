@@ -1,7 +1,6 @@
 package com.three.user.service;
 
 import com.google.common.collect.Lists;
-import com.three.common.auth.LoginUser;
 import com.three.commonclient.exception.ParameterException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Employee;
@@ -107,21 +106,27 @@ public class EmployeeService extends BaseService<Employee, String> {
 
     public PageResult<Employee> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
-        List<Organization> organizationSet;
-        if ("organizationId".equals(searchKey)) {
-           organizationSet = organizationService.getOrganizationListByParentId(searchValue);
-        } else {
-            organizationSet = organizationService.getOrganizationListByParentId(Objects.requireNonNull(LoginUserUtil.getLoginUser()).getSysOrganization().getId());
-        }
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
             if (!"organizationId".equals(searchKey)) {
                 Specification<Employee> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
                 predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
             }
-            CriteriaBuilder.In<Organization> in = criteriaBuilder.in(root.get("organization"));
-            organizationSet.forEach(in::value);
-            predicateList.add(in);
+            // 按组织机构查询人员信息
+            List<Organization> organizationList = new ArrayList<>();
+            if ("organizationId".equals(searchKey)) {
+                organizationList = organizationService.getChildOrganizationListByOrgId(searchValue);
+            } else {
+                String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
+                if (firstParentId != null) {
+                    organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
+                }
+            }
+            if (organizationList.size() > 0) {
+                CriteriaBuilder.In<Organization> in = criteriaBuilder.in(root.get("organization"));
+                organizationList.forEach(in::value);
+                predicateList.add(in);
+            }
             Predicate[] predicates = new Predicate[predicateList.size()];
             return criteriaBuilder.and(predicateList.toArray(predicates));
         };

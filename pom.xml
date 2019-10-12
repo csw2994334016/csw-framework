@@ -18,6 +18,7 @@
         <module>auth-server</module>
         <module>develop-server</module>
         <module>user-server</module>
+        <module>points-server</module>
         <module>zuul-server</module>
     </modules>
 

@@ -39,7 +39,7 @@ public class User implements Serializable {
     @Column(name = "full_name", nullable = false, columnDefinition = "varchar(50) comment '姓名'")
     private String fullName; // 姓名
 
-    @Column(name = "cell_num", unique = true, columnDefinition = "varchar(30) comment '手机号'")
+    @Column(name = "cell_num", nullable = false, columnDefinition = "varchar(30) comment '手机号'")
     private String cellNum; // 手机号
 
     @JsonIgnore

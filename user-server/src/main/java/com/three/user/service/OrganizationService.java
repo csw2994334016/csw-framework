@@ -1,6 +1,7 @@
 package com.three.user.service;
 
 import com.three.common.auth.LoginUser;
+import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Organization;
@@ -14,10 +15,12 @@ import com.three.commonclient.utils.BeanValidator;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.user.vo.OrgVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
+import javax.persistence.criteria.Predicate;
 import java.util.*;
 
 /**
@@ -66,21 +69,41 @@ public class OrganizationService extends BaseService<Organization, String> {
 
     public PageResult<Organization> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
-        return query(organizationRepository, pageQuery, sort, code, searchKey, searchValue);
+        String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        Specification<Organization> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            Specification<Organization> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
+            if (firstParentId != null) { // 根据当前登录用户，查找该公司的所有组织机构
+                predicateList.add(criteriaBuilder.equal(root.get("firstParentId"), firstParentId));
+            }
+            predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
+            Predicate[] predicates = new Predicate[predicateList.size()];
+            return criteriaBuilder.and(predicateList.toArray(predicates));
+        };
+        if (pageQuery != null) {
+            return query(organizationRepository, pageQuery, sort, specification);
+        } else {
+            return query(organizationRepository, sort, specification);
+        }
+
     }
 
     public PageResult<Organization> findAll(int code, String searchKey, String searchValue) {
-        Sort sort = new Sort(Sort.Direction.ASC, "sort");
-        return findAll(organizationRepository, sort, code, searchKey, searchValue);
+        return query(null, code, searchKey, searchValue);
     }
 
     public List<OrgVo> findAllWithTree(int code) {
-        List<Organization> organizationList = organizationRepository.findAllByStatus(code);
+        List<Organization> organizationList = new ArrayList<>();
 
         LoginUser loginUser = LoginUserUtil.getLoginUser();
-        if (loginUser != null && loginUser.getSysOrganization() != null && !"-1".equals(loginUser.getSysOrganization().getFirstParentId())) {
-            organizationList = organizationRepository.findAllByFirstParentIdAndStatus(loginUser.getSysOrganization().getFirstParentId(), code);
-            organizationList.add(getEntityById(loginUser.getSysOrganization().getFirstParentId()));
+        if (loginUser != null) {
+            if (loginUser.getSysOrganization() != null) {
+                organizationList = organizationRepository.findAllByFirstParentIdAndStatus(loginUser.getSysOrganization().getFirstParentId(), code);
+            } else {
+                if (loginUser.getIsAdmin().equals(AdminEnum.YES.getCode())) {
+                    organizationList = organizationRepository.findAllByStatus(code); // 默认admin账号可以查看全库所有组织机构
+                }
+            }
         }
 
         Map<String, OrgVo> orgVoMap = new HashMap<>();
@@ -99,32 +122,7 @@ public class OrganizationService extends BaseService<Organization, String> {
         }
         // 排序
         sortBySort(parentOrgVoList);
-
-
-//        List<OrgVo> parentList = new ArrayList<>();
-//        List<OrgVo> orgVoList = new ArrayList<>();
-//        for (Organization organization : organizationList) {
-//            OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).parentId(organization.getParentId()).build();
-//            orgVoList.add(orgVo);
-//            if (orgVo.getParentId().equals("-1")) { // 根节点
-//                parentList.add(orgVo);
-//            }
-//        }
-//        for (OrgVo parent : parentList) {
-//            generateTree(parent, orgVoList);
-//        }
-//        // 排序
-//        sortBySort(parentOrgVoList);
         return parentOrgVoList;
-    }
-
-    private void generateTree(OrgVo parent, List<OrgVo> orgVoList) {
-        for (OrgVo orgVo : orgVoList) {
-            if (parent.getId().equals(orgVo.getParentId())) {
-                generateTree(orgVo, orgVoList);
-                parent.getChildren().add(orgVo);
-            }
-        }
     }
 
     private void sortBySort(List<OrgVo> orgVoList) {
@@ -136,26 +134,26 @@ public class OrganizationService extends BaseService<Organization, String> {
         }
     }
 
-    public Organization getEntityById(String organizationId) {
+    Organization getEntityById(String organizationId) {
         return getEntityById(organizationRepository, organizationId);
     }
 
-    public List<Organization> getOrganizationListByParentId(String parentId) {
-        List<Organization> organizationList = new ArrayList<>();
-        List<Organization> organizationList1 = organizationRepository.findAllByStatus(StatusEnum.OK.getCode());
+    List<Organization> getChildOrganizationListByOrgId(String orgId) {
+        List<Organization> childOrganizationList = new ArrayList<>();
+        List<Organization> organizationList = findAll(StatusEnum.OK.getCode(), null, null).getData();
         Map<String, Organization> organizationMap = new HashMap<>();
-        for (Organization organization : organizationList1) {
+        for (Organization organization : organizationList) {
             organizationMap.put(organization.getId(), organization);
         }
-        for (Organization organization : organizationList1) {
+        for (Organization organization : organizationList) {
             Organization parentOrg = organizationMap.get(organization.getParentId());
             if (parentOrg != null) {
                 parentOrg.getChildren().add(organization);
             }
         }
-        getChildren(parentId, organizationMap, organizationList);
-        organizationList.add(organizationMap.get(parentId));
-        return organizationList;
+        getChildren(orgId, organizationMap, childOrganizationList);
+        childOrganizationList.add(organizationMap.get(orgId));
+        return childOrganizationList;
     }
 
     private void getChildren(String parentId, Map<String, Organization> organizationMap, List<Organization> organizationList) {

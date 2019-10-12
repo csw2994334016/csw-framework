@@ -33,7 +33,7 @@ public class Organization implements Serializable {
     private String id;
 
 
-    @Column(name = "org_name", nullable = false, unique = true, columnDefinition = "varchar(100) comment '组织机构名称'")
+    @Column(name = "org_name", nullable = false, columnDefinition = "varchar(100) comment '组织机构名称'")
     private String orgName; // 组织机构名称
 
     @Column(name = "org_code", nullable = false, unique = true, columnDefinition = "varchar(100) comment '组织机构编码'")
@@ -51,8 +51,8 @@ public class Organization implements Serializable {
     @Column(name = "parent_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '父级机构ID'")
     private String parentId = "-1"; // 父级机构ID
 
-    @Column(name = "first_parent_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '一级父级机构ID'")
-    private String firstParentId = "-1"; // 父级机构ID
+    @Column(name = "first_parent_id", nullable = false, columnDefinition = "varchar(36) comment '一级父级机构ID'")
+    private String firstParentId; // 一级父级机构ID
 
     @Column(name = "parent_name", columnDefinition = "varchar(100) comment '父级机构名称'")
     private String parentName; // 父级机构名称

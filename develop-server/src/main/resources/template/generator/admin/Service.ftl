@@ -9,7 +9,7 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.commonjpa.base.service.BaseService;
+import com.three.resource_jpa.jpa.base.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

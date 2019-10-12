@@ -40,7 +40,7 @@ public class Employee implements Serializable {
     @Column(name = "full_name", nullable = false, columnDefinition = "varchar(50) comment '姓名'")
     private String fullName; // 姓名
 
-    @Column(name = "cell_num", unique = true, columnDefinition = "varchar(30) comment '手机号'")
+    @Column(name = "cell_num", nullable = false, columnDefinition = "varchar(30) comment '手机号'")
     private String cellNum; // 手机号
 
     @Column(name = "emp_num", columnDefinition = "varchar(100) comment '员工工号'")
@@ -103,8 +103,8 @@ public class Employee implements Serializable {
     @Column(name = "join_date", columnDefinition = "datetime comment '入职日期'")
     private Date joinDate; // 入职日期
 
-    @Column(name = "title_level", columnDefinition = "varchar(255) comment '职称'")
-    private String titleLevel; // 职称
+    @Column(name = "title_level", columnDefinition = "varchar(255) comment '职位'")
+    private String titleLevel; // 职位
 
     @Column(name = "emp_status", columnDefinition = "int(2) comment '职位状态：1=在职；2=不在职'")
     private Integer empStatus; // 职位状态：1=在职；2=不在职
