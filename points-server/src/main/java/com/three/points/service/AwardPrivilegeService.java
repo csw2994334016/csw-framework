@@ -7,7 +7,10 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.points.entity.AwardPrivilege;
+import com.three.points.entity.AwardPrivilegeEmployee;
+import com.three.points.param.AwardPrivilegeEmployeeParam;
 import com.three.points.param.AwardPrivilegeParam;
+import com.three.points.repository.AwardPrivilegeEmployeeRepository;
 import com.three.points.repository.AwardPrivilegeRepository;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -26,10 +29,13 @@ import java.util.Set;
  */
 
 @Service
-public class AwardPrivilegeService extends BaseService<AwardPrivilege,  String> {
+public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
 
     @Autowired
     private AwardPrivilegeRepository awardPrivilegeRepository;
+
+    @Autowired
+    private AwardPrivilegeEmployeeRepository awardPrivilegeEmployeeRepository;
 
     @Transactional
     public void create(AwardPrivilegeParam awardPrivilegeParam) {
@@ -64,6 +70,10 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege,  String> 
         }
 
         awardPrivilegeRepository.saveAll(awardPrivilegeList);
+
+        for (AwardPrivilege awardPrivilege : awardPrivilegeList) {
+            awardPrivilegeEmployeeRepository.deleteByAwardPrivilegeId(awardPrivilege.getId());
+        }
     }
 
     public PageResult<AwardPrivilege> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
@@ -71,4 +81,22 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege,  String> 
         return query(awardPrivilegeRepository, pageQuery, sort, code, searchKey, searchValue);
     }
 
+    @Transactional
+    public void bindEmployee(AwardPrivilegeEmployeeParam awardPrivilegeEmployeeParam) {
+        BeanValidator.check(awardPrivilegeEmployeeParam);
+
+        awardPrivilegeEmployeeRepository.deleteByAwardPrivilegeId(awardPrivilegeEmployeeParam.getAwardPrivilegeId());
+
+        List<AwardPrivilegeEmployee> awardPrivilegeEmployeeList = new ArrayList<>();
+        for (String employeeId : awardPrivilegeEmployeeParam.getEmployeeIdList()) {
+            AwardPrivilegeEmployee awardPrivilegeEmployee = new AwardPrivilegeEmployee();
+            awardPrivilegeEmployee.setAwardPrivilegeId(awardPrivilegeEmployeeParam.getAwardPrivilegeId());
+            awardPrivilegeEmployee.setEmployeeId(employeeId);
+            awardPrivilegeEmployeeList.add(awardPrivilegeEmployee);
+        }
+
+        if (awardPrivilegeEmployeeList.size() > 0) {
+            awardPrivilegeEmployeeRepository.saveAll(awardPrivilegeEmployeeList);
+        }
+    }
 }

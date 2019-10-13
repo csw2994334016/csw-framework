@@ -31,7 +31,7 @@ public class OrganizationParam {
 
     private String parentIds; //
 
-    private String firstParentId; // 父级机构ID
+    private String firstParentId; // 一级父级机构ID
 
     private String parentName; // 父级名称
 

@@ -34,6 +34,7 @@ public class Employee implements Serializable {
     @Column(name = "id", columnDefinition = "varchar(36) comment '主键ID'")
     private String id;
 
+
     @Column(nullable = false, unique = true, columnDefinition = "varchar(36) comment '账号'")
     private String username; // 账号
 

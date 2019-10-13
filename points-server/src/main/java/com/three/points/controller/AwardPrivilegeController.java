@@ -7,6 +7,7 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.points.entity.AwardPrivilege;
+import com.three.points.param.AwardPrivilegeEmployeeParam;
 import com.three.points.param.AwardPrivilegeParam;
 import com.three.points.service.AwardPrivilegeService;
 import io.swagger.annotations.Api;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Api(value = "奖扣权限设置", tags = "奖扣权限设置")
 @RestController
-@RequestMapping("/sys/awardPrivileges")
+@RequestMapping("/points/awardPrivileges")
 public class AwardPrivilegeController {
 
     @Autowired
@@ -69,5 +70,14 @@ public class AwardPrivilegeController {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);
         return awardPrivilegeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+    }
+
+    @LogAnnotation(module = "添加人员")
+    @ApiOperation(value = "添加人员")
+    @ApiImplicitParam(name = "awardPrivilegeParam", value = "添加人员信息", required = true, dataType = "AwardPrivilegeEmployeeParam")
+    @PostMapping("/bindEmployee")
+    public JsonResult bindEmployee(@RequestBody AwardPrivilegeEmployeeParam awardPrivilegeEmployeeParam) {
+        awardPrivilegeService.bindEmployee(awardPrivilegeEmployeeParam);
+        return JsonResult.ok("添加人员成功");
     }
 }
