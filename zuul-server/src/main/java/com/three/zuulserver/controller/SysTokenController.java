@@ -1,6 +1,5 @@
 package com.three.zuulserver.controller;
 
-import com.three.common.constants.SystemClientConstant;
 import com.three.common.log.Log;
 import com.three.common.utils.LogUtil;
 import com.three.common.vo.JsonResult;
@@ -141,12 +140,12 @@ public class SysTokenController {
      * @return
      */
     @PostMapping("/sys/refresh_token")
-    public Map<String, Object> refresh_token(String access_token, String refresh_token) {
+    public Map<String, Object> refresh_token(String refresh_token, String client_id, String client_secret, String scope) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "refresh_token");
-        parameters.put(CLIENT_ID, SystemClientConstant.CLIENT_ID);
-        parameters.put("client_secret", SystemClientConstant.CLIENT_SECRET);
-        parameters.put(SCOPE, SystemClientConstant.CLIENT_SCOPE);
+        parameters.put(CLIENT_ID, client_id);
+        parameters.put("client_secret", client_secret);
+        parameters.put(SCOPE, scope);
         parameters.put("refresh_token", refresh_token);
 
         Map<String, Object> refreshTokenMap = oauth2Client.postAccessToken(parameters);
