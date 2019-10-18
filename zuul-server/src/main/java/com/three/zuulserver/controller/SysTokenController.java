@@ -44,12 +44,12 @@ public class SysTokenController {
      * @return
      */
     @PostMapping("/sys/login")
-    public Map<String, Object> login(String username, String password, String clientId, String clientSecret, String clientScope) {
+    public Map<String, Object> login(String username, String password, String client_id, String client_secret, String scope) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "password");
-        parameters.put(CLIENT_ID, clientId);
-        parameters.put("client_secret", clientSecret);
-        parameters.put(SCOPE, clientScope);
+        parameters.put(CLIENT_ID, client_id);
+        parameters.put("client_secret", client_secret);
+        parameters.put(SCOPE, scope);
         parameters.put("username", username);
 //        // 为了支持多类型登录，这里在username后拼装上登录类型
 //        parameters.put("username", username + "|" + CredentialType.USERNAME.name());
