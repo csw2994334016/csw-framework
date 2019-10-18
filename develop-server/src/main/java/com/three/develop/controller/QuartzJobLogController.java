@@ -40,8 +40,7 @@ public class QuartzJobLogController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段(任务名称)", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", dataType = "String"),
-            @ApiImplicitParam(name = "endDate", value = "结束日期", dataType = "String"),
-            @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
+            @ApiImplicitParam(name = "endDate", value = "结束日期", dataType = "String")
     })
     @PostMapping("/query")
     public PageResult<QuartzJobLog> query(Integer page, Integer limit, String searchKey, String searchValue, String startDate, String endDate) {

@@ -62,8 +62,7 @@ public class EmployeeController {
             @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String"),
-            @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
+            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @PostMapping("/query")
     public PageResult<Employee> query(Integer page, Integer limit, String searchKey, String searchValue) {
@@ -112,8 +111,7 @@ public class EmployeeController {
             @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataType = "String"),
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段", dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String"),
-            @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
+            @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String")
     })
     @PostMapping("/findByRole")
     public PageResult<Employee> queryByRole(Integer page, Integer limit, String roleId, String searchKey, String searchValue) {

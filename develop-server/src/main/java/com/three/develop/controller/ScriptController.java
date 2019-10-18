@@ -56,8 +56,7 @@ public class ScriptController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "searchValue", value = "脚本名称", dataType = "String"),
-            @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
+            @ApiImplicitParam(name = "searchValue", value = "脚本名称", dataType = "String")
     })
     @PostMapping("/query")
     public PageResult<Script> query(Integer page, Integer limit, String searchValue) {

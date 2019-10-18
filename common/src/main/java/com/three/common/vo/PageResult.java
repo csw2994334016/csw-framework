@@ -24,14 +24,14 @@ public class PageResult<T> {
     public PageResult(List<T> rows) {
         this.data = rows;
         this.count = rows.size();
-        this.code = 0;
+        this.code = 200;
         this.msg = "";
     }
 
     public PageResult(long total, List<T> rows) {
         this.count = total;
         this.data = rows;
-        this.code = 0;
+        this.code = 200;
         this.msg = "";
     }
 
