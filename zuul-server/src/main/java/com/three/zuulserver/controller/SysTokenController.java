@@ -6,6 +6,7 @@ import com.three.common.utils.LogUtil;
 import com.three.common.vo.JsonResult;
 import com.three.zuulserver.feign.LogClient;
 import com.three.zuulserver.feign.Oauth2Client;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +44,12 @@ public class SysTokenController {
      * @return
      */
     @PostMapping("/sys/login")
-    public Map<String, Object> login(String username, String password) {
+    public Map<String, Object> login(String username, String password, String clientId, String clientSecret, String clientScope) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "password");
-        parameters.put(CLIENT_ID, SystemClientConstant.CLIENT_ID);
-        parameters.put("client_secret", SystemClientConstant.CLIENT_SECRET);
-        parameters.put(SCOPE, SystemClientConstant.CLIENT_SCOPE);
+        parameters.put(CLIENT_ID, clientId);
+        parameters.put("client_secret", clientSecret);
+        parameters.put(SCOPE, clientScope);
         parameters.put("username", username);
 //        // 为了支持多类型登录，这里在username后拼装上登录类型
 //        parameters.put("username", username + "|" + CredentialType.USERNAME.name());
