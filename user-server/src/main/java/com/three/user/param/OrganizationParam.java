@@ -1,5 +1,6 @@
 package com.three.user.param;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,24 +19,31 @@ public class OrganizationParam {
 
 
     @NotBlank(message = "组织机构名称不可以为空")
+    @ApiModelProperty("组织机构名称")
     private String orgName; // 组织机构名称
 
     @NotBlank(message = "组织机构编码不可以为空")
+    @ApiModelProperty("组织机构编码")
     private String orgCode; // 组织机构编码
 
+    @ApiModelProperty("组织机构类型")
     private String orgType; // 组织机构类型，1=部门；2=公司
 
     @NotBlank(message = "父级编号不可以为空")
     @Builder.Default
+    @ApiModelProperty("父级编号")
     private String parentId = "-1"; // 父级编号
 
     private String parentIds; //
 
+    @ApiModelProperty("一级父级机构ID")
     private String firstParentId; // 一级父级机构ID
 
+    @ApiModelProperty("父级名称")
     private String parentName; // 父级名称
 
     @Builder.Default
+    @ApiModelProperty("排序")
     private Integer sort = 100; // 排序
 
 

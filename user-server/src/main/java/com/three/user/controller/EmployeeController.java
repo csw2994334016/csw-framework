@@ -9,10 +9,7 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +29,7 @@ public class EmployeeController {
 
     @LogAnnotation(module = "添加员工信息")
     @ApiOperation(value = "添加员工信息")
-    @ApiImplicitParam(name = "employeeParam", value = "员工信息信息", required = true, dataType = "EmployeeParam")
+    @ApiImplicitParam(name = "employeeParam", value = "员工信息", required = true, dataType = "EmployeeParam")
     @PostMapping()
     public JsonResult create(@RequestBody EmployeeParam employeeParam) {
         employeeService.create(employeeParam);
@@ -41,7 +38,7 @@ public class EmployeeController {
 
     @LogAnnotation(module = "修改员工信息")
     @ApiOperation(value = "修改员工信息")
-    @ApiImplicitParam(name = "employeeParam", value = "员工信息信息", required = true, dataType = "EmployeeParam")
+    @ApiImplicitParam(name = "employeeParam", value = "员工信息", required = true, dataType = "EmployeeParam")
     @PutMapping()
     public JsonResult update(@RequestBody EmployeeParam employeeParam) {
         employeeService.update(employeeParam);
@@ -50,7 +47,7 @@ public class EmployeeController {
 
     @LogAnnotation(module = "删除员工信息")
     @ApiOperation(value = "删除员工信息")
-    @ApiImplicitParam(name = "ids", value = "员工信息信息ids", required = true, dataType = "String")
+    @ApiImplicitParam(name = "ids", value = "员工信息ids", required = true, dataType = "String")
     @DeleteMapping()
     public JsonResult delete(String ids) {
         employeeService.delete(ids, StatusEnum.DELETE.getCode());

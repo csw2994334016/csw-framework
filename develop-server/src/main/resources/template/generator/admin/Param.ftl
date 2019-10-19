@@ -1,5 +1,6 @@
 package ${package}.param;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ public class ${className}Param {
         <#if column.columnName != 'id'>
             <#if column.isNullable == false>
     @NotBlank(message = "${column.columnComment}不可以为空")
+    @ApiModelProperty("${column.columnComment}")
             </#if>
     private ${column.columnType} ${column.columnName};<#if column.columnComment != ''> // ${column.columnComment}</#if>
         </#if>
