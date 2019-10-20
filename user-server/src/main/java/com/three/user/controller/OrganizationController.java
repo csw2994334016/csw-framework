@@ -86,4 +86,20 @@ public class OrganizationController {
     public JsonResult findAllWithTree() {
         return JsonResult.ok("查找成功").put("data", organizationService.findAllWithTree(StatusEnum.OK.getCode()));
     }
+
+    @ApiOperation(value = "上移")
+    @ApiImplicitParam(name = "id", value = "组织机构信息id", required = true, dataType = "String")
+    @PutMapping("/moveUp")
+    public JsonResult moveUp(String id) {
+        organizationService.moveUp(id);
+        return JsonResult.ok("上移成功");
+    }
+
+    @ApiOperation(value = "下移")
+    @ApiImplicitParam(name = "id", value = "组织机构信息id", required = true, dataType = "String")
+    @GetMapping("/moveDown")
+    public JsonResult moveDown(String id) {
+        organizationService.moveDown(id);
+        return JsonResult.ok("下移成功");
+    }
 }

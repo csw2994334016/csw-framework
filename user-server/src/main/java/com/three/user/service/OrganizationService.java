@@ -3,8 +3,11 @@ package com.three.user.service;
 import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
+import com.three.commonclient.exception.BusinessException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
+import com.three.user.entity.Employee;
 import com.three.user.entity.Organization;
+import com.three.user.repository.EmployeeRepository;
 import com.three.user.repository.OrganizationRepository;
 import com.three.user.param.OrganizationParam;
 import com.three.common.utils.BeanCopyUtil;
@@ -34,6 +37,9 @@ public class OrganizationService extends BaseService<Organization, String> {
     @Autowired
     private OrganizationRepository organizationRepository;
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
     @Transactional
     public void create(OrganizationParam organizationParam) {
         BeanValidator.check(organizationParam);
@@ -62,6 +68,32 @@ public class OrganizationService extends BaseService<Organization, String> {
             Organization organization = getEntityById(organizationRepository, String.valueOf(id));
             organization.setStatus(code);
             organizationList.add(organization);
+        }
+
+        // 判断组织是否为一级组织，如果是、且有员工，则不能删除
+        List<String> orgNameList = new ArrayList<>();
+        List<Employee> employeeList1 = new ArrayList<>();
+        for (Organization organization : organizationList) {
+            List<Employee> employeeList = employeeRepository.findAllByOrganization(organization);
+            if (employeeList.size() > 0 && organization.getParentId().equals("-1")) {
+                orgNameList.add(organization.getOrgName());
+            } else { // 将员工的组织绑定到上级组织中
+                if (employeeList.size() > 0) {
+                    Organization organizationP = getEntityById(organizationRepository, organization.getParentId());
+                    for (Employee employee : employeeList) {
+                        employee.setOrganization(organizationP);
+                    }
+                    employeeList1.addAll(employeeList);
+                }
+            }
+        }
+
+        if (orgNameList.size() > 0) {
+            throw new BusinessException("一级组织" + orgNameList.toString() + "有员工信息，无法删除！");
+        }
+
+        if (employeeList1.size() > 0) {
+            employeeRepository.saveAll(employeeList1);
         }
 
         organizationRepository.saveAll(organizationList);
@@ -161,5 +193,15 @@ public class OrganizationService extends BaseService<Organization, String> {
             organizationList.add(organization);
             getChildren(organization.getId(), organizationMap, organizationList);
         }
+    }
+
+    @Transactional
+    public void moveUp(String id) {
+
+    }
+
+    @Transactional
+    public void moveDown(String id) {
+
     }
 }

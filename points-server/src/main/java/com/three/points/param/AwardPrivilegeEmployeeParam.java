@@ -1,5 +1,6 @@
 package com.three.points.param;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,9 +18,11 @@ public class AwardPrivilegeEmployeeParam {
 
 
     @NotBlank(message = "奖扣权限id不可以为空")
+    @ApiModelProperty("奖扣权限id")
     private String awardPrivilegeId; // 奖扣权限id
 
     @Builder.Default
+    @ApiModelProperty("员工idList")
     private List<String> employeeIdList = new ArrayList<>(); // 员工idList
 
 }
