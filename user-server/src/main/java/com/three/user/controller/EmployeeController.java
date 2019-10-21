@@ -115,4 +115,10 @@ public class EmployeeController {
         PageQuery pageQuery = new PageQuery(page, limit);
         return employeeService.findByRole(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue, roleId);
     }
+
+    @ApiOperation(value = "查找所有员工(按组织/公司/部门ID)", notes = "")
+    @GetMapping("/findAllByOrgId")
+    public JsonResult findAllByOrgId(String orgId) {
+        return JsonResult.ok().put("data", employeeService.findAllByOrgId(orgId));
+    }
 }

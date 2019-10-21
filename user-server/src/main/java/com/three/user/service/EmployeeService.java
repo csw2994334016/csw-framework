@@ -192,4 +192,9 @@ public class EmployeeService extends BaseService<Employee, String> {
         Set<String> roleIdSet = StringUtil.getStrToIdSet1(roleIds);
         return new HashSet<>(roleRepository.findAllById(roleIdSet));
     }
+
+    public List<Employee> findAllByOrgId(String orgId) {
+        Organization organization = organizationService.getEntityById(orgId);
+        return employeeRepository.findAllByOrganization(organization);
+    }
 }
