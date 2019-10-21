@@ -73,8 +73,7 @@ public class OrganizationController {
     @ApiOperation(value = "查询所有组织机构")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String"),
-            @ApiImplicitParam(name = "access_token", value = "令牌", required = true, dataType = "String")
+            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @GetMapping()
     public PageResult<Organization> findAll(String searchKey, String searchValue) {
