@@ -104,27 +104,27 @@ public class EmployeeService extends BaseService<Employee, String> {
         employeeRepository.saveAll(employeeList);
     }
 
-    public PageResult<Employee> query(PageQuery pageQuery, int code, String searchKey, String searchValue, String con) {
+    public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
-            if (!"organizationId".equals(searchKey)) {
-                Specification<Employee> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
-                predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
-            }
+
+            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
+
             // 按组织机构查询人员信息
             List<Organization> organizationList = new ArrayList<>();
-            if ("only".equals(con)) {
-                Organization organization = organizationService.getEntityById(searchValue);
-                organizationList.add(organization);
+            if (StringUtil.isNotBlank(organizationId)) {
+                organizationList = organizationService.getChildOrganizationListByOrgId(organizationId);
             } else {
-                if ("organizationId".equals(searchKey)) {
-                    organizationList = organizationService.getChildOrganizationListByOrgId(searchValue);
-                } else {
-                    String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
-                    if (firstParentId != null) {
-                        organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
-                    }
+                String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
+                if (firstParentId != null) {
+                    organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
+                }
+            }
+            if ("0".equals(containChildFlag)) { // 不包含子部门人员
+                if (StringUtil.isNotBlank(organizationId)) {
+                    Organization organization = organizationService.getEntityById(organizationId);
+                    organizationList.add(organization);
                 }
             }
             if (organizationList.size() > 0) {
@@ -133,7 +133,20 @@ public class EmployeeService extends BaseService<Employee, String> {
                 predicateList.add(in);
             }
             Predicate[] predicates = new Predicate[predicateList.size()];
-            return criteriaBuilder.and(predicateList.toArray(predicates));
+            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+
+            if (StringUtil.isNotBlank(searchValue)) {
+                List<Predicate> predicateList1 = Lists.newArrayList();
+                Predicate p1 = criteriaBuilder.like(root.get("fullName"), "%" + searchValue + "%");
+                Predicate p2 = criteriaBuilder.like(root.get("cellNum"), searchValue + "%");
+                predicateList1.add(criteriaBuilder.or(p1));
+                predicateList1.add(criteriaBuilder.or(p2));
+                Predicate[] predicates1 = new Predicate[predicateList1.size()];
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
+
+                return criteriaQuery.where(predicate, predicate1).getRestriction();
+            }
+            return predicate;
         };
         return query(employeeRepository, pageQuery, sort, specification);
     }
@@ -201,5 +214,9 @@ public class EmployeeService extends BaseService<Employee, String> {
     public List<Employee> findAllByOrgId(String orgId) {
         Organization organization = organizationService.getEntityById(orgId);
         return employeeRepository.findAllByOrganization(organization);
+    }
+
+    public Employee findById(String id) {
+        return getEntityById(employeeRepository, id);
     }
 }
