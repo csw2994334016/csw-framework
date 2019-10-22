@@ -104,7 +104,7 @@ public class EmployeeService extends BaseService<Employee, String> {
         employeeRepository.saveAll(employeeList);
     }
 
-    public PageResult<Employee> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
+    public PageResult<Employee> query(PageQuery pageQuery, int code, String searchKey, String searchValue, String con) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
@@ -114,12 +114,17 @@ public class EmployeeService extends BaseService<Employee, String> {
             }
             // 按组织机构查询人员信息
             List<Organization> organizationList = new ArrayList<>();
-            if ("organizationId".equals(searchKey)) {
-                organizationList = organizationService.getChildOrganizationListByOrgId(searchValue);
+            if ("only".equals(con)) {
+                Organization organization = organizationService.getEntityById(searchValue);
+                organizationList.add(organization);
             } else {
-                String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
-                if (firstParentId != null) {
-                    organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
+                if ("organizationId".equals(searchKey)) {
+                    organizationList = organizationService.getChildOrganizationListByOrgId(searchValue);
+                } else {
+                    String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
+                    if (firstParentId != null) {
+                        organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
+                    }
                 }
             }
             if (organizationList.size() > 0) {

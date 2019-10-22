@@ -37,7 +37,7 @@ public class UserController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段(船名)", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<User> query(Integer page, Integer limit, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);
@@ -104,7 +104,7 @@ public class UserController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段(账号、用户名、手机号)", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String")
     })
-    @PostMapping("/findByRole")
+    @GetMapping("/findByRole")
     public PageResult<User> queryByRole(Integer page, Integer limit, String roleId, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         return userService.findByRole(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue, roleId);

@@ -54,18 +54,18 @@ public class EmployeeController {
         return JsonResult.ok("员工信息删除成功");
     }
 
-    @ApiOperation(value = "查询员工信息（分页）", notes = "")
+    @ApiOperation(value = "查询员工信息(包括子部门下的人员)（分页）", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<Employee> query(Integer page, Integer limit, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);
-        return employeeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+        return employeeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue, null);
     }
 
     @LogAnnotation(module = "分配角色")
@@ -102,7 +102,7 @@ public class EmployeeController {
         return JsonResult.ok("密码修改成功");
     }
 
-    @ApiOperation(value = "查找所有员工(按角色)", notes = "")
+    @ApiOperation(value = "查找所有员工(按角色)(分页)", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
@@ -110,15 +110,21 @@ public class EmployeeController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String")
     })
-    @PostMapping("/findByRole")
+    @GetMapping("/findByRole")
     public PageResult<Employee> queryByRole(Integer page, Integer limit, String roleId, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         return employeeService.findByRole(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue, roleId);
     }
 
-    @ApiOperation(value = "查找所有员工(按组织/公司/部门ID)", notes = "")
+    @ApiOperation(value = "查找所有员工(不包括子部门下的人员)(分页)", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "organizationId", value = "组织/公司/部门ID", required = true, dataType = "String")
+    })
     @GetMapping("/findAllByOrgId")
-    public JsonResult findAllByOrgId(String orgId) {
-        return JsonResult.ok().put("data", employeeService.findAllByOrgId(orgId));
+    public PageResult<Employee> findAllByOrgId(Integer page, Integer limit, String organizationId) {
+        PageQuery pageQuery = new PageQuery(page, limit);
+        return employeeService.query(pageQuery, StatusEnum.OK.getCode(), "organizationId", organizationId, "only");
     }
 }

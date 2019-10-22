@@ -38,7 +38,7 @@ public class RoleController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段(船名)", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<Role> query(Integer page, Integer limit, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);

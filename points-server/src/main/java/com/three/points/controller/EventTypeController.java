@@ -63,7 +63,7 @@ public class EventTypeController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<EventType> query(Integer page, Integer limit, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);

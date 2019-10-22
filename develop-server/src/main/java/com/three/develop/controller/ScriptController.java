@@ -58,7 +58,7 @@ public class ScriptController {
             @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "searchValue", value = "脚本名称", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<Script> query(Integer page, Integer limit, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);

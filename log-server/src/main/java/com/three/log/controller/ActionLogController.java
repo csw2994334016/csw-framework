@@ -40,7 +40,7 @@ public class ActionLogController {
 			@ApiImplicitParam(name = "startDate", value = "开始日期", dataType = "String"),
 			@ApiImplicitParam(name = "endDate", value = "结束日期", dataType = "String")
 	})
-	@PostMapping("/log/actionLogs/query")
+	@GetMapping("/log/actionLogs/query")
 	public PageResult<ActionLog> query(Integer page, Integer limit, String searchKey, String searchValue, String startDate, String endDate) {
 		PageQuery pageQuery = new PageQuery(page, limit);
 		BeanValidator.check(pageQuery);

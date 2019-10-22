@@ -42,7 +42,7 @@ public class QuartzJobLogController {
             @ApiImplicitParam(name = "startDate", value = "开始日期", dataType = "String"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<QuartzJobLog> query(Integer page, Integer limit, String searchKey, String searchValue, String startDate, String endDate) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);

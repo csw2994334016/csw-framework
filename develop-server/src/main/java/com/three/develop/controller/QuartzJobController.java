@@ -60,7 +60,7 @@ public class QuartzJobController {
             @ApiImplicitParam(name = "searchKey", value = "筛选条件字段(任务名称)", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选条件关键字", dataType = "String")
     })
-    @PostMapping("/query")
+    @GetMapping("/query")
     public PageResult<QuartzJob> query(Integer page, Integer limit, String searchKey, String searchValue) {
         PageQuery pageQuery = new PageQuery(page, limit);
         BeanValidator.check(pageQuery);
