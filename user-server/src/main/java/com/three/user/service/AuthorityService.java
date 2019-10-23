@@ -110,7 +110,7 @@ public class AuthorityService extends BaseService<Authority, String> {
 
     public PageResult<Authority> findAll(int code, String searchKey, String searchValue) {
         Sort sort = new Sort(Sort.Direction.ASC, "sort");
-        return findAll(authorityRepository, sort, code, searchKey, searchValue);
+        return query(authorityRepository, sort, code, searchKey, searchValue);
     }
 
     public List<Authority> findMenuAuth() {

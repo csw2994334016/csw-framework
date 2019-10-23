@@ -56,18 +56,22 @@ public class EventTypeController {
         return JsonResult.ok("事件分类删除成功");
     }
 
-    @ApiOperation(value = "查询事件分类（分页）", notes = "")
+    @ApiOperation(value = "查询事件分类（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @GetMapping("/query")
     public PageResult<EventType> query(Integer page, Integer limit, String searchKey, String searchValue) {
-        PageQuery pageQuery = new PageQuery(page, limit);
-        BeanValidator.check(pageQuery);
-        return eventTypeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+        if (page != null && limit != null) {
+            PageQuery pageQuery = new PageQuery(page, limit);
+            BeanValidator.check(pageQuery);
+            return eventTypeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+        } else {
+            return eventTypeService.query(null, StatusEnum.OK.getCode(), searchKey, searchValue);
+        }
     }
 
     @ApiOperation(value = "查询所有事件分类(树形结构)")

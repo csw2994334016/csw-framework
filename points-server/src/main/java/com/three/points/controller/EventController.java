@@ -56,17 +56,21 @@ public class EventController {
         return JsonResult.ok("事件删除成功");
     }
 
-    @ApiOperation(value = "查询事件（分页）", notes = "")
+    @ApiOperation(value = "查询事件（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
+            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
+            @ApiImplicitParam(name = "typeId", value = "事件分类ID", dataType = "String"),
+            @ApiImplicitParam(name = "searchValue", value = "筛选值(事件名称)", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<Event> query(Integer page, Integer limit, String searchKey, String searchValue) {
-        PageQuery pageQuery = new PageQuery(page, limit);
-        BeanValidator.check(pageQuery);
-        return eventService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+    public PageResult<Event> query(Integer page, Integer limit,String typeId, String searchValue) {
+        if (page != null && limit != null) {
+            PageQuery pageQuery = new PageQuery(page, limit);
+            BeanValidator.check(pageQuery);
+            return eventService.query(pageQuery, StatusEnum.OK.getCode(), typeId, searchValue);
+        } else {
+            return eventService.query(null, StatusEnum.OK.getCode(), typeId, searchValue);
+        }
     }
 }

@@ -40,6 +40,10 @@ public class Event implements Serializable {
     @ApiModelProperty("事件分类ID")
     private String typeId; // 事件分类ID
 
+    @Column(name = "type_name", columnDefinition = "varchar(255) comment '事件分类'")
+    @ApiModelProperty("事件分类")
+    private String typeName; // 事件分类
+
     @Column(name = "event_name", nullable = false, columnDefinition = "varchar(1000) comment '事件名称'")
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称

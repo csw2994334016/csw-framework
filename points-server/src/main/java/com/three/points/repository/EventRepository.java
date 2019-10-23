@@ -9,4 +9,5 @@ import com.three.resource_jpa.jpa.base.repository.BaseRepository;
  */
 public interface EventRepository extends BaseRepository<Event, String> {
 
+    int countByTypeId(String id);
 }

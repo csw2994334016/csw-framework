@@ -30,7 +30,7 @@ public class BaseService<T, ID> {
     }
 
     // 不分页，按code、关键字
-    protected PageResult<T> findAll(BaseRepository baseRepository, Sort sort, int code, String searchKey, String searchValue) {
+    protected PageResult<T> query(BaseRepository baseRepository, Sort sort, int code, String searchKey, String searchValue) {
         Specification<T> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
         List<T> resultList = baseRepository.findAll(codeAndSearchKeySpec, sort);
         return new PageResult<T>(resultList);
