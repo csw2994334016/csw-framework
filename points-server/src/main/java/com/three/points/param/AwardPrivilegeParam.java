@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
  * Created by csw on 2019-09-29.
  * Description:
  */
-@Builder
 @Data
 public class AwardPrivilegeParam {
 

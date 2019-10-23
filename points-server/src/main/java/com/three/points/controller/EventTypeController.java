@@ -34,8 +34,8 @@ public class EventTypeController {
     @ApiImplicitParam(name = "eventTypeParam", value = "事件分类信息", required = true, dataType = "EventTypeParam")
     @PostMapping()
     public JsonResult create(@RequestBody EventTypeParam eventTypeParam) {
-        eventTypeService.create(eventTypeParam);
-        return JsonResult.ok("事件分类添加成功");
+        EventType eventType = eventTypeService.create(eventTypeParam);
+        return JsonResult.ok("事件分类添加成功").put("data", eventType);
     }
 
     @LogAnnotation(module = "修改事件分类")
@@ -43,8 +43,8 @@ public class EventTypeController {
     @ApiImplicitParam(name = "eventTypeParam", value = "事件分类信息", required = true, dataType = "EventTypeParam")
     @PutMapping()
     public JsonResult update(@RequestBody EventTypeParam eventTypeParam) {
-        eventTypeService.update(eventTypeParam);
-        return JsonResult.ok("事件分类修改成功");
+        EventType eventType = eventTypeService.update(eventTypeParam);
+        return JsonResult.ok("事件分类修改成功").put("data", eventType);
     }
 
     @LogAnnotation(module = "删除事件分类")
@@ -60,17 +60,16 @@ public class EventTypeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
-            @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
+            @ApiImplicitParam(name = "searchValue", value = "筛选值(事件分类名)", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<EventType> query(Integer page, Integer limit, String searchKey, String searchValue) {
+    public PageResult<EventType> query(Integer page, Integer limit, String searchValue) {
         if (page != null && limit != null) {
             PageQuery pageQuery = new PageQuery(page, limit);
             BeanValidator.check(pageQuery);
-            return eventTypeService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+            return eventTypeService.query(pageQuery, StatusEnum.OK.getCode(), searchValue);
         } else {
-            return eventTypeService.query(null, StatusEnum.OK.getCode(), searchKey, searchValue);
+            return eventTypeService.query(null, StatusEnum.OK.getCode(), searchValue);
         }
     }
 
@@ -78,5 +77,12 @@ public class EventTypeController {
     @GetMapping("/tree")
     public JsonResult findAllWithTree() {
         return JsonResult.ok("查找成功").put("data", eventTypeService.findAllWithTree(StatusEnum.OK.getCode()));
+    }
+
+    @ApiOperation(value = "查询子事件分类(根据ID)")
+    @ApiImplicitParam(name = "id", value = "事件分类ID(id没有表示查找一级事件分类)", dataType = "String")
+    @GetMapping("/findChildren")
+    public JsonResult findChildren(String id) {
+        return JsonResult.ok("查找成功").put("data", eventTypeService.findChildren(StatusEnum.OK.getCode(), id));
     }
 }

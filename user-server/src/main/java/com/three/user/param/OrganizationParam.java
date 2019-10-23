@@ -1,17 +1,14 @@
 package com.three.user.param;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 /**
  * Created by  on 2019-09-22.
  * Description:
  */
-@Builder
 @Data
 public class OrganizationParam {
 
@@ -29,12 +26,8 @@ public class OrganizationParam {
     @ApiModelProperty("组织机构类型")
     private String orgType; // 组织机构类型，1=部门；2=公司
 
-    @NotBlank(message = "父级编号不可以为空")
-    @Builder.Default
     @ApiModelProperty("父级编号")
     private String parentId = "-1"; // 父级编号
-
-    private String parentIds; //
 
     @ApiModelProperty("一级父级机构ID")
     private String firstParentId; // 一级父级机构ID
@@ -42,7 +35,6 @@ public class OrganizationParam {
     @ApiModelProperty("父级名称")
     private String parentName; // 父级名称
 
-    @Builder.Default
     @ApiModelProperty("排序")
     private Integer sort = 100; // 排序
 

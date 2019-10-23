@@ -5,6 +5,7 @@ import com.three.common.utils.LogUtil;
 import com.three.common.vo.JsonResult;
 import com.three.zuulserver.feign.LogClient;
 import com.three.zuulserver.feign.Oauth2Client;
+import com.three.zuulserver.param.LoginParam;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,25 +35,21 @@ public class SysTokenController {
      * 系统登陆<br>
      * 根据用户名登录<br>
      * 采用oauth2密码模式获取access_token和refresh_token
-     *
-     * @param username
-     * @param password
-     * @return
      */
     @PostMapping("/sys/login")
-    public Map<String, Object> login(String username, String password, String client_id, String client_secret, String scope) {
+    public Map<String, Object> login(@RequestBody LoginParam loginParam) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "password");
-        parameters.put(CLIENT_ID, client_id);
-        parameters.put("client_secret", client_secret);
-        parameters.put(SCOPE, scope);
-        parameters.put("username", username);
+        parameters.put(CLIENT_ID, loginParam.getClient_id());
+        parameters.put("client_secret", loginParam.getClient_secret());
+        parameters.put(SCOPE, loginParam.getScope());
+        parameters.put("username", loginParam.getUsername());
 //        // 为了支持多类型登录，这里在username后拼装上登录类型
 //        parameters.put("username", username + "|" + CredentialType.USERNAME.name());
-        parameters.put("password", password);
+        parameters.put("password", loginParam.getPassword());
 
         Map<String, Object> tokenInfo = oauth2Client.postAccessToken(parameters);
-        saveLoginLog(username, "用户名密码登陆");
+        saveLoginLog(loginParam.getUsername(), "用户名密码登陆");
 
         return tokenInfo;
     }
@@ -133,17 +130,16 @@ public class SysTokenController {
     /**
      * 系统刷新refresh_token
      *
-     * @param refresh_token
      * @return
      */
     @PostMapping("/sys/refresh_token")
-    public Map<String, Object> refresh_token(String refresh_token, String client_id, String client_secret, String scope) {
+    public Map<String, Object> refresh_token(@RequestBody LoginParam loginParam) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "refresh_token");
-        parameters.put(CLIENT_ID, client_id);
-        parameters.put("client_secret", client_secret);
-        parameters.put(SCOPE, scope);
-        parameters.put("refresh_token", refresh_token);
+        parameters.put(CLIENT_ID, loginParam.getClient_id());
+        parameters.put("client_secret", loginParam.getClient_secret());
+        parameters.put(SCOPE, loginParam.getScope());
+        parameters.put("refresh_token", loginParam.getRefresh_token());
 
         Map<String, Object> refreshTokenMap = oauth2Client.postAccessToken(parameters);
 

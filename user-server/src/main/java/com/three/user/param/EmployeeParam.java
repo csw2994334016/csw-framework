@@ -1,7 +1,6 @@
 package com.three.user.param;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -11,7 +10,6 @@ import java.util.Date;
  * Created by csw on 2019-09-22.
  * Description:
  */
-@Builder
 @Data
 public class EmployeeParam {
 

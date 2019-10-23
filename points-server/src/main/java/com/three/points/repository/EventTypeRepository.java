@@ -12,4 +12,8 @@ import java.util.List;
 public interface EventTypeRepository extends BaseRepository<EventType, String> {
 
     List<EventType> findAllByOrganizationIdAndStatus(String firstParentId, int code);
+
+    List<EventType> findAllByOrganizationIdAndStatusAndParentId(String firstOrganizationId, int code, String parentId);
+
+    List<EventType> findAllByStatusAndParentId(int code, String parentId);
 }

@@ -1,10 +1,8 @@
 package com.three.user.param;
 
-import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-@Builder
 @Data
 public class RoleParam {
 

@@ -1,7 +1,6 @@
 package com.three.points.param;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -10,15 +9,12 @@ import javax.validation.constraints.NotBlank;
  * Created by csw on 2019-10-20.
  * Description:
  */
-@Builder
 @Data
 public class EventTypeParam {
 
     private String id;
 
-    @NotBlank(message = "父级分类ID不可以为空")
     @ApiModelProperty("父级分类ID")
-    @Builder.Default
     private String parentId = "-1"; // 父级分类ID
 
     private String parentName; // 父级分类名称
@@ -28,8 +24,7 @@ public class EventTypeParam {
     private String typeName; // 分类名称
 
     @ApiModelProperty("排序")
-    @Builder.Default
-    private int sort = 100; // 排序
+    private Integer sort = 100; // 排序
 
 
     private String remark;

@@ -88,11 +88,15 @@ public class EventService extends BaseService<Event,  String> {
 
             predicateList.add(criteriaBuilder.equal(root.get("status"), code));
 
-            // 按组织机构查询人员信息
+            // 按事件分类查找事件
             if (StringUtil.isNotBlank(typeId)) {
                 predicateList.add(criteriaBuilder.equal(root.get("typeId"), typeId));
             }
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+            if (firstOrganizationId != null) {
+                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
+            }
             Predicate[] predicates = new Predicate[predicateList.size()];
             Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
 

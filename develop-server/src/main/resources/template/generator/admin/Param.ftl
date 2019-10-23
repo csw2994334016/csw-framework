@@ -1,7 +1,6 @@
 package ${package}.param;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -13,7 +12,6 @@ import java.util.Date;
  * Created by ${author} on ${date}.
  * Description:
  */
-@Builder
 @Data
 public class ${className}Param {
 

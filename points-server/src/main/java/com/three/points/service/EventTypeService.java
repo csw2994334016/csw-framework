@@ -1,5 +1,6 @@
 package com.three.points.service;
 
+import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
 import com.three.commonclient.exception.BusinessException;
@@ -11,16 +12,17 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.points.vo.EventTypeVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
+import javax.persistence.criteria.Predicate;
 import java.util.*;
 
 /**
@@ -38,7 +40,7 @@ public class EventTypeService extends BaseService<EventType, String> {
     private EventRepository eventRepository;
 
     @Transactional
-    public void create(EventTypeParam eventTypeParam) {
+    public EventType create(EventTypeParam eventTypeParam) {
         BeanValidator.check(eventTypeParam);
 
         EventType eventType = new EventType();
@@ -46,17 +48,19 @@ public class EventTypeService extends BaseService<EventType, String> {
 
         eventType.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
-        eventTypeRepository.save(eventType);
+        eventType = eventTypeRepository.save(eventType);
+        return eventType;
     }
 
     @Transactional
-    public void update(EventTypeParam eventTypeParam) {
+    public EventType update(EventTypeParam eventTypeParam) {
         BeanValidator.check(eventTypeParam);
 
         EventType eventType = getEntityById(eventTypeRepository, eventTypeParam.getId());
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
 
-        eventTypeRepository.save(eventType);
+        eventType = eventTypeRepository.save(eventType);
+        return eventType;
     }
 
     @Transactional
@@ -79,12 +83,35 @@ public class EventTypeService extends BaseService<EventType, String> {
         eventTypeRepository.saveAll(eventTypeList);
     }
 
-    public PageResult<EventType> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
+    public PageResult<EventType> query(PageQuery pageQuery, int code, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        Specification<EventType> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicateList = Lists.newArrayList();
+
+            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
+
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+            if (firstOrganizationId != null) {
+                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
+            }
+            Predicate[] predicates = new Predicate[predicateList.size()];
+            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+
+            if (StringUtil.isNotBlank(searchValue)) {
+                List<Predicate> predicateList1 = Lists.newArrayList();
+                Predicate p1 = criteriaBuilder.like(root.get("typeName"), "%" + searchValue + "%");
+                predicateList1.add(criteriaBuilder.or(p1));
+                Predicate[] predicates1 = new Predicate[predicateList1.size()];
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
+
+                return criteriaQuery.where(predicate, predicate1).getRestriction();
+            }
+            return predicate;
+        };
         if (pageQuery != null) {
-            return query(eventTypeRepository, pageQuery, sort, code, searchKey, searchValue);
+            return query(eventTypeRepository, pageQuery, sort, specification);
         } else {
-            return query(eventTypeRepository, sort, code, searchKey, searchValue);
+            return query(eventTypeRepository, sort, specification);
         }
     }
 
@@ -132,5 +159,17 @@ public class EventTypeService extends BaseService<EventType, String> {
 
     public EventType getEventTypeById(String typeId) {
         return getEntityById(eventTypeRepository, typeId);
+    }
+
+    public List<EventType> findChildren(int code, String id) {
+        List<EventType> eventTypeList;
+        String parentId = StringUtil.isNotBlank(id) ? id : "-1";
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        if (firstOrganizationId != null) {
+            eventTypeList = eventTypeRepository.findAllByOrganizationIdAndStatusAndParentId(firstOrganizationId, code, parentId);
+        } else {
+            eventTypeList = eventTypeRepository.findAllByStatusAndParentId(code, parentId);
+        }
+        return eventTypeList;
     }
 }

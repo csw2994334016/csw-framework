@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by csw on 2019-10-20.
  * Description:
  */
-@Builder
 @Data
 public class EventParam {
 
@@ -25,19 +25,19 @@ public class EventParam {
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称
 
-    @NotBlank(message = "A分最小值不可以为空")
+    @NotNull(message = "A分最小值不可以为空")
     @ApiModelProperty("A分最小值")
     private Integer aScoreMin; // A分最小值
 
-    @NotBlank(message = "A分最大值不可以为空")
+    @NotNull(message = "A分最大值不可以为空")
     @ApiModelProperty("A分最大值")
     private Integer aScoreMax; // A分最大值
 
-    @NotBlank(message = "B分最小值不可以为空")
+    @NotNull(message = "B分最小值不可以为空")
     @ApiModelProperty("B分最小值")
     private Integer bScoreMin; // B分最小值
 
-    @NotBlank(message = "B分最大值不可以为空")
+    @NotNull(message = "B分最大值不可以为空")
     @ApiModelProperty("B分最大值")
     private Integer bScoreMax; // B分最大值
 
@@ -50,9 +50,8 @@ public class EventParam {
     @ApiModelProperty("专人审核：1=是；0=否")
     private Integer auditFlag; // 专人审核：1=是；0=否
 
-    @NotBlank(message = "排序不可以为空")
     @ApiModelProperty("排序")
-    private Integer sort; // 排序
+    private Integer sort = 100; // 排序
 
 
     private String remark;
