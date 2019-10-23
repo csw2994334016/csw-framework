@@ -29,6 +29,8 @@ public class SysUserService {
 
         sysUser.setSysOrganization(loginUser.getSysOrganization());
 
+        sysUser.setSysEmployee(loginUser.getSysEmployee());
+
         return sysUser;
     }
 

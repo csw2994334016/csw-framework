@@ -1,9 +1,6 @@
 package com.three.user.controller;
 
-import com.three.common.auth.LoginUser;
-import com.three.common.auth.SysAuthority;
-import com.three.common.auth.SysOrganization;
-import com.three.common.auth.SysRole;
+import com.three.common.auth.*;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -75,6 +72,10 @@ public class SysController {
             SysOrganization sysOrganization = new SysOrganization();
             sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(user.getEmployee().getOrganization(), sysOrganization);
             loginUser.setSysOrganization(sysOrganization);
+
+            SysEmployee sysEmployee = new SysEmployee();
+            sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(user.getEmployee(), sysEmployee);
+            loginUser.setSysEmployee(sysEmployee);
         }
         return loginUser;
     }

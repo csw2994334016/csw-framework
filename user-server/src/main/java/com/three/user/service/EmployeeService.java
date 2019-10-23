@@ -122,8 +122,17 @@ public class EmployeeService extends BaseService<Employee, String> {
                 }
             }
             if ("0".equals(containChildFlag)) { // 不包含子部门人员
+                Organization organization = null;
                 if (StringUtil.isNotBlank(organizationId)) {
-                    Organization organization = organizationService.getEntityById(organizationId);
+                    organization = organizationService.getEntityById(organizationId);
+                } else {
+                    String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
+                    if (firstParentId != null) {
+                        organization = organizationService.getEntityById(firstParentId);
+                    }
+                }
+                if (organization != null) {
+                    organizationList.clear();
                     organizationList.add(organization);
                 }
             }
@@ -148,7 +157,11 @@ public class EmployeeService extends BaseService<Employee, String> {
             }
             return predicate;
         };
-        return query(employeeRepository, pageQuery, sort, specification);
+        if (pageQuery != null) {
+            return query(employeeRepository, pageQuery, sort, specification);
+        } else {
+            return query(employeeRepository, sort, specification);
+        }
     }
 
     @Transactional

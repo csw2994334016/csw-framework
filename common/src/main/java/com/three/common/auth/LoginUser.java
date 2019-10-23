@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 public class LoginUser {
 
-    private Long id;
+    private String id;
     private String username;
     private String password;
     private String fullName; // 姓名
@@ -34,4 +34,6 @@ public class LoginUser {
     private Set<SysAuthority> sysAuthorities = new HashSet<>();
 
     private SysOrganization sysOrganization;
+
+    private SysEmployee sysEmployee;
 }
