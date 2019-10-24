@@ -1,8 +1,8 @@
-package ${package}.service;
+package com.three.points.service;
 
-import ${package}.entity.${className};
-import ${package}.repository.${className}Repository;
-import ${package}.param.${className}Param;
+import com.three.points.entity.ThemeDetail;
+import com.three.points.repository.ThemeDetailRepository;
+import com.three.points.param.ThemeDetailParam;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
@@ -22,54 +22,54 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by ${author} on ${date}.
+ * Created by csw on 2019-10-24.
  * Description:
  */
 
 @Service
-public class ${className}Service extends BaseService<${className},  ${pkColumnType}> {
+public class ThemeDetailService extends BaseService<ThemeDetail,  String> {
 
     @Autowired
-    private ${className}Repository ${changeClassName}Repository;
+    private ThemeDetailRepository themeDetailRepository;
 
     @Transactional
-    public void create(${className}Param ${changeClassName}Param) {
-        BeanValidator.check(${changeClassName}Param);
+    public void create(ThemeDetailParam themeDetailParam) {
+        BeanValidator.check(themeDetailParam);
 
-        ${className} ${changeClassName} = new ${className}();
-        ${changeClassName} = (${className}) BeanCopyUtil.copyBean(${changeClassName}Param, ${changeClassName});
+        ThemeDetail themeDetail = new ThemeDetail();
+        themeDetail = (ThemeDetail) BeanCopyUtil.copyBean(themeDetailParam, themeDetail);
 
-        ${changeClassName}.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+        themeDetail.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
-        ${changeClassName}Repository.save(${changeClassName});
+        themeDetailRepository.save(themeDetail);
     }
 
     @Transactional
-    public void update(${className}Param ${changeClassName}Param) {
-        BeanValidator.check(${changeClassName}Param);
+    public void update(ThemeDetailParam themeDetailParam) {
+        BeanValidator.check(themeDetailParam);
 
-        ${className} ${changeClassName} = getEntityById(${changeClassName}Repository, ${changeClassName}Param.getId());
-        ${changeClassName} = (${className}) BeanCopyUtil.copyBean(${changeClassName}Param, ${changeClassName});
+        ThemeDetail themeDetail = getEntityById(themeDetailRepository, themeDetailParam.getId());
+        themeDetail = (ThemeDetail) BeanCopyUtil.copyBean(themeDetailParam, themeDetail);
 
-        ${changeClassName}Repository.save(${changeClassName});
+        themeDetailRepository.save(themeDetail);
     }
 
     @Transactional
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
-        List<${className}> ${changeClassName}List = new ArrayList<>();
+        List<ThemeDetail> themeDetailList = new ArrayList<>();
         for (String id : idSet) {
-            ${className} ${changeClassName} = getEntityById(${changeClassName}Repository, ${pkColumnType}.valueOf(id));
-            ${changeClassName}.setStatus(code);
-            ${changeClassName}List.add(${changeClassName});
+            ThemeDetail themeDetail = getEntityById(themeDetailRepository, String.valueOf(id));
+            themeDetail.setStatus(code);
+            themeDetailList.add(themeDetail);
         }
 
-        ${changeClassName}Repository.saveAll(${changeClassName}List);
+        themeDetailRepository.saveAll(themeDetailList);
     }
 
-    public PageResult<${className}> query(PageQuery pageQuery, int code, String searchValue) {
+    public PageResult<ThemeDetail> query(PageQuery pageQuery, int code, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
-        Specification<${className}> specification = (root, criteriaQuery, criteriaBuilder) -> {
+        Specification<ThemeDetail> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
             predicateList.add(criteriaBuilder.equal(root.get("status"), code));
@@ -93,13 +93,13 @@ public class ${className}Service extends BaseService<${className},  ${pkColumnTy
             return predicate;
         };
         if (pageQuery != null) {
-            return query(${changeClassName}Repository, pageQuery, sort, specification);
+            return query(themeDetailRepository, pageQuery, sort, specification);
         } else {
-            return query(${changeClassName}Repository, sort, specification);
+            return query(themeDetailRepository, sort, specification);
         }
     }
 
-    public ${className} findById(String id) {
-        return getEntityById(${changeClassName}Repository, id);
+    public ThemeDetail findById(String id) {
+        return getEntityById(themeDetailRepository, id);
     }
 }

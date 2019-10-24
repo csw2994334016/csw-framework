@@ -52,7 +52,7 @@ public class EventController {
     @ApiOperation(value = "删除事件")
     @ApiImplicitParam(name = "ids", value = "事件信息ids", required = true, dataType = "String")
     @DeleteMapping()
-    public JsonResult delete(String ids) {
+    public JsonResult delete(@RequestParam(required = true) String ids) {
         eventService.delete(ids, StatusEnum.DELETE.getCode());
         return JsonResult.ok("事件删除成功");
     }

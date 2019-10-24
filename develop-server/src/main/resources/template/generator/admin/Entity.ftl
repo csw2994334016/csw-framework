@@ -69,9 +69,11 @@ public class ${className} implements Serializable {
     private Integer status = StatusEnum.OK.getCode(); // 记录状态：1=正常；2=锁定；3=删除
 
     @CreatedDate
+    @ApiModelProperty("创建时间")
     private Date createDate; // 创建时间
 
     @LastModifiedDate
+    @ApiModelProperty("修改时间")
     private Date updateDate; // 修改时间
 </#if>
 

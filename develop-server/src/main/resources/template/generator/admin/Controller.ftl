@@ -51,22 +51,32 @@ public class ${className}Controller {
     @ApiOperation(value = "删除${menuName}")
     @ApiImplicitParam(name = "ids", value = "${menuName}信息ids", required = true, dataType = "String")
     @DeleteMapping()
-    public JsonResult delete(String ids) {
+    public JsonResult delete(@RequestParam(required = true) String ids) {
         ${changeClassName}Service.delete(ids, StatusEnum.DELETE.getCode());
         return JsonResult.ok("${menuName}删除成功");
     }
 
     @ApiOperation(value = "查询${menuName}（分页）", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<${className}> query(Integer page, Integer limit, String searchKey, String searchValue) {
-        PageQuery pageQuery = new PageQuery(page, limit);
-        BeanValidator.check(pageQuery);
-        return ${changeClassName}Service.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
+    public PageResult<${className}> query(Integer page, Integer limit, String searchValue) {
+        if (page != null && limit != null) {
+            PageQuery pageQuery = new PageQuery(page, limit);
+            BeanValidator.check(pageQuery);
+            return ${changeClassName}Service.query(pageQuery, StatusEnum.OK.getCode(), searchValue);
+        } else {
+            return ${changeClassName}Service.query(null, StatusEnum.OK.getCode(), searchValue);
+        }
+    }
+
+    @ApiOperation(value = "查询${menuName}（根据ID查找）")
+    @ApiImplicitParam(name = "id", value = "${menuName}信息id", required = true, dataType = "String")
+    @GetMapping()
+    public JsonResult findById(@RequestParam(required = true) String id) {
+        return JsonResult.ok().put("data", ${changeClassName}Service.findById(id));
     }
 }
