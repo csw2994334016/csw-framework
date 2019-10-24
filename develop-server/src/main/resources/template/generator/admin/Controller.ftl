@@ -70,9 +70,9 @@ public class ${className}Controller {
         }
     }
 
-    @ApiOperation(value = "查询${menuName}（根据ID查找）")
+    @ApiOperation(value = "查询${menuName}（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "${menuName}信息id", required = true, dataType = "String")
-    @GetMapping()
+    @GetMapping("/findById")
     public JsonResult findById(@RequestParam(required = true) String id) {
         return JsonResult.ok().put("data", ${changeClassName}Service.findById(id));
     }

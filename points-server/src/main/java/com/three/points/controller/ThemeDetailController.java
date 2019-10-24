@@ -51,9 +51,9 @@ public class ThemeDetailController {
         }
     }
 
-    @ApiOperation(value = "查询积分奖扣主题详情（根据ID查找）")
+    @ApiOperation(value = "查询积分奖扣主题详情（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "积分奖扣主题详情信息id", required = true, dataType = "String")
-    @GetMapping()
+    @GetMapping("/findById")
     public JsonResult findById(@RequestParam(required = true) String id) {
         return JsonResult.ok().put("data", themeDetailService.findById(id));
     }
