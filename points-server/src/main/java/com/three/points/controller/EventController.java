@@ -83,4 +83,11 @@ public class EventController {
         eventService.moveEvent(moveEventParam);
         return JsonResult.ok("移库成功");
     }
+
+    @ApiOperation(value = "查询事件（根据ID查找）")
+    @ApiImplicitParam(name = "id", value = "事件信息id", required = true, dataType = "String")
+    @GetMapping()
+    public JsonResult findById(@RequestParam(required = true) String id) {
+        return JsonResult.ok().put("data", eventService.findById(id));
+    }
 }

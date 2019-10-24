@@ -35,6 +35,22 @@ public class LoginUserUtil {
         return null;
     }
 
+    public static String getLoginUserEmpId() {
+        LoginUser loginUser = getLoginUser();
+        if (loginUser != null) {
+            return loginUser.getSysEmployee().getId();
+        }
+        return null;
+    }
+
+    public static String getLoginUserEmpFullName() {
+        LoginUser loginUser = getLoginUser();
+        if (loginUser != null) {
+            return loginUser.getSysEmployee().getFullName();
+        }
+        return null;
+    }
+
     public static String getLoginUsername() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null) {

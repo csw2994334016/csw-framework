@@ -3,6 +3,9 @@ package com.three.points.param;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,28 +20,27 @@ public class ThemeParam {
     private String id;
 
 
-
+    @NotBlank(message = "主题名不可以为空")
     @ApiModelProperty("主题名")
     private String themeName; // 主题名
 
+    @NotNull(message = "奖扣时间不可以为空")
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
 
-    @ApiModelProperty("A分（汇总分）")
-    private Integer aScore; // A分（汇总分）
-
-    @ApiModelProperty("B分（汇总分）")
-    private Integer bScore; // B分（汇总分）
-
+    @NotBlank(message = "初审人ID不可以为空")
     @ApiModelProperty("初审人ID")
     private String attnId; // 初审人ID
 
+    @NotBlank(message = "初审人姓名不可以为空")
     @ApiModelProperty("初审人姓名")
     private String attnName; // 初审人姓名
 
+    @NotBlank(message = "终审人ID不可以为空")
     @ApiModelProperty("终审人ID")
     private String auditId; // 终审人ID
 
+    @NotBlank(message = "终审人姓名不可以为空")
     @ApiModelProperty("终审人姓名")
     private String auditName; // 终审人姓名
 
@@ -48,6 +50,7 @@ public class ThemeParam {
     @ApiModelProperty("抄送人姓名")
     private String copyPersonName; // 抄送人姓名
 
+    @NotEmpty(message = "主题事件List不可以为空")
     @ApiModelProperty("主题事件List")
     private List<ThemeEventParam> themeEventParamList = new ArrayList<>(); // 主题事件List
 

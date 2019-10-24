@@ -48,15 +48,15 @@ public class Theme implements Serializable {
     @ApiModelProperty("主题状态：0=草稿;1=保存;2=已提交;3=初审人审核;4=终审人审核;5=审核不通过;6=审核通过")
     private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=已提交;3=初审人审核;4=终审人审核;5=审核不通过;6=审核通过
 
-    @Column(name = "a_score", columnDefinition = "int(11) comment 'A分（汇总分）'")
+    @Column(name = "a_score", columnDefinition = "int(11) default 0 comment 'A分（汇总分）'")
     @ApiModelProperty("A分（汇总分）")
-    private Integer aScore; // A分（汇总分）
+    private Integer aScore = 0; // A分（汇总分）
 
-    @Column(name = "b_score", columnDefinition = "int(11) comment 'B分（汇总分）'")
+    @Column(name = "b_score", columnDefinition = "int(11) default 0 comment 'B分（汇总分）'")
     @ApiModelProperty("B分（汇总分）")
-    private Integer bScore; // B分（汇总分）
+    private Integer bScore = 0; // B分（汇总分）
 
-    @Column(name = "emp_count", columnDefinition = "int(11) comment '人次'")
+    @Column(name = "emp_count", nullable = false, columnDefinition = "int(11) comment '人次'")
     @ApiModelProperty("人次")
     private Integer empCount; // 人次
 
@@ -107,14 +107,6 @@ public class Theme implements Serializable {
     @Column(name = "copy_person_name", columnDefinition = "varchar(255) comment '抄送人姓名'")
     @ApiModelProperty("抄送人姓名")
     private String copyPersonName; // 抄送人姓名
-
-    @Column(name = "create_user_id", columnDefinition = "varchar(36) comment '创建用户ID'")
-    @ApiModelProperty("创建用户ID")
-    private String createUserID; // 创建用户ID
-
-    @Column(name = "create_user_name", columnDefinition = "varchar(255) comment '创建用户姓名'")
-    @ApiModelProperty("创建用户姓名")
-    private String createUserName; // 创建用户姓名
 
     @Column(name = "last_edit_user_id", columnDefinition = "varchar(36) comment '最后编辑用户ID'")
     @ApiModelProperty("最后编辑用户ID")

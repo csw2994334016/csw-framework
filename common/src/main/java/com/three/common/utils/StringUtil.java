@@ -272,4 +272,10 @@ public class StringUtil {
             return fromIndex == toIndex ? "" : str.toString().substring(fromIndex, toIndex);
         }
     }
+
+    public static SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMdd");
+
+    public static String getDateStr() {
+        return sdf1.format(new Date());
+    }
 }

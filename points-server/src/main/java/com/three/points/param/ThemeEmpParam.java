@@ -17,6 +17,10 @@ public class ThemeEmpParam {
     @ApiModelProperty("人员ID")
     private String empId; // 人员ID
 
+    @NotNull(message = "人员姓名不可以为空")
+    @ApiModelProperty("人员姓名")
+    private String empFullName; // 人员姓名
+
     @ApiModelProperty("A分")
     private Integer aScore = 0; // A分
 

@@ -2,14 +2,12 @@ package com.three.points.controller;
 
 import com.three.points.entity.Theme;
 import com.three.points.param.ThemeParam;
-import com.three.points.param.UpdateThemeParam;
 import com.three.points.service.ThemeService;
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -41,19 +39,19 @@ public class ThemeController {
 
     @LogAnnotation(module = "添加积分奖扣主题")
     @ApiOperation(value = "添加积分奖扣主题")
-    @ApiImplicitParam(name = "updateThemeParam", value = "积分奖扣主题信息", required = true, dataType = "UpdateThemeParam")
+    @ApiImplicitParam(name = "themeParam", value = "积分奖扣主题信息", required = true, dataType = "ThemeParam")
     @PostMapping()
-    public JsonResult create(@RequestBody UpdateThemeParam updateThemeParam) {
-        themeService.create(updateThemeParam);
+    public JsonResult create(@RequestBody ThemeParam themeParam) {
+        themeService.create(themeParam);
         return JsonResult.ok("积分奖扣主题添加成功");
     }
 
     @LogAnnotation(module = "修改积分奖扣主题")
     @ApiOperation(value = "修改积分奖扣主题")
-    @ApiImplicitParam(name = "updateThemeParam", value = "积分奖扣主题信息", required = true, dataType = "UpdateThemeParam")
+    @ApiImplicitParam(name = "themeParam", value = "积分奖扣主题信息", required = true, dataType = "ThemeParam")
     @PutMapping()
-    public JsonResult update(@RequestBody UpdateThemeParam updateThemeParam) {
-        themeService.update(updateThemeParam);
+    public JsonResult update(@RequestBody ThemeParam themeParam) {
+        themeService.update(themeParam);
         return JsonResult.ok("积分奖扣主题修改成功");
     }
 

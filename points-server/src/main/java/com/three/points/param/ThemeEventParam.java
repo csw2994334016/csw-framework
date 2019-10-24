@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +30,7 @@ public class ThemeEventParam {
     @ApiModelProperty("事件名称(自定义临时事件一定要名称)")
     private String eventName; // 事件名称(自定义临时事件一定要名称)
 
-    @ApiModelProperty("记件事件：1=是；0=否")
-    private Integer countFlag = 0; // 记件事件：1=是；0=否
-
+    @NotEmpty(message = "事件参与人员List不可以为空")
     @ApiModelProperty("事件参与人员List")
     private List<ThemeEmpParam> themeEmpParamList = new ArrayList<>(); // 事件参与人员List
 

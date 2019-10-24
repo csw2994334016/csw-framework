@@ -10,9 +10,7 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.points.repository.EventTypeRepository;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,5 +117,9 @@ public class EventService extends BaseService<Event, String> {
         Event event = getEntityById(eventRepository, moveEventParam.getId());
         event.setTypeId(moveEventParam.getTypeId());
         eventRepository.save(event);
+    }
+
+    public Event findById(String id) {
+        return getEntityById(eventRepository, id);
     }
 }

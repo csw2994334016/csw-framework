@@ -64,17 +64,17 @@ public class Event implements Serializable {
     @ApiModelProperty("B分最大值")
     private Integer bScoreMax; // B分最大值
 
-    @Column(name = "prize_flag", columnDefinition = "int(1) comment '奖票事件：1=是；0=否'")
+    @Column(name = "prize_flag", columnDefinition = "int(1) default 0 comment '奖票事件：1=是；0=否'")
     @ApiModelProperty("奖票事件：1=是；0=否")
-    private Integer prizeFlag; // 奖票事件：1=是；0=否
+    private Integer prizeFlag = 0; // 奖票事件：1=是；0=否
 
-    @Column(name = "count_flag", columnDefinition = "int(1) comment '记件事件：1=是；0=否'")
+    @Column(name = "count_flag", columnDefinition = "int(1) default 0 comment '记件事件：1=是；0=否'")
     @ApiModelProperty("记件事件：1=是；0=否")
-    private Integer countFlag; // 记件事件：1=是；0=否
+    private Integer countFlag = 0; // 记件事件：1=是；0=否
 
-    @Column(name = "audit_flag", columnDefinition = "int(1) comment '专人审核：1=是；0=否'")
+    @Column(name = "audit_flag", columnDefinition = "int(1) default 0 comment '专人审核：1=是；0=否'")
     @ApiModelProperty("专人审核：1=是；0=否")
-    private Integer auditFlag; // 专人审核：1=是；0=否
+    private Integer auditFlag = 0; // 专人审核：1=是；0=否
 
     @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 100 comment '排序'")
     @ApiModelProperty("排序")

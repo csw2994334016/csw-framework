@@ -9,4 +9,5 @@ import com.three.resource_jpa.jpa.base.repository.BaseRepository;
  */
 public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, String> {
 
+    void deleteByThemeId(String id);
 }
