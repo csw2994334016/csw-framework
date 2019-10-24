@@ -88,21 +88,14 @@ public class EventTypeService extends BaseService<EventType, String> {
         Specification<EventType> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
 
-            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
-
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-            if (firstOrganizationId != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
-            }
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+            Specification<EventType> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = Lists.newArrayList();
                 Predicate p1 = criteriaBuilder.like(root.get("typeName"), "%" + searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
 
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
