@@ -11,11 +11,10 @@ public enum  ThemeEnum {
 
     DRAFT(0, "草稿"),
     SAVE(1, "保存"),
-    SUBMIT(2, "已提交"),
-    ATTN(3, "初审人审核"),
-    AUDIT(4, "终审人审核"),
-    FAILED(5, "审核不通过"),
-    SUCCESS(6, "审核通过");
+    SUBMIT(2, "待初审"),
+    ATTN(3, "待终审"),
+    AUDIT(4, "审核不通过"),
+    FAILED(5, "审核通过");
 
     private int code;
 
