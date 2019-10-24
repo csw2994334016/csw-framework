@@ -42,7 +42,6 @@ public class ThemeService extends BaseService<Theme, String> {
 
     @Transactional
     public void createDraft(ThemeParam themeParam) {
-
         // 创建主题
         Theme theme = new Theme();
 
@@ -134,7 +133,6 @@ public class ThemeService extends BaseService<Theme, String> {
     }
 
     private void setTheme(Theme theme, List<ThemeDetail> themeDetailList) {
-
         String empId = LoginUserUtil.getLoginUserEmpId();
         String empFullName = LoginUserUtil.getLoginUserEmpFullName();
         theme.setRecorderId(empId);

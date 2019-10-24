@@ -48,14 +48,6 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
 
-    @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '人员ID'")
-    @ApiModelProperty("人员ID")
-    private String empId; // 人员ID
-
-    @Column(name = "emp_full_name", nullable = false, columnDefinition = "varchar(255) comment '人员姓名'")
-    @ApiModelProperty("人员姓名")
-    private String empFullName; // 人员姓名
-
     @Column(name = "event_type_id", columnDefinition = "varchar(36) comment '事件分类ID'")
     @ApiModelProperty("事件分类ID")
     private String eventTypeId; // 事件分类ID
@@ -71,6 +63,14 @@ public class ThemeDetail implements Serializable {
     @Column(name = "event_name", nullable = false, columnDefinition = "varchar(255) comment '事件名称'")
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称
+
+    @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '人员ID'")
+    @ApiModelProperty("人员ID")
+    private String empId; // 人员ID
+
+    @Column(name = "emp_full_name", nullable = false, columnDefinition = "varchar(255) comment '人员姓名'")
+    @ApiModelProperty("人员姓名")
+    private String empFullName; // 人员姓名
 
     @Column(name = "a_score", nullable = false, columnDefinition = "int(11) default 0 comment 'A分'")
     @ApiModelProperty("A分")
