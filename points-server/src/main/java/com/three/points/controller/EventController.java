@@ -2,6 +2,7 @@ package com.three.points.controller;
 
 import com.three.points.entity.Event;
 import com.three.points.param.EventParam;
+import com.three.points.param.MoveEventParam;
 import com.three.points.service.EventService;
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
@@ -64,7 +65,7 @@ public class EventController {
             @ApiImplicitParam(name = "searchValue", value = "筛选值(事件名称)", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<Event> query(Integer page, Integer limit,String typeId, String searchValue) {
+    public PageResult<Event> query(Integer page, Integer limit, String typeId, String searchValue) {
         if (page != null && limit != null) {
             PageQuery pageQuery = new PageQuery(page, limit);
             BeanValidator.check(pageQuery);
@@ -72,5 +73,14 @@ public class EventController {
         } else {
             return eventService.query(null, StatusEnum.OK.getCode(), typeId, searchValue);
         }
+    }
+
+    @LogAnnotation(module = "移库")
+    @ApiOperation(value = "移库")
+    @ApiImplicitParam(name = "moveEventParam", value = "事件信息", required = true, dataType = "MoveEventParam")
+    @PutMapping("moveEvent")
+    public JsonResult moveEvent(@RequestBody MoveEventParam moveEventParam) {
+        eventService.moveEvent(moveEventParam);
+        return JsonResult.ok("移库成功");
     }
 }

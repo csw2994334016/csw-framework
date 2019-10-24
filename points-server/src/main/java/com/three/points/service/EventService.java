@@ -3,6 +3,7 @@ package com.three.points.service;
 import com.google.common.collect.Lists;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
+import com.three.points.param.MoveEventParam;
 import com.three.points.repository.EventRepository;
 import com.three.points.param.EventParam;
 import com.three.common.utils.BeanCopyUtil;
@@ -32,7 +33,7 @@ import java.util.Set;
  */
 
 @Service
-public class EventService extends BaseService<Event,  String> {
+public class EventService extends BaseService<Event, String> {
 
     @Autowired
     private EventRepository eventRepository;
@@ -118,4 +119,11 @@ public class EventService extends BaseService<Event,  String> {
         }
     }
 
+    @Transactional
+    public void moveEvent(MoveEventParam moveEventParam) {
+        BeanValidator.check(moveEventParam);
+        Event event = getEntityById(eventRepository, moveEventParam.getId());
+        event.setTypeId(moveEventParam.getTypeId());
+        eventRepository.save(event);
+    }
 }
