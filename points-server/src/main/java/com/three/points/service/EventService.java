@@ -87,26 +87,21 @@ public class EventService extends BaseService<Event, String> {
         Specification<Event> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
 
-            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
+            Specification<Event> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
             // 按事件分类查找事件
             if (StringUtil.isNotBlank(typeId)) {
                 predicateList.add(criteriaBuilder.equal(root.get("typeId"), typeId));
             }
 
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-            if (firstOrganizationId != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
-            }
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+            Predicate predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
 
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = Lists.newArrayList();
                 Predicate p1 = criteriaBuilder.like(root.get("eventName"), "%" + searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
 
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
