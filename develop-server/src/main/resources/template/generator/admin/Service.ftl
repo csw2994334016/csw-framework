@@ -72,14 +72,8 @@ public class ${className}Service extends BaseService<${className},  ${pkColumnTy
         Specification<${className}> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
-
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-            if (firstOrganizationId != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
-            }
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+            Specification<${className}> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = new ArrayList<>();

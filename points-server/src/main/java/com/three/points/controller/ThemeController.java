@@ -2,6 +2,7 @@ package com.three.points.controller;
 
 import com.three.points.entity.Theme;
 import com.three.points.param.ThemeParam;
+import com.three.points.param.UpdateThemeParam;
 import com.three.points.service.ThemeService;
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
@@ -29,21 +30,30 @@ public class ThemeController {
     @Autowired
     private ThemeService themeService;
 
+    @LogAnnotation(module = "保存积分奖扣主题到草稿")
+    @ApiOperation(value = "保存积分奖扣主题到草稿")
+    @ApiImplicitParam(name = "themeParam", value = "积分奖扣主题信息", required = true, dataType = "ThemeParam")
+    @PostMapping("/createDraft")
+    public JsonResult createDraft(@RequestBody ThemeParam themeParam) {
+        themeService.createDraft(themeParam);
+        return JsonResult.ok("积分奖扣主题草稿保存成功");
+    }
+
     @LogAnnotation(module = "添加积分奖扣主题")
     @ApiOperation(value = "添加积分奖扣主题")
-    @ApiImplicitParam(name = "themeParam", value = "积分奖扣主题信息", required = true, dataType = "ThemeParam")
+    @ApiImplicitParam(name = "updateThemeParam", value = "积分奖扣主题信息", required = true, dataType = "UpdateThemeParam")
     @PostMapping()
-    public JsonResult create(@RequestBody ThemeParam themeParam) {
-        themeService.create(themeParam);
+    public JsonResult create(@RequestBody UpdateThemeParam updateThemeParam) {
+        themeService.create(updateThemeParam);
         return JsonResult.ok("积分奖扣主题添加成功");
     }
 
     @LogAnnotation(module = "修改积分奖扣主题")
     @ApiOperation(value = "修改积分奖扣主题")
-    @ApiImplicitParam(name = "themeParam", value = "积分奖扣主题信息", required = true, dataType = "ThemeParam")
+    @ApiImplicitParam(name = "updateThemeParam", value = "积分奖扣主题信息", required = true, dataType = "UpdateThemeParam")
     @PutMapping()
-    public JsonResult update(@RequestBody ThemeParam themeParam) {
-        themeService.update(themeParam);
+    public JsonResult update(@RequestBody UpdateThemeParam updateThemeParam) {
+        themeService.update(updateThemeParam);
         return JsonResult.ok("积分奖扣主题修改成功");
     }
 
@@ -65,9 +75,7 @@ public class ThemeController {
     @GetMapping("/query")
     public PageResult<Theme> query(Integer page, Integer limit, String searchValue) {
         if (page != null && limit != null) {
-            PageQuery pageQuery = new PageQuery(page, limit);
-            BeanValidator.check(pageQuery);
-            return themeService.query(pageQuery, StatusEnum.OK.getCode(), searchValue);
+            return themeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
         } else {
             return themeService.query(null, StatusEnum.OK.getCode(), searchValue);
         }
@@ -79,4 +87,6 @@ public class ThemeController {
     public JsonResult findById(@RequestParam(required = true) String id) {
         return JsonResult.ok().put("data", themeService.findById(id));
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.three.points.service;
 
 import com.three.points.entity.Theme;
+import com.three.points.param.UpdateThemeParam;
 import com.three.points.repository.ThemeRepository;
 import com.three.points.param.ThemeParam;
 import com.three.common.utils.BeanCopyUtil;
@@ -33,11 +34,16 @@ public class ThemeService extends BaseService<Theme,  String> {
     private ThemeRepository themeRepository;
 
     @Transactional
-    public void create(ThemeParam themeParam) {
-        BeanValidator.check(themeParam);
+    public void createDraft(ThemeParam themeParam) {
+
+    }
+
+    @Transactional
+    public void create(UpdateThemeParam updateThemeParam) {
+        BeanValidator.check(updateThemeParam);
 
         Theme theme = new Theme();
-        theme = (Theme) BeanCopyUtil.copyBean(themeParam, theme);
+        theme = (Theme) BeanCopyUtil.copyBean(updateThemeParam, theme);
 
         theme.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
@@ -45,11 +51,11 @@ public class ThemeService extends BaseService<Theme,  String> {
     }
 
     @Transactional
-    public void update(ThemeParam themeParam) {
-        BeanValidator.check(themeParam);
+    public void update(UpdateThemeParam updateThemeParam) {
+        BeanValidator.check(updateThemeParam);
 
-        Theme theme = getEntityById(themeRepository, themeParam.getId());
-        theme = (Theme) BeanCopyUtil.copyBean(themeParam, theme);
+        Theme theme = getEntityById(themeRepository, updateThemeParam.getId());
+        theme = (Theme) BeanCopyUtil.copyBean(updateThemeParam, theme);
 
         themeRepository.save(theme);
     }
@@ -72,22 +78,14 @@ public class ThemeService extends BaseService<Theme,  String> {
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
-
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-            if (firstOrganizationId != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
-            }
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+            Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = new ArrayList<>();
-                Predicate p1 = criteriaBuilder.like(root.get("name"), "%" + searchValue + "%");
+                Predicate p1 = criteriaBuilder.like(root.get("themeName"), "%" + searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
-
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
             return predicate;

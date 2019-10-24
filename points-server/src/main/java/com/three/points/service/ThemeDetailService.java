@@ -2,7 +2,6 @@ package com.three.points.service;
 
 import com.three.points.entity.ThemeDetail;
 import com.three.points.repository.ThemeDetailRepository;
-import com.three.points.param.ThemeDetailParam;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
@@ -33,28 +32,6 @@ public class ThemeDetailService extends BaseService<ThemeDetail,  String> {
     private ThemeDetailRepository themeDetailRepository;
 
     @Transactional
-    public void create(ThemeDetailParam themeDetailParam) {
-        BeanValidator.check(themeDetailParam);
-
-        ThemeDetail themeDetail = new ThemeDetail();
-        themeDetail = (ThemeDetail) BeanCopyUtil.copyBean(themeDetailParam, themeDetail);
-
-        themeDetail.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
-
-        themeDetailRepository.save(themeDetail);
-    }
-
-    @Transactional
-    public void update(ThemeDetailParam themeDetailParam) {
-        BeanValidator.check(themeDetailParam);
-
-        ThemeDetail themeDetail = getEntityById(themeDetailRepository, themeDetailParam.getId());
-        themeDetail = (ThemeDetail) BeanCopyUtil.copyBean(themeDetailParam, themeDetail);
-
-        themeDetailRepository.save(themeDetail);
-    }
-
-    @Transactional
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<ThemeDetail> themeDetailList = new ArrayList<>();
@@ -72,22 +49,14 @@ public class ThemeDetailService extends BaseService<ThemeDetail,  String> {
         Specification<ThemeDetail> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
-
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-            if (firstOrganizationId != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
-            }
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+            Specification<ThemeDetail> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = new ArrayList<>();
                 Predicate p1 = criteriaBuilder.like(root.get("name"), "%" + searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
-
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
             return predicate;

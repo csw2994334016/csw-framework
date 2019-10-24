@@ -8,7 +8,6 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -65,9 +64,7 @@ public class ${className}Controller {
     @GetMapping("/query")
     public PageResult<${className}> query(Integer page, Integer limit, String searchValue) {
         if (page != null && limit != null) {
-            PageQuery pageQuery = new PageQuery(page, limit);
-            BeanValidator.check(pageQuery);
-            return ${changeClassName}Service.query(pageQuery, StatusEnum.OK.getCode(), searchValue);
+            return ${changeClassName}Service.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
         } else {
             return ${changeClassName}Service.query(null, StatusEnum.OK.getCode(), searchValue);
         }

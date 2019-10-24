@@ -1,14 +1,12 @@
 package com.three.points.controller;
 
 import com.three.points.entity.ThemeDetail;
-import com.three.points.param.ThemeDetailParam;
 import com.three.points.service.ThemeDetailService;
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -29,24 +27,6 @@ public class ThemeDetailController {
     @Autowired
     private ThemeDetailService themeDetailService;
 
-    @LogAnnotation(module = "添加积分奖扣主题详情")
-    @ApiOperation(value = "添加积分奖扣主题详情")
-    @ApiImplicitParam(name = "themeDetailParam", value = "积分奖扣主题详情信息", required = true, dataType = "ThemeDetailParam")
-    @PostMapping()
-    public JsonResult create(@RequestBody ThemeDetailParam themeDetailParam) {
-        themeDetailService.create(themeDetailParam);
-        return JsonResult.ok("积分奖扣主题详情添加成功");
-    }
-
-    @LogAnnotation(module = "修改积分奖扣主题详情")
-    @ApiOperation(value = "修改积分奖扣主题详情")
-    @ApiImplicitParam(name = "themeDetailParam", value = "积分奖扣主题详情信息", required = true, dataType = "ThemeDetailParam")
-    @PutMapping()
-    public JsonResult update(@RequestBody ThemeDetailParam themeDetailParam) {
-        themeDetailService.update(themeDetailParam);
-        return JsonResult.ok("积分奖扣主题详情修改成功");
-    }
-
     @LogAnnotation(module = "删除积分奖扣主题详情")
     @ApiOperation(value = "删除积分奖扣主题详情")
     @ApiImplicitParam(name = "ids", value = "积分奖扣主题详情信息ids", required = true, dataType = "String")
@@ -65,9 +45,7 @@ public class ThemeDetailController {
     @GetMapping("/query")
     public PageResult<ThemeDetail> query(Integer page, Integer limit, String searchValue) {
         if (page != null && limit != null) {
-            PageQuery pageQuery = new PageQuery(page, limit);
-            BeanValidator.check(pageQuery);
-            return themeDetailService.query(pageQuery, StatusEnum.OK.getCode(), searchValue);
+            return themeDetailService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
         } else {
             return themeDetailService.query(null, StatusEnum.OK.getCode(), searchValue);
         }

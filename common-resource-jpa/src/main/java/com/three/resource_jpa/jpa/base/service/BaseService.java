@@ -6,6 +6,7 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
+import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,6 +75,19 @@ public class BaseService<T, ID> {
             predicateList.add(criteriaBuilder.equal(root.get("status"), code));
             if (StringUtil.isNotBlank(searchKey) && StringUtil.isNotBlank(searchValue)) {
                 predicateList.add(criteriaBuilder.like(root.get(searchKey), "%" + searchValue + "%"));
+            }
+            Predicate[] predicates = new Predicate[predicateList.size()];
+            return criteriaBuilder.and(predicateList.toArray(predicates));
+        };
+    }
+
+    protected Specification<T> getCodeAndOrganizationSpec(int code) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicateList = Lists.newArrayList();
+            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+            if (firstOrganizationId != null) {
+                predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
             }
             Predicate[] predicates = new Predicate[predicateList.size()];
             return criteriaBuilder.and(predicateList.toArray(predicates));
