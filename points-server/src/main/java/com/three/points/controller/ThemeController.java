@@ -70,19 +70,25 @@ public class ThemeController {
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "whoFlag", value = "我提交/参与的奖扣标记,1=我提交;2=我参与(默认1)", required = true, dataType = "String"),
             @ApiImplicitParam(name = "themeName", value = "主题关键词", dataType = "String"),
-            @ApiImplicitParam(name = "recordDate", value = "记录时间", dataType = "String"),
-            @ApiImplicitParam(name = "themeDate", value = "奖扣时间", dataType = "String"),
+            @ApiImplicitParam(name = "recordDateSt", value = "记录时间开始(yyyy-MM-dd)", dataType = "String"),
+            @ApiImplicitParam(name = "recordDateEt", value = "记录时间结束(yyyy-MM-dd),为空默认为当前时间", dataType = "String"),
+            @ApiImplicitParam(name = "themeDateSt", value = "奖扣时间开始(yyyy-MM-dd)", dataType = "String"),
+            @ApiImplicitParam(name = "themeDateEt", value = "奖扣时间结束(yyyy-MM-dd),为空默认为当前时间", dataType = "String"),
             @ApiImplicitParam(name = "attnName", value = "初审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "auditName", value = "终审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "recorderName", value = "记录人姓名", dataType = "String"),
             @ApiImplicitParam(name = "themeStatus", value = "状态", dataType = "Integer")
     })
     @GetMapping("/query")
-    public PageResult<Theme> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String themeName, String recordDate, String themeDate, String attnName, String auditName, String recorderName, Integer themeStatus) {
+    public PageResult<Theme> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String themeName,
+                                   String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt,
+                                   String attnName, String auditName, String recorderName, Integer themeStatus) {
         if (page != null && limit != null) {
-            return themeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), whoFlag, themeName, recordDate, themeDate, attnName, auditName, recorderName, themeStatus);
+            return themeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), whoFlag, themeName,
+                    recordDateSt, recordDateEt, themeDateSt, themeDateEt, attnName, auditName, recorderName, themeStatus);
         } else {
-            return themeService.query(null, StatusEnum.OK.getCode(), whoFlag, themeName, recordDate, themeDate, attnName, auditName, recorderName, themeStatus);
+            return themeService.query(null, StatusEnum.OK.getCode(), whoFlag, themeName,
+                    recordDateSt, recordDateEt, themeDateSt, themeDateEt, attnName, auditName, recorderName, themeStatus);
         }
     }
 

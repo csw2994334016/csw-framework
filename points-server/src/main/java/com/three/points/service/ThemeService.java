@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -69,6 +72,10 @@ public class ThemeService extends BaseService<Theme, String> {
 
     private void saveThemeAndThemeDetailList(Theme theme, List<ThemeDetail> themeDetailList) {
         theme.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+        String empId = LoginUserUtil.getLoginUserEmpId();
+        String empFullName = LoginUserUtil.getLoginUserEmpFullName();
+        theme.setRecorderId(empId);
+        theme.setRecorderName(empFullName);
         theme = themeRepository.save(theme);
 
         for (ThemeDetail themeDetail : themeDetailList) {
@@ -91,7 +98,7 @@ public class ThemeService extends BaseService<Theme, String> {
         for (ThemeDetail themeDetail : themeDetailList) {
             themeDetail.setThemeId(theme.getId());
         }
-        // 删除原因的记录
+        // 删除原有记录
         themeDetailRepository.deleteByThemeId(theme.getId());
 
         themeDetailRepository.saveAll(themeDetailList);
@@ -138,8 +145,6 @@ public class ThemeService extends BaseService<Theme, String> {
     private void setTheme(Theme theme, List<ThemeDetail> themeDetailList) {
         String empId = LoginUserUtil.getLoginUserEmpId();
         String empFullName = LoginUserUtil.getLoginUserEmpFullName();
-        theme.setRecorderId(empId);
-        theme.setRecorderName(empFullName);
         theme.setLastEditUserID(empId);
         theme.setLastEditUserName(empFullName);
 
@@ -179,8 +184,9 @@ public class ThemeService extends BaseService<Theme, String> {
         themeRepository.saveAll(themeList);
     }
 
-    public PageResult<Theme> query(PageQuery pageQuery, int code, String whoFlag, String themeName, String recordDate,
-                                   String themeDate, String attnName, String auditName, String recorderName, Integer themeStatus) {
+    public PageResult<Theme> query(PageQuery pageQuery, int code, String whoFlag, String themeName,
+                                   String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt,
+                                   String attnName, String auditName, String recorderName, Integer themeStatus) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -193,22 +199,16 @@ public class ThemeService extends BaseService<Theme, String> {
             if ("1".equals(whoFlag) && loginUserEmpId != null) {
                 predicateList.add(criteriaBuilder.equal(root.get("submitterId"), loginUserEmpId));
             }
-            if (StringUtil.isNotBlank(themeName)) {
-                predicateList.add(criteriaBuilder.like(root.get("themeName"), "%" + themeName + "%"));
+            // 我参与的奖扣
+            if ("2".equals(whoFlag) && loginUserEmpId != null) {
+                List<String> themeIdList = themeDetailRepository.findThemeIdByEmpId(loginUserEmpId);
+                if (themeIdList != null) {
+                    predicateList.add(root.get("id").in(themeIdList));
+                }
             }
 
-            if (StringUtil.isNotBlank(attnName)) {
-                predicateList.add(criteriaBuilder.like(root.get("attnName"), "%" + attnName + "%"));
-            }
-            if (StringUtil.isNotBlank(auditName)) {
-                predicateList.add(criteriaBuilder.like(root.get("auditName"), "%" + auditName + "%"));
-            }
-            if (StringUtil.isNotBlank(recorderName)) {
-                predicateList.add(criteriaBuilder.like(root.get("recorderName"), "%" + recorderName + "%"));
-            }
-            if (themeStatus != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("themeStatus"), themeStatus));
-            }
+            addPredicateToList(predicateList, criteriaBuilder, root,
+                    themeName, attnName, auditName, recorderName, themeStatus, recordDateSt, recordDateEt, themeDateSt, themeDateEt);
 
             return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
@@ -218,6 +218,44 @@ public class ThemeService extends BaseService<Theme, String> {
             return query(themeRepository, sort, specification);
         }
     }
+
+    private void addPredicateToList(List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Theme> root,
+                                    String themeName, String attnName, String auditName, String recorderName, Integer themeStatus,
+                                    String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt) {
+        if (StringUtil.isNotBlank(themeName)) {
+            predicateList.add(criteriaBuilder.like(root.get("themeName"), "%" + themeName + "%"));
+        }
+        if (StringUtil.isNotBlank(attnName)) {
+            predicateList.add(criteriaBuilder.like(root.get("attnName"), "%" + attnName + "%"));
+        }
+        if (StringUtil.isNotBlank(auditName)) {
+            predicateList.add(criteriaBuilder.like(root.get("auditName"), "%" + auditName + "%"));
+        }
+        if (StringUtil.isNotBlank(recorderName)) {
+            predicateList.add(criteriaBuilder.like(root.get("recorderName"), "%" + recorderName + "%"));
+        }
+        if (themeStatus != null) {
+            predicateList.add(criteriaBuilder.equal(root.get("themeStatus"), themeStatus));
+        }
+        // 记录时间、奖扣时间
+        if (StringUtil.isNotBlank(recordDateSt)) {
+            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createDate"), StringUtil.getStrToDate(recordDateSt)));
+            if (StringUtil.isNotBlank(recordDateEt)) {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createDate"), StringUtil.getStrToDate(recordDateEt)));
+            } else {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createDate"), StringUtil.sdf.format(new Date())));
+            }
+        }
+        if (StringUtil.isNotBlank(themeDateSt)) {
+            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("themeDate"), StringUtil.getStrToDate(themeDateSt)));
+            if (StringUtil.isNotBlank(themeDateEt)) {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("themeDate"), StringUtil.getStrToDate(themeDateEt)));
+            } else {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("themeDate"), StringUtil.sdf.format(new Date())));
+            }
+        }
+    }
+
 
     public Theme findById(String id) {
         return getEntityById(themeRepository, id);

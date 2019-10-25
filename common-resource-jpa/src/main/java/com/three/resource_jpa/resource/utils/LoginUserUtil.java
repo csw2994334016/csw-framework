@@ -38,7 +38,9 @@ public class LoginUserUtil {
     public static String getLoginUserEmpId() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null) {
-            return loginUser.getSysEmployee().getId();
+            if (loginUser.getSysEmployee() != null) {
+                return loginUser.getSysEmployee().getId();
+            }
         }
         return null;
     }
@@ -46,7 +48,9 @@ public class LoginUserUtil {
     public static String getLoginUserEmpFullName() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null) {
-            return loginUser.getSysEmployee().getFullName();
+            if (loginUser.getSysEmployee() != null) {
+                return loginUser.getSysEmployee().getFullName();
+            }
         }
         return null;
     }
