@@ -1,5 +1,6 @@
 package com.three.points.param;
 
+import com.three.common.utils.StringUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -22,11 +23,11 @@ public class ThemeParam {
 
     @NotBlank(message = "主题名不可以为空")
     @ApiModelProperty("主题名")
-    private String themeName; // 主题名
+    private String themeName = StringUtil.getDateStr() + "未设置主题"; // 主题名
 
     @NotNull(message = "奖扣时间不可以为空")
     @ApiModelProperty("奖扣时间")
-    private Date themeDate; // 奖扣时间
+    private Date themeDate = new Date(); // 奖扣时间
 
     @NotBlank(message = "初审人ID不可以为空")
     @ApiModelProperty("初审人ID")
