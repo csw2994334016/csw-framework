@@ -123,24 +123,6 @@ public class EmployeeController {
         return employeeService.findByRole(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue, roleId);
     }
 
-    @ApiOperation(value = "查找所有员工信息(不包括子部门人员)(分页,page/limit不给表示不分页)", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
-            @ApiImplicitParam(name = "organizationId", value = "组织/公司/部门ID", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "搜索值（姓名/手机号）", dataType = "String")
-    })
-    @GetMapping("/findAllByOrgId")
-    public PageResult<Employee> findAllByOrgId(Integer page, Integer limit, String organizationId, String searchValue) {
-        if (page != null && limit != null) {
-            PageQuery pageQuery = new PageQuery(page, limit);
-            return employeeService.query(pageQuery, StatusEnum.OK.getCode(), organizationId, searchValue, "0");
-        } else {
-            return employeeService.query(null, StatusEnum.OK.getCode(), organizationId, searchValue, "0");
-        }
-
-    }
-
     @ApiOperation(value = "查找员工信息（根据Id）", notes = "")
     @ApiImplicitParam(name = "id", value = "员工ID", required = true, dataType = "String")
     @GetMapping("/findById")
