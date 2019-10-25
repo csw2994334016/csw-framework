@@ -44,9 +44,9 @@ public class Theme implements Serializable {
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
 
-    @Column(name = "theme_status", nullable = false, columnDefinition = "int(2) comment '主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=审核不通过;5=审核通过'")
-    @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=审核不通过;5=审核通过")
-    private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=审核不通过;5=审核通过
+    @Column(name = "theme_status", nullable = false, columnDefinition = "int(2) comment '主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定'")
+    @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定")
+    private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定
 
     @Column(name = "a_pos_score", columnDefinition = "int(11) default 0 comment 'A分（汇总正分）'")
     @ApiModelProperty("A分（汇总正分）")
@@ -106,7 +106,7 @@ public class Theme implements Serializable {
 
     @Column(name = "audit_id", columnDefinition = "varchar(36) comment '终审人ID'")
     @ApiModelProperty("终审人ID")
-    private String auditId; // 终审人ID
+    private String auditId; // 终审人ID不能和初审人相同
 
     @Column(name = "audit_name", columnDefinition = "varchar(255) comment '终审人姓名'")
     @ApiModelProperty("终审人姓名")

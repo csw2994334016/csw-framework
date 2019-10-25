@@ -1,5 +1,6 @@
 package com.three.points.service;
 
+import com.three.commonclient.exception.BusinessException;
 import com.three.points.enums.ThemeEnum;
 import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
@@ -24,10 +25,7 @@ import org.springframework.data.domain.Sort;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csw on 2019-10-24.
@@ -59,6 +57,7 @@ public class ThemeService extends BaseService<Theme, String> {
     @Transactional
     public void create(ThemeParam themeParam) {
         BeanValidator.check(themeParam);
+        checkAttnIdAndAuditId(themeParam);
 
         Theme theme = new Theme();
 
@@ -88,6 +87,7 @@ public class ThemeService extends BaseService<Theme, String> {
     @Transactional
     public void update(ThemeParam themeParam) {
         BeanValidator.check(themeParam);
+        checkAttnIdAndAuditId(themeParam);
 
         Theme theme = getEntityById(themeRepository, themeParam.getId());
         List<ThemeDetail> themeDetailList = new ArrayList<>();
@@ -102,6 +102,12 @@ public class ThemeService extends BaseService<Theme, String> {
         themeDetailRepository.deleteByThemeId(theme.getId());
 
         themeDetailRepository.saveAll(themeDetailList);
+    }
+
+    private void checkAttnIdAndAuditId(ThemeParam themeParam) {
+        if (themeParam.getAttnId().equals(themeParam.getAuditId())) {
+            throw new BusinessException("终审人和初审人不能相同");
+        }
     }
 
     private void createTheme(Theme theme, List<ThemeDetail> themeDetailList, ThemeParam themeParam) {
@@ -175,13 +181,19 @@ public class ThemeService extends BaseService<Theme, String> {
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<Theme> themeList = new ArrayList<>();
+        List<ThemeDetail> themeDetailList = new ArrayList<>();
         for (String id : idSet) {
             Theme theme = getEntityById(themeRepository, String.valueOf(id));
             theme.setStatus(code);
             themeList.add(theme);
+            List<ThemeDetail> themeDetails = themeDetailRepository.findAllByThemeId(theme.getId());
+            themeDetails.forEach(e -> {
+                e.setStatus(code);
+                themeDetailList.add(e);
+            });
         }
-
         themeRepository.saveAll(themeList);
+        themeDetailRepository.saveAll(themeDetailList);
     }
 
     public PageResult<Theme> query(PageQuery pageQuery, int code, String whoFlag, String themeName,
@@ -194,22 +206,62 @@ public class ThemeService extends BaseService<Theme, String> {
             Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
-            // 我提交的奖扣
             String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
-            if ("1".equals(whoFlag) && loginUserEmpId != null) {
-                predicateList.add(criteriaBuilder.equal(root.get("submitterId"), loginUserEmpId));
-            }
-            // 我参与的奖扣
-            if ("2".equals(whoFlag) && loginUserEmpId != null) {
-                List<String> themeIdList = themeDetailRepository.findThemeIdByEmpId(loginUserEmpId);
-                if (themeIdList != null) {
-                    predicateList.add(root.get("id").in(themeIdList));
+            if (loginUserEmpId != null) {
+                if ("2".equals(whoFlag)) { // 我参与的奖扣
+                    List<String> themeIdList = themeDetailRepository.findThemeIdByEmpId(loginUserEmpId);
+                    if (themeIdList != null) {
+                        predicateList.add(root.get("id").in(themeIdList));
+                    }
+                } else { // 我提交的奖扣
+                    predicateList.add(criteriaBuilder.equal(root.get("submitterId"), loginUserEmpId));
                 }
             }
 
             addPredicateToList(predicateList, criteriaBuilder, root,
                     themeName, attnName, auditName, recorderName, themeStatus, recordDateSt, recordDateEt, themeDateSt, themeDateEt);
 
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
+        };
+        if (pageQuery != null) {
+            return query(themeRepository, pageQuery, sort, specification);
+        } else {
+            return query(themeRepository, sort, specification);
+        }
+    }
+
+    public PageResult<Theme> queryApproval(PageQuery pageQuery, int code, String whoFlag, String themeName,
+                                           String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt,
+                                           String attnName, String auditName, String recorderName, Integer themeStatus) {
+        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+
+            Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
+
+            addPredicateToList(predicateList, criteriaBuilder, root,
+                    themeName, attnName, auditName, recorderName, themeStatus, recordDateSt, recordDateEt, themeDateSt, themeDateEt);
+
+            String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+            if (loginUserEmpId != null) {
+                if ("3".equals(whoFlag)) { // 抄送给我
+                    predicateList.add(criteriaBuilder.equal(root.get("copyPersonId"), loginUserEmpId));
+                } else {
+                    List<Predicate> predicateList1 = new ArrayList<>();
+                    // 初审人或终审人
+                    Predicate p1 = criteriaBuilder.equal(root.get("attnId"), loginUserEmpId);
+                    predicateList1.add(criteriaBuilder.or(p1));
+                    Predicate p2 = criteriaBuilder.equal(root.get("auditId"), loginUserEmpId);
+                    predicateList1.add(criteriaBuilder.or(p2));
+                    if ("2".equals(whoFlag)) { // 我已审核
+                        predicateList.add(root.get("themeStatus").in(Arrays.asList(ThemeEnum.AUDIT.getCode(), ThemeEnum.SUCCESS.getCode())));
+                    } else { // 待我审核
+                        predicateList.add(root.get("themeStatus").in(Arrays.asList(ThemeEnum.ATTN.getCode(), ThemeEnum.AUDIT.getCode())));
+                    }
+                    return criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])), criteriaBuilder.and(predicateList1.toArray(new Predicate[0]))).getRestriction();
+                }
+            }
             return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
         if (pageQuery != null) {
@@ -259,5 +311,107 @@ public class ThemeService extends BaseService<Theme, String> {
 
     public Theme findById(String id) {
         return getEntityById(themeRepository, id);
+    }
+
+    @Transactional
+    public void submit(String id) {
+        Theme theme = getEntityById(themeRepository, id);
+        if (theme.getThemeStatus() == ThemeEnum.SAVE.getCode()) { // 只有保存状态才能提交
+            // 当前用户是初审人,则直接到待终审状态
+            theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+            if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(LoginUserUtil.getLoginUserEmpId())) {
+                theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+            }
+            themeRepository.save(theme);
+        } else {
+            throw new BusinessException("只有保存状态才能提交");
+        }
+    }
+
+    @Transactional
+    public void retreat(String id) {
+        Theme theme = getEntityById(themeRepository, id);
+        if (theme.getThemeStatus() != ThemeEnum.LOCK.getCode()) {
+            String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+            if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是记录人才能撤回
+                if (theme.getRecorderId().equals(loginUserEmpId)) {
+                    theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+                    themeRepository.save(theme);
+                } else {
+                    throw new BusinessException("记录是待初审状态,只有当前用户是记录人才能撤回");
+                }
+            } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是待终审/驳回状态,只有当前用户是初审人才能撤回
+                if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
+                    theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                    themeRepository.save(theme);
+                } else {
+                    throw new BusinessException("记录是待终审/驳回状态,只有当前用户是初审人才能撤回");
+                }
+            } else if (theme.getThemeStatus() == ThemeEnum.SUCCESS.getCode()) { // 记录是审核通过状态,只有当前用户是终审人才能撤回
+                if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
+                    theme.setThemeStatus(ThemeEnum.LOCK.getCode());
+                    themeRepository.save(theme);
+                } else {
+                    throw new BusinessException("记录是审核通过状态,只有当前用户是终审人才能撤回");
+                }
+            } else {
+                throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能撤回");
+            }
+        } else {
+            throw new BusinessException("锁定状态不能撤回");
+        }
+    }
+
+    @Transactional
+    public void reject(String id, String opinion, Integer recorderBScore, Integer attnBScore) {
+        Theme theme = getEntityById(themeRepository, id);
+        String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是初审人才能驳回
+            if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
+                theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+                theme.setAttnOpinion(opinion);
+                themeRepository.save(theme);
+            } else {
+                throw new BusinessException("记录是待初审状态,只有当前用户是初审人才能驳回");
+            }
+        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.LOCK.getCode()) { // 记录是待终审/锁定状态,只有当前用户是终审人才能驳回
+            if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
+                theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                theme.setAuditOpinion(opinion);
+                // todo: 只有终审人驳回才能进行扣分操作
+                themeRepository.save(theme);
+            } else {
+                throw new BusinessException("记录是待终审/锁定状态,只有当前用户是终审人才能驳回");
+            }
+        } else {
+            throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能撤回");
+        }
+    }
+
+    @Transactional
+    public void approve(String id, String opinion, Integer recorderBScore, Integer attnBScore) {
+        Theme theme = getEntityById(themeRepository, id);
+        String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是初审人才能通过
+            if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
+                theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+                theme.setAttnOpinion(opinion);
+                themeRepository.save(theme);
+            } else {
+                throw new BusinessException("记录是待初审状态,只有当前用户是初审人才能通过");
+            }
+        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode()) { // 记录是待终审状态,只有当前用户是终审人才能通过
+            if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
+                theme.setThemeStatus(ThemeEnum.SUCCESS.getCode());
+                theme.setAuditOpinion(opinion);
+                // todo: 只有终审人驳回才能进行奖分操作
+                // todo: 事件参与人员积分实时结算
+                themeRepository.save(theme);
+            } else {
+                throw new BusinessException("记录是待终审状态,只有当前用户是终审人才能通过");
+            }
+        } else {
+            throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能通过");
+        }
     }
 }

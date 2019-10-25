@@ -19,4 +19,6 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
 
     @Query("select distinct t.themeId from ThemeDetail t where t.empId = :loginUserEmpId")
     List<String> findThemeIdByEmpId(@Param("loginUserEmpId") String loginUserEmpId);
+
+    List<ThemeDetail> findAllByThemeId(String id);
 }

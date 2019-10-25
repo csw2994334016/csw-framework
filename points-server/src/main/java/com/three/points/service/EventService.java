@@ -99,7 +99,6 @@ public class EventService extends BaseService<Event, String> {
                 Predicate p1 = criteriaBuilder.like(root.get("eventName"), "%" + searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
                 Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
-
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
             return predicate;
