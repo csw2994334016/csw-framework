@@ -4,6 +4,7 @@ import com.three.authserver.feign.LogClient;
 import com.three.common.log.Log;
 import com.three.common.utils.LogUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -39,6 +40,7 @@ public class OAuth2Controller {
      *
      * @return
      */
+    @ApiOperation(value = "当前登陆用户信息", notes = "")
     @GetMapping("/user-me")
     public Authentication principal() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -98,6 +100,7 @@ public class OAuth2Controller {
      *
      * @param access_token
      */
+    @ApiOperation(value = "注销登陆/退出", notes = "")
     @DeleteMapping(value = "/remove_token", params = "access_token")
     public void removeToken(String access_token) {
 

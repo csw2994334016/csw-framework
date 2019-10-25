@@ -2,6 +2,7 @@ package com.three.points.controller;
 
 import com.three.points.entity.Theme;
 import com.three.points.param.ThemeParam;
+import com.three.points.service.ThemeDetailService;
 import com.three.points.service.ThemeService;
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
@@ -20,13 +21,16 @@ import org.springframework.web.bind.annotation.*;
  * Description:
  */
 
-@Api(value = "积分奖扣主题", tags = "积分奖扣主题")
+@Api(value = "积分奖扣", tags = "积分奖扣")
 @RestController
 @RequestMapping("/points/themes")
 public class ThemeController {
 
     @Autowired
     private ThemeService themeService;
+
+    @Autowired
+    private ThemeDetailService themeDetailService;
 
     @LogAnnotation(module = "保存积分奖扣主题到草稿")
     @ApiOperation(value = "保存积分奖扣主题到草稿")
@@ -77,7 +81,7 @@ public class ThemeController {
             @ApiImplicitParam(name = "attnName", value = "初审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "auditName", value = "终审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "recorderName", value = "记录人姓名", dataType = "String"),
-            @ApiImplicitParam(name = "themeStatus", value = "状态", dataType = "Integer")
+            @ApiImplicitParam(name = "themeStatus", value = "状态：0=草稿;1=保存;2=待初审;3=待终审;4=审核不通过;5=审核通过", dataType = "Integer")
     })
     @GetMapping("/query")
     public PageResult<Theme> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String themeName,
@@ -99,5 +103,19 @@ public class ThemeController {
         return JsonResult.ok().put("data", themeService.findById(id));
     }
 
+    @LogAnnotation(module = "删除积分奖扣详情")
+    @ApiOperation(value = "删除积分奖扣详情")
+    @ApiImplicitParam(name = "ids", value = "积分奖扣详情信息ids", required = true, dataType = "String")
+    @DeleteMapping("/themeDetails")
+    public JsonResult deleteThemeDetail(@RequestParam(required = true) String ids) {
+        themeDetailService.delete(ids, StatusEnum.DELETE.getCode());
+        return JsonResult.ok("积分奖扣详情删除成功");
+    }
 
+    @ApiOperation(value = "查询积分奖扣详情（根据主题ID查找事件及参与人员）", notes = "")
+    @ApiImplicitParam(name = "themeId", value = "积分奖扣id", required = true, dataType = "String")
+    @GetMapping("/themeDetails/findByThemeId")
+    public JsonResult findByThemeId(@RequestParam() String themeId) {
+        return JsonResult.ok().put("data", themeDetailService.findByThemeId(themeId));
+    }
 }

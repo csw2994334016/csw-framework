@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * Description:
  */
 
-@Api(value = "事件", tags = "事件")
+@Api(value = "事件库", tags = "事件库")
 @RestController
 @RequestMapping("/points/events")
 public class EventController {
