@@ -103,15 +103,6 @@ public class ThemeController {
         return JsonResult.ok().put("data", themeService.findById(id));
     }
 
-    @LogAnnotation(module = "删除积分奖扣详情")
-    @ApiOperation(value = "删除积分奖扣详情")
-    @ApiImplicitParam(name = "ids", value = "积分奖扣详情信息ids", required = true, dataType = "String")
-    @DeleteMapping("/themeDetails")
-    public JsonResult deleteThemeDetail(@RequestParam(required = true) String ids) {
-        themeDetailService.delete(ids, StatusEnum.DELETE.getCode());
-        return JsonResult.ok("积分奖扣详情删除成功");
-    }
-
     @ApiOperation(value = "查询积分奖扣详情（根据主题ID查找事件及参与人员）", notes = "")
     @ApiImplicitParam(name = "themeId", value = "积分奖扣id", required = true, dataType = "String")
     @GetMapping("/themeDetails/findByThemeId")
