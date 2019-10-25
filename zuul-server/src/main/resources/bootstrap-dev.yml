@@ -11,7 +11,7 @@ logging:
   level:
     root: info
     com.three: debug
-    org.springframework.security: debug
+    org.springframework.security: info
   file: logs/${spring.application.name}.log
 security:
   oauth2:
