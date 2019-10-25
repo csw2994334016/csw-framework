@@ -84,6 +84,10 @@ public class Theme implements Serializable {
     @ApiModelProperty("提交人姓名")
     private String submitterName; // 提交人姓名
 
+    @Column(name = "submitter_date", columnDefinition = "datetime comment '提交时间'")
+    @ApiModelProperty("提交时间")
+    private Date submitterDate; // 提交时间
+
     @Column(name = "attn_id", columnDefinition = "varchar(36) comment '初审人ID'")
     @ApiModelProperty("初审人ID")
     private String attnId; // 初审人ID
