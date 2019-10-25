@@ -58,7 +58,7 @@ public class Authority implements Serializable {
     @Column(columnDefinition = "varchar(800) comment '菜单/接口父权限IDS'")
     private String parentIds;
 
-    @Column(columnDefinition = "varchar(36) comment '菜单/接口父权限名称'")
+    @Column(columnDefinition = "varchar(255) comment '菜单/接口父权限名称'")
     private String parentName;
 
     @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 1 comment '排序'")
