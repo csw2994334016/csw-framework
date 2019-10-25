@@ -1,12 +1,15 @@
 package com.three.points.service;
 
+import com.three.common.enums.StatusEnum;
 import com.three.points.entity.ThemeDetail;
+import com.three.points.param.ThemeEmpParam;
 import com.three.points.repository.ThemeDetailRepository;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.vo.ThemeDetailVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csw on 2019-10-24.
@@ -26,7 +27,7 @@ import java.util.Set;
  */
 
 @Service
-public class ThemeDetailService extends BaseService<ThemeDetail,  String> {
+public class ThemeDetailService extends BaseService<ThemeDetail, String> {
 
     @Autowired
     private ThemeDetailRepository themeDetailRepository;
@@ -70,5 +71,22 @@ public class ThemeDetailService extends BaseService<ThemeDetail,  String> {
 
     public ThemeDetail findById(String id) {
         return getEntityById(themeDetailRepository, id);
+    }
+
+    public List<ThemeDetailVo> findByThemeId(String themeId) {
+        List<ThemeDetail> themeDetailList = themeDetailRepository.findAllByThemeIdAndStatus(themeId, StatusEnum.OK.getCode());
+        Map<String, ThemeDetailVo> themeDetailVoMap = new HashMap<>();
+        for (ThemeDetail themeDetail : themeDetailList) {
+            // 参与人员
+            ThemeEmpParam themeEmpParam = new ThemeEmpParam();
+            themeEmpParam = (ThemeEmpParam) BeanCopyUtil.copyBean(themeDetail, themeEmpParam);
+            if (themeDetailVoMap.get(themeDetail.getEventName()) == null) {
+                ThemeDetailVo themeDetailVo = new ThemeDetailVo();
+                themeDetailVo = (ThemeDetailVo) BeanCopyUtil.copyBean(themeDetail, themeDetailVo);
+                themeDetailVoMap.put(themeDetail.getEventName(), themeDetailVo);
+            }
+            themeDetailVoMap.get(themeDetail.getEventName()).getThemeEmpParamList().add(themeEmpParam);
+        }
+        return (List<ThemeDetailVo>) themeDetailVoMap.values();
     }
 }

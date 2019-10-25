@@ -48,13 +48,21 @@ public class Theme implements Serializable {
     @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=审核不通过;5=审核通过")
     private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=审核不通过;5=审核通过
 
-    @Column(name = "a_score", columnDefinition = "int(11) default 0 comment 'A分（汇总分）'")
-    @ApiModelProperty("A分（汇总分）")
-    private Integer aScore = 0; // A分（汇总分）
+    @Column(name = "a_pos_score", columnDefinition = "int(11) default 0 comment 'A分（汇总正分）'")
+    @ApiModelProperty("A分（汇总正分）")
+    private Integer aPosScore = 0; // A分（汇总正分）
 
-    @Column(name = "b_score", columnDefinition = "int(11) default 0 comment 'B分（汇总分）'")
-    @ApiModelProperty("B分（汇总分）")
-    private Integer bScore = 0; // B分（汇总分）
+    @Column(name = "a_neg_score", columnDefinition = "int(11) default 0 comment 'A分（汇总负分）'")
+    @ApiModelProperty("A分（汇总负分）")
+    private Integer aNegScore = 0; // A分（汇总负分）
+
+    @Column(name = "b_pos_score", columnDefinition = "int(11) default 0 comment 'B分（汇总正分）'")
+    @ApiModelProperty("B分（汇总正分）")
+    private Integer bPosScore = 0; // B分（汇总正分）
+
+    @Column(name = "b_neg_score", columnDefinition = "int(11) default 0 comment 'B分（汇总负分）'")
+    @ApiModelProperty("B分（汇总负分）")
+    private Integer bNegScore = 0; // B分（汇总负分）
 
     @Column(name = "emp_count", nullable = false, columnDefinition = "int(11) comment '人次'")
     @ApiModelProperty("人次")
@@ -67,6 +75,14 @@ public class Theme implements Serializable {
     @Column(name = "recorder_name", columnDefinition = "varchar(255) comment '记录人姓名'")
     @ApiModelProperty("记录人姓名")
     private String recorderName; // 记录人姓名
+
+    @Column(name = "submitter_id", columnDefinition = "varchar(36) comment '提交人ID'")
+    @ApiModelProperty("提交人ID")
+    private String submitterId; // 提交人ID
+
+    @Column(name = "submitter_name", columnDefinition = "varchar(255) comment '提交人姓名'")
+    @ApiModelProperty("提交人姓名")
+    private String submitterName; // 提交人姓名
 
     @Column(name = "attn_id", columnDefinition = "varchar(36) comment '初审人ID'")
     @ApiModelProperty("初审人ID")

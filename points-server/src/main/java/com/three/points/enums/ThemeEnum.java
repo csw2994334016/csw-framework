@@ -1,4 +1,4 @@
-package com.three.common.enums;
+package com.three.points.enums;
 
 import lombok.Getter;
 

@@ -64,6 +64,18 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称
 
+    @Column(name = "prize_flag", columnDefinition = "int(1) default 0 comment '奖票事件：1=是；0=否'")
+    @ApiModelProperty("奖票事件：1=是；0=否")
+    private Integer prizeFlag = 0; // 奖票事件：1=是；0=否
+
+    @Column(name = "count_flag", columnDefinition = "int(1) default 0 comment '记件事件：1=是；0=否'")
+    @ApiModelProperty("记件事件：1=是；0=否")
+    private Integer countFlag = 0; // 记件事件：1=是；0=否
+
+    @Column(name = "audit_flag", columnDefinition = "int(1) default 0 comment '专人审核：1=是；0=否'")
+    @ApiModelProperty("专人审核：1=是；0=否")
+    private Integer auditFlag = 0; // 专人审核：1=是；0=否
+
     @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '人员ID'")
     @ApiModelProperty("人员ID")
     private String empId; // 人员ID

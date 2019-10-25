@@ -64,18 +64,25 @@ public class ThemeController {
         return JsonResult.ok("积分奖扣主题删除成功");
     }
 
-    @ApiOperation(value = "查询积分奖扣主题（分页）", notes = "")
+    @ApiOperation(value = "查询积分奖扣主题（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
+            @ApiImplicitParam(name = "whoFlag", value = "我提交/参与的奖扣标记,1=我提交;2=我参与(默认1)", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "themeName", value = "主题关键词", dataType = "String"),
+            @ApiImplicitParam(name = "recordDate", value = "记录时间", dataType = "String"),
+            @ApiImplicitParam(name = "themeDate", value = "奖扣时间", dataType = "String"),
+            @ApiImplicitParam(name = "attnName", value = "初审人姓名", dataType = "String"),
+            @ApiImplicitParam(name = "auditName", value = "终审人姓名", dataType = "String"),
+            @ApiImplicitParam(name = "recorderName", value = "记录人姓名", dataType = "String"),
+            @ApiImplicitParam(name = "themeStatus", value = "状态", dataType = "Integer")
     })
     @GetMapping("/query")
-    public PageResult<Theme> query(Integer page, Integer limit, String searchValue) {
+    public PageResult<Theme> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String themeName, String recordDate, String themeDate, String attnName, String auditName, String recorderName, Integer themeStatus) {
         if (page != null && limit != null) {
-            return themeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
+            return themeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), whoFlag, themeName, recordDate, themeDate, attnName, auditName, recorderName, themeStatus);
         } else {
-            return themeService.query(null, StatusEnum.OK.getCode(), searchValue);
+            return themeService.query(null, StatusEnum.OK.getCode(), whoFlag, themeName, recordDate, themeDate, attnName, auditName, recorderName, themeStatus);
         }
     }
 

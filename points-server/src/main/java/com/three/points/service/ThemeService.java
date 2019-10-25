@@ -1,6 +1,6 @@
 package com.three.points.service;
 
-import com.three.common.enums.ThemeEnum;
+import com.three.points.enums.ThemeEnum;
 import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.param.ThemeEmpParam;
@@ -118,12 +118,15 @@ public class ThemeService extends BaseService<Theme, String> {
                 ThemeDetail themeDetail = new ThemeDetail();
                 themeDetail.setThemeName(theme.getThemeName());
                 themeDetail.setThemeDate(theme.getThemeDate());
-                themeDetail.setEmpId(themeEmpParam.getEmpId());
-                themeDetail.setEmpFullName(themeEmpParam.getEmpFullName());
-                themeDetail.setEventId(themeEventParam.getEventId());
-                themeDetail.setEventName(themeEventParam.getEventName());
                 themeDetail.setEventTypeId(themeEventParam.getEventTypeId());
                 themeDetail.setEventTypeName(themeEventParam.getEventTypeName());
+                themeDetail.setEventId(themeEventParam.getEventId());
+                themeDetail.setEventName(themeEventParam.getEventName());
+                themeDetail.setPrizeFlag(themeEventParam.getPrizeFlag());
+                themeDetail.setCountFlag(themeEventParam.getCountFlag());
+                themeDetail.setAuditFlag(themeEventParam.getAuditFlag());
+                themeDetail.setEmpId(themeEmpParam.getEmpId());
+                themeDetail.setEmpFullName(themeEmpParam.getEmpFullName());
                 themeDetail.setAScore(themeEmpParam.getAScore());
                 themeDetail.setBScore(themeEmpParam.getBScore());
                 themeDetail.setRemark(themeEventParam.getRemark());
@@ -141,14 +144,26 @@ public class ThemeService extends BaseService<Theme, String> {
         theme.setLastEditUserName(empFullName);
 
         theme.setEmpCount(themeDetailList.size());
-        int aScore = 0;
-        int bScore = 0;
+        int aPosScore = 0;
+        int aNegScore = 0;
+        int bPosScore = 0;
+        int bNegScore = 0;
         for (ThemeDetail themeDetail : themeDetailList) {
-            aScore += themeDetail.getAScore();
-            bScore += themeDetail.getBScore();
+            if (themeDetail.getAScore() > 0) {
+                aPosScore += themeDetail.getAScore();
+            } else {
+                aNegScore += themeDetail.getAScore();
+            }
+            if (themeDetail.getBScore() > 0) {
+                bPosScore += themeDetail.getBScore();
+            } else {
+                bNegScore += themeDetail.getBScore();
+            }
         }
-        theme.setAScore(aScore);
-        theme.setBScore(bScore);
+        theme.setAPosScore(aPosScore);
+        theme.setANegScore(aNegScore);
+        theme.setBPosScore(bPosScore);
+        theme.setBNegScore(bNegScore);
     }
 
     @Transactional
@@ -164,22 +179,38 @@ public class ThemeService extends BaseService<Theme, String> {
         themeRepository.saveAll(themeList);
     }
 
-    public PageResult<Theme> query(PageQuery pageQuery, int code, String searchValue) {
+    public PageResult<Theme> query(PageQuery pageQuery, int code, String whoFlag, String themeName, String recordDate,
+                                   String themeDate, String attnName, String auditName, String recorderName, Integer themeStatus) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
             Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
-            Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
+            predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
-            if (StringUtil.isNotBlank(searchValue)) {
-                List<Predicate> predicateList1 = new ArrayList<>();
-                Predicate p1 = criteriaBuilder.like(root.get("themeName"), "%" + searchValue + "%");
-                predicateList1.add(criteriaBuilder.or(p1));
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
-                return criteriaQuery.where(predicate, predicate1).getRestriction();
+            // 我提交的奖扣
+            String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+            if ("1".equals(whoFlag) && loginUserEmpId != null) {
+                predicateList.add(criteriaBuilder.equal(root.get("submitterId"), loginUserEmpId));
             }
-            return predicate;
+            if (StringUtil.isNotBlank(themeName)) {
+                predicateList.add(criteriaBuilder.like(root.get("themeName"), "%" + themeName + "%"));
+            }
+
+            if (StringUtil.isNotBlank(attnName)) {
+                predicateList.add(criteriaBuilder.like(root.get("attnName"), "%" + attnName + "%"));
+            }
+            if (StringUtil.isNotBlank(auditName)) {
+                predicateList.add(criteriaBuilder.like(root.get("auditName"), "%" + auditName + "%"));
+            }
+            if (StringUtil.isNotBlank(recorderName)) {
+                predicateList.add(criteriaBuilder.like(root.get("recorderName"), "%" + recorderName + "%"));
+            }
+            if (themeStatus != null) {
+                predicateList.add(criteriaBuilder.equal(root.get("themeStatus"), themeStatus));
+            }
+
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
         if (pageQuery != null) {
             return query(themeRepository, pageQuery, sort, specification);

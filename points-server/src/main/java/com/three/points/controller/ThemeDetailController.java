@@ -36,25 +36,32 @@ public class ThemeDetailController {
         return JsonResult.ok("积分奖扣主题详情删除成功");
     }
 
-    @ApiOperation(value = "查询积分奖扣主题详情（分页）", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
-    })
-    @GetMapping("/query")
-    public PageResult<ThemeDetail> query(Integer page, Integer limit, String searchValue) {
-        if (page != null && limit != null) {
-            return themeDetailService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
-        } else {
-            return themeDetailService.query(null, StatusEnum.OK.getCode(), searchValue);
-        }
-    }
+//    @ApiOperation(value = "查询积分奖扣主题详情（分页）", notes = "")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
+//            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
+//            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
+//    })
+//    @GetMapping("/query")
+//    public PageResult<ThemeDetail> query(Integer page, Integer limit, String searchValue) {
+//        if (page != null && limit != null) {
+//            return themeDetailService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
+//        } else {
+//            return themeDetailService.query(null, StatusEnum.OK.getCode(), searchValue);
+//        }
+//    }
 
-    @ApiOperation(value = "查询积分奖扣主题详情（根据ID查找）", notes = "")
-    @ApiImplicitParam(name = "id", value = "积分奖扣主题详情信息id", required = true, dataType = "String")
-    @GetMapping("/findById")
-    public JsonResult findById(@RequestParam(required = true) String id) {
-        return JsonResult.ok().put("data", themeDetailService.findById(id));
+//    @ApiOperation(value = "查询积分奖扣主题详情（根据ID查找）", notes = "")
+//    @ApiImplicitParam(name = "id", value = "积分奖扣主题详情信息id", required = true, dataType = "String")
+//    @GetMapping("/findById")
+//    public JsonResult findById(@RequestParam(required = true) String id) {
+//        return JsonResult.ok().put("data", themeDetailService.findById(id));
+//    }
+
+    @ApiOperation(value = "查询积分奖扣主题详情（根据主题ID查找事件及参与人员）", notes = "")
+    @ApiImplicitParam(name = "themeId", value = "积分奖扣主题id", required = true, dataType = "String")
+    @GetMapping("/findByThemeId")
+    public JsonResult findByThemeId(@RequestParam() String themeId) {
+        return JsonResult.ok().put("data", themeDetailService.findByThemeId(themeId));
     }
 }

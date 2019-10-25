@@ -55,7 +55,7 @@ public class ${className}Controller {
         return JsonResult.ok("${menuName}删除成功");
     }
 
-    @ApiOperation(value = "查询${menuName}（分页）", notes = "")
+    @ApiOperation(value = "查询${menuName}（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
