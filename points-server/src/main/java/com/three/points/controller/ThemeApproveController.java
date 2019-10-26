@@ -6,7 +6,6 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.entity.Theme;
-import com.three.points.service.ThemeDetailService;
 import com.three.points.service.ThemeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

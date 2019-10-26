@@ -90,6 +90,9 @@ public class ThemeService extends BaseService<Theme, String> {
         checkAttnIdAndAuditId(themeParam);
 
         Theme theme = getEntityById(themeRepository, themeParam.getId());
+        if (theme.getThemeStatus() == ThemeEnum.DRAFT.getCode() || theme.getThemeStatus() == ThemeEnum.SAVE.getCode()) {
+            throw new BusinessException("记录只有在草稿或保存状态下才能编辑");
+        }
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         createTheme(theme, themeDetailList, themeParam);
 
@@ -319,9 +322,13 @@ public class ThemeService extends BaseService<Theme, String> {
         if (theme.getThemeStatus() == ThemeEnum.SAVE.getCode()) { // 只有保存状态才能提交
             // 当前用户是初审人,则直接到待终审状态
             theme.setThemeStatus(ThemeEnum.ATTN.getCode());
-            if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(LoginUserUtil.getLoginUserEmpId())) {
+            String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+            if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
             }
+            theme.setSubmitterId(loginUserEmpId);
+            theme.setSubmitterName(LoginUserUtil.getLoginUserEmpFullName());
+            theme.setSubmitterDate(new Date());
             themeRepository.save(theme);
         } else {
             throw new BusinessException("只有保存状态才能提交");
@@ -378,7 +385,9 @@ public class ThemeService extends BaseService<Theme, String> {
             if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.ATTN.getCode());
                 theme.setAuditOpinion(opinion);
-                // todo: 只有终审人驳回才能进行扣分操作
+                // 只有终审人驳回才能进行扣分操作
+                theme.setRecorderNegBScore(recorderBScore);
+                theme.setAttnNegBScore(attnBScore);
                 themeRepository.save(theme);
             } else {
                 throw new BusinessException("记录是待终审/锁定状态,只有当前用户是终审人才能驳回");
@@ -396,6 +405,7 @@ public class ThemeService extends BaseService<Theme, String> {
             if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
                 theme.setAttnOpinion(opinion);
+                theme.setAttnDate(new Date());
                 themeRepository.save(theme);
             } else {
                 throw new BusinessException("记录是待初审状态,只有当前用户是初审人才能通过");
@@ -404,8 +414,10 @@ public class ThemeService extends BaseService<Theme, String> {
             if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.SUCCESS.getCode());
                 theme.setAuditOpinion(opinion);
-                // todo: 只有终审人驳回才能进行奖分操作
-                // todo: 事件参与人员积分实时结算
+                theme.setAuditDate(new Date());
+                // 只有终审人驳回才能进行奖分操作
+                theme.setRecorderPosBScore(recorderBScore);
+                theme.setAttnPosBScore(attnBScore);
                 themeRepository.save(theme);
             } else {
                 throw new BusinessException("记录是待终审状态,只有当前用户是终审人才能通过");
