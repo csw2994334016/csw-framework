@@ -72,6 +72,10 @@ public class Employee implements Serializable {
     @ApiModelProperty("民族")
     private String nation; // 民族
 
+    @Column(name = "native_place", columnDefinition = "varchar(255) comment '籍贯'")
+    @ApiModelProperty("籍贯")
+    private String nativePlace; // 籍贯
+
     @Column(name = "tell_num", columnDefinition = "varchar(30) comment '固定电话'")
     @ApiModelProperty("固定电话")
     private String tellNum; // 固定电话
