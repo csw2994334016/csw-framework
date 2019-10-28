@@ -26,8 +26,8 @@ public class ThemeParam {
     private String themeName = StringUtil.getDateStr() + "未设置主题"; // 主题名
 
     @NotNull(message = "奖扣时间不可以为空")
-    @ApiModelProperty("奖扣时间")
-    private Date themeDate = new Date(); // 奖扣时间
+    @ApiModelProperty("奖扣时间（时间戳，毫秒）")
+    private Long themeDate = new Date().getTime(); // 奖扣时间（时间戳，毫秒）
 
     @NotBlank(message = "初审人ID不可以为空")
     @ApiModelProperty("初审人ID")

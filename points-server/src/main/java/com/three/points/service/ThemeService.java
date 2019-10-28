@@ -64,7 +64,7 @@ public class ThemeService extends BaseService<Theme, String> {
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         createTheme(theme, themeDetailList, themeParam);
 
-        theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+        theme.setThemeStatus(ThemeEnum.ATTN.getCode());
 
         saveThemeAndThemeDetailList(theme, themeDetailList);
     }
@@ -116,6 +116,7 @@ public class ThemeService extends BaseService<Theme, String> {
     private void createTheme(Theme theme, List<ThemeDetail> themeDetailList, ThemeParam themeParam) {
         theme = (Theme) BeanCopyUtil.copyBean(themeParam, theme);
 
+        theme.setThemeDate(new Date(themeParam.getThemeDate()));
         // 设置主题详情
         setThemeDetailList(theme, themeDetailList, themeParam.getThemeEventParamList());
 
@@ -200,7 +201,7 @@ public class ThemeService extends BaseService<Theme, String> {
     }
 
     public PageResult<Theme> query(PageQuery pageQuery, int code, String whoFlag, String themeName,
-                                   String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt,
+                                   Long recordDateSt, Long recordDateEt, Long themeDateSt, Long themeDateEt,
                                    String attnName, String auditName, String recorderName, Integer themeStatus) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
@@ -234,7 +235,7 @@ public class ThemeService extends BaseService<Theme, String> {
     }
 
     public PageResult<Theme> queryApproval(PageQuery pageQuery, int code, String whoFlag, String themeName,
-                                           String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt,
+                                           Long recordDateSt, Long recordDateEt, Long themeDateSt, Long themeDateEt,
                                            String attnName, String auditName, String recorderName, Integer themeStatus) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
@@ -276,7 +277,7 @@ public class ThemeService extends BaseService<Theme, String> {
 
     private void addPredicateToList(List<Predicate> predicateList, CriteriaBuilder criteriaBuilder, Root<Theme> root,
                                     String themeName, String attnName, String auditName, String recorderName, Integer themeStatus,
-                                    String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt) {
+                                    Long recordDateSt, Long recordDateEt, Long themeDateSt, Long themeDateEt) {
         if (StringUtil.isNotBlank(themeName)) {
             predicateList.add(criteriaBuilder.like(root.get("themeName"), "%" + themeName + "%"));
         }
@@ -293,18 +294,18 @@ public class ThemeService extends BaseService<Theme, String> {
             predicateList.add(criteriaBuilder.equal(root.get("themeStatus"), themeStatus));
         }
         // 记录时间、奖扣时间
-        if (StringUtil.isNotBlank(recordDateSt)) {
-            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createDate"), StringUtil.getStrToDate(recordDateSt)));
-            if (StringUtil.isNotBlank(recordDateEt)) {
-                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createDate"), StringUtil.getStrToDate(recordDateEt)));
+        if (recordDateSt != null) {
+            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createDate"), new Date(recordDateSt)));
+            if (recordDateEt != null) {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createDate"), new Date(recordDateEt)));
             } else {
                 predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createDate"), StringUtil.sdf.format(new Date())));
             }
         }
-        if (StringUtil.isNotBlank(themeDateSt)) {
-            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("themeDate"), StringUtil.getStrToDate(themeDateSt)));
-            if (StringUtil.isNotBlank(themeDateEt)) {
-                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("themeDate"), StringUtil.getStrToDate(themeDateEt)));
+        if (themeDateSt != null) {
+            predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("themeDate"), new Date(themeDateSt)));
+            if (themeDateEt != null) {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("themeDate"), new Date(themeDateEt)));
             } else {
                 predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("themeDate"), StringUtil.sdf.format(new Date())));
             }

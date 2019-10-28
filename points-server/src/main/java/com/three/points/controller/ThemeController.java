@@ -74,10 +74,10 @@ public class ThemeController {
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "whoFlag", value = "我提交/参与的奖扣标记,1=我提交;2=我参与(默认1)", required = true, dataType = "String"),
             @ApiImplicitParam(name = "themeName", value = "主题关键词", dataType = "String"),
-            @ApiImplicitParam(name = "recordDateSt", value = "记录时间开始(yyyy-MM-dd)", dataType = "String"),
-            @ApiImplicitParam(name = "recordDateEt", value = "记录时间结束(yyyy-MM-dd),默认为当前时间", dataType = "String"),
-            @ApiImplicitParam(name = "themeDateSt", value = "奖扣时间开始(yyyy-MM-dd)", dataType = "String"),
-            @ApiImplicitParam(name = "themeDateEt", value = "奖扣时间结束(yyyy-MM-dd),默认为当前时间", dataType = "String"),
+            @ApiImplicitParam(name = "recordDateSt", value = "记录时间开始(时间戳，毫秒)", dataType = "Long"),
+            @ApiImplicitParam(name = "recordDateEt", value = "记录时间结束(时间戳，毫秒,默认为当前时间", dataType = "Long"),
+            @ApiImplicitParam(name = "themeDateSt", value = "奖扣时间开始(时间戳，毫秒)", dataType = "Long"),
+            @ApiImplicitParam(name = "themeDateEt", value = "奖扣时间结束(时间戳，毫秒),默认为当前时间", dataType = "Long"),
             @ApiImplicitParam(name = "attnName", value = "初审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "auditName", value = "终审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "recorderName", value = "记录人姓名", dataType = "String"),
@@ -85,7 +85,7 @@ public class ThemeController {
     })
     @GetMapping("/query")
     public PageResult<Theme> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String themeName,
-                                   String recordDateSt, String recordDateEt, String themeDateSt, String themeDateEt,
+                                   Long recordDateSt, Long recordDateEt, Long themeDateSt, Long themeDateEt,
                                    String attnName, String auditName, String recorderName, Integer themeStatus) {
         if (page != null && limit != null) {
             return themeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), whoFlag, themeName,
