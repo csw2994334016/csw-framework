@@ -138,11 +138,11 @@ public class Theme implements Serializable {
     @ApiModelProperty("终审时间")
     private Date auditDate; // 终审时间
 
-    @Column(name = "copy_person_id", columnDefinition = "varchar(36) comment '抄送人ID'")
+    @Column(name = "copy_person_id", columnDefinition = "varchar(5000) comment '抄送人ID'")
     @ApiModelProperty("抄送人ID")
     private String copyPersonId; // 抄送人ID
 
-    @Column(name = "copy_person_name", columnDefinition = "varchar(255) comment '抄送人姓名'")
+    @Column(name = "copy_person_name", columnDefinition = "varchar(5000) comment '抄送人姓名'")
     @ApiModelProperty("抄送人姓名")
     private String copyPersonName; // 抄送人姓名
 

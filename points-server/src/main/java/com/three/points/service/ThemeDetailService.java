@@ -85,6 +85,6 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             }
             themeDetailVoMap.get(themeDetail.getEventName()).getThemeEmpParamList().add(themeEmpParam);
         }
-        return (List<ThemeDetailVo>) themeDetailVoMap.values();
+        return new ArrayList<>(themeDetailVoMap.values());
     }
 }
