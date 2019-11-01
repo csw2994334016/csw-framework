@@ -86,7 +86,6 @@ public class ThemeService extends BaseService<Theme, String> {
         }
 
         theme = themeRepository.save(theme);
-
         for (ThemeDetail themeDetail : themeDetailList) {
             themeDetail.setThemeId(theme.getId());
             themeDetail.setOrganizationId(theme.getOrganizationId());
@@ -116,15 +115,14 @@ public class ThemeService extends BaseService<Theme, String> {
             theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
         }
 
-        theme = themeRepository.save(theme);
+        // 删除原有记录
+        themeDetailRepository.deleteByThemeId(theme.getId());
 
+        theme = themeRepository.save(theme);
         for (ThemeDetail themeDetail : themeDetailList) {
             themeDetail.setThemeId(theme.getId());
             themeDetail.setOrganizationId(theme.getOrganizationId());
         }
-        // 删除原有记录
-        themeDetailRepository.deleteByThemeId(theme.getId());
-
         themeDetailRepository.saveAll(themeDetailList);
     }
 
@@ -179,7 +177,7 @@ public class ThemeService extends BaseService<Theme, String> {
         theme.setLastEditUserID(empId);
         theme.setLastEditUserName(empFullName);
 
-        if (theme.getRecorderId().equals(theme.getAuditId())) {
+        if (empId != null && empId.equals(theme.getAuditId())) {
             throw new BusinessException("终审人不能是记录人");
         }
 
