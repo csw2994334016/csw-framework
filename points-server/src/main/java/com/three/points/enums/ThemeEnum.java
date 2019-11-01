@@ -25,4 +25,13 @@ public enum  ThemeEnum {
         this.code = code;
         this.message = message;
     }
+
+    public static String getMessageByCode(Integer code) {
+        for (ThemeEnum themeEnum : ThemeEnum.values()) {
+            if (themeEnum.getCode() == code) {
+                return themeEnum.getMessage();
+            }
+        }
+        return null;
+    }
 }

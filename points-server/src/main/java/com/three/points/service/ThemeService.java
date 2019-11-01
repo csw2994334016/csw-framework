@@ -14,6 +14,7 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.vo.ThemeApprovalVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,13 +80,16 @@ public class ThemeService extends BaseService<Theme, String> {
             theme.setSubmitterId(empId);
             theme.setSubmitterName(empFullName);
             theme.setSubmitterDate(new Date());
+            if (theme.getAttnId().equals(theme.getRecorderId())) {
+                theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+            }
         }
 
         theme = themeRepository.save(theme);
 
         for (ThemeDetail themeDetail : themeDetailList) {
             themeDetail.setThemeId(theme.getId());
-            themeDetail.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+            themeDetail.setOrganizationId(theme.getOrganizationId());
         }
         themeDetailRepository.saveAll(themeDetailList);
     }
@@ -96,16 +100,27 @@ public class ThemeService extends BaseService<Theme, String> {
         checkAttnIdAndAuditId(themeParam);
 
         Theme theme = getEntityById(themeRepository, themeParam.getId());
-        if (theme.getThemeStatus() == ThemeEnum.DRAFT.getCode() || theme.getThemeStatus() == ThemeEnum.SAVE.getCode()) {
+        if (theme.getThemeStatus() != ThemeEnum.DRAFT.getCode() && theme.getThemeStatus() != ThemeEnum.SAVE.getCode()) {
             throw new BusinessException("记录只有在草稿或保存状态下才能编辑");
         }
+
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         createTheme(theme, themeDetailList, themeParam);
+
+        String empId = LoginUserUtil.getLoginUserEmpId();
+        String empFullName = LoginUserUtil.getLoginUserEmpFullName();
+        theme.setSubmitterId(empId);
+        theme.setSubmitterName(empFullName);
+        theme.setSubmitterDate(new Date());
+        if (theme.getAttnId().equals(theme.getRecorderId())) {
+            theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+        }
 
         theme = themeRepository.save(theme);
 
         for (ThemeDetail themeDetail : themeDetailList) {
             themeDetail.setThemeId(theme.getId());
+            themeDetail.setOrganizationId(theme.getOrganizationId());
         }
         // 删除原有记录
         themeDetailRepository.deleteByThemeId(theme.getId());
@@ -115,7 +130,7 @@ public class ThemeService extends BaseService<Theme, String> {
 
     private void checkAttnIdAndAuditId(ThemeParam themeParam) {
         if (themeParam.getAttnId().equals(themeParam.getAuditId())) {
-            throw new BusinessException("终审人和初审人不能相同");
+            throw new BusinessException("终审人不能是初审人");
         }
     }
 
@@ -164,6 +179,10 @@ public class ThemeService extends BaseService<Theme, String> {
         theme.setLastEditUserID(empId);
         theme.setLastEditUserName(empFullName);
 
+        if (theme.getRecorderId().equals(theme.getAuditId())) {
+            throw new BusinessException("终审人不能是记录人");
+        }
+
         theme.setEmpCount(themeDetailList.size());
         int aPosScore = 0;
         int aNegScore = 0;
@@ -179,6 +198,9 @@ public class ThemeService extends BaseService<Theme, String> {
                 bPosScore += themeDetail.getBScore();
             } else {
                 bNegScore += themeDetail.getBScore();
+            }
+            if (themeDetail.getEmpId().equals(theme.getAuditId())) {
+                throw new BusinessException("终审人不能是奖扣对象");
             }
         }
         theme.setAPosScore(aPosScore);
@@ -256,7 +278,7 @@ public class ThemeService extends BaseService<Theme, String> {
             String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
             if (loginUserEmpId != null) {
                 if ("3".equals(whoFlag)) { // 抄送给我
-                    predicateList.add(criteriaBuilder.equal(root.get("copyPersonId"), loginUserEmpId));
+                    predicateList.add(criteriaBuilder.like(root.get("copyPersonId"), "%" + loginUserEmpId + "%"));
                 } else {
                     List<Predicate> predicateList1 = new ArrayList<>();
                     // 初审人或终审人
@@ -269,7 +291,7 @@ public class ThemeService extends BaseService<Theme, String> {
                     } else { // 待我审核
                         predicateList.add(root.get("themeStatus").in(Arrays.asList(ThemeEnum.ATTN.getCode(), ThemeEnum.AUDIT.getCode())));
                     }
-                    return criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])), criteriaBuilder.and(predicateList1.toArray(new Predicate[0]))).getRestriction();
+                    return criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])), criteriaBuilder.or(predicateList1.toArray(new Predicate[0]))).getRestriction();
                 }
             }
             return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
@@ -432,5 +454,32 @@ public class ThemeService extends BaseService<Theme, String> {
         } else {
             throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能通过");
         }
+    }
+
+    public List<ThemeApprovalVo> findApprovalInfo(String id) {
+        Theme theme = getEntityById(themeRepository, id);
+        List<ThemeApprovalVo> themeApprovalVoList = new ArrayList<>();
+        // 记录人
+        String state1 = ThemeEnum.getMessageByCode(theme.getThemeStatus());
+        if (theme.getThemeStatus() > 1) {
+            state1 = "已完成";
+        }
+        ThemeApprovalVo themeApprovalVo1 = new ThemeApprovalVo("记录人", state1, theme.getRecorderId(), theme.getRecorderName(), theme.getCreateDate());
+        themeApprovalVoList.add(themeApprovalVo1);
+        // 初审
+        String state2 = ThemeEnum.getMessageByCode(theme.getThemeStatus());
+        if (theme.getThemeStatus() > 2) {
+            state2 = "已完成";
+        }
+        ThemeApprovalVo themeApprovalVo2 = new ThemeApprovalVo("初审", state2, theme.getAttnId(), theme.getAttnName(), theme.getAttnDate());
+        themeApprovalVoList.add(themeApprovalVo2);
+        // 终审
+        String state3 = ThemeEnum.getMessageByCode(theme.getThemeStatus());
+        if (theme.getThemeStatus() == 5) {
+            state3 = "已完成";
+        }
+        ThemeApprovalVo themeApprovalVo3 = new ThemeApprovalVo("终审", state3, theme.getAuditId(), theme.getAuditName(), theme.getAuditDate());
+        themeApprovalVoList.add(themeApprovalVo3);
+        return themeApprovalVoList;
     }
 }

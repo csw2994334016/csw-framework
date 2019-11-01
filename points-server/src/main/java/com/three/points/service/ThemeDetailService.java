@@ -1,6 +1,7 @@
 package com.three.points.service;
 
 import com.three.common.enums.StatusEnum;
+import com.three.points.entity.Event;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.param.ThemeEmpParam;
 import com.three.points.repository.ThemeDetailRepository;
@@ -29,6 +30,9 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
 
     @Autowired
     private ThemeDetailRepository themeDetailRepository;
+
+    @Autowired
+    private EventService eventService;
 
     @Transactional
     public void delete(String ids, int code) {
@@ -81,6 +85,14 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             if (themeDetailVoMap.get(themeDetail.getEventName()) == null) {
                 ThemeDetailVo themeDetailVo = new ThemeDetailVo();
                 themeDetailVo = (ThemeDetailVo) BeanCopyUtil.copyBean(themeDetail, themeDetailVo);
+                // 查找事件
+                if (themeDetail.getEventId() != null) {
+                    Event event = eventService.findById(themeDetail.getEventId());
+                    themeDetailVo.setAScoreMin(event.getAScoreMin());
+                    themeDetailVo.setAScoreMax(event.getAScoreMax());
+                    themeDetailVo.setBScoreMin(event.getBScoreMin());
+                    themeDetailVo.setBScoreMax(event.getBScoreMax());
+                }
                 themeDetailVoMap.put(themeDetail.getEventName(), themeDetailVo);
             }
             themeDetailVoMap.get(themeDetail.getEventName()).getThemeEmpParamList().add(themeEmpParam);

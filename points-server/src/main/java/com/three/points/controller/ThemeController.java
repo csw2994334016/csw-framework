@@ -103,6 +103,13 @@ public class ThemeController {
         return JsonResult.ok().put("data", themeService.findById(id));
     }
 
+    @ApiOperation(value = "查询积分奖扣审批流程", notes = "")
+    @ApiImplicitParam(name = "id", value = "积分奖扣id", required = true, dataType = "String")
+    @GetMapping("/findApprovalInfo")
+    public JsonResult findApprovalInfo(@RequestParam() String id) {
+        return JsonResult.ok().put("data", themeService.findApprovalInfo(id));
+    }
+
     @LogAnnotation(module = "提交积分奖扣")
     @ApiOperation(value = "提交积分奖扣", notes = "")
     @ApiImplicitParam(name = "id", value = "积分奖扣id", required = true, dataType = "String")

@@ -26,6 +26,18 @@ public class ThemeDetailVo {
     @ApiModelProperty("事件名称(自定义临时事件一定要名称)")
     private String eventName; // 事件名称(自定义临时事件一定要名称)
 
+    @ApiModelProperty("A分最小值")
+    private Integer aScoreMin; // A分最小值
+
+    @ApiModelProperty("A分最大值")
+    private Integer aScoreMax; // A分最大值
+
+    @ApiModelProperty("B分最小值")
+    private Integer bScoreMin; // B分最小值
+
+    @ApiModelProperty("B分最大值")
+    private Integer bScoreMax; // B分最大值
+
     @ApiModelProperty("奖票事件：1=是；0=否")
     private Integer prizeFlag = 0; // 奖票事件：1=是；0=否
 
