@@ -119,16 +119,12 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
     public void completeTask(String id) {
         PointsTask pointsTask = getEntityById(pointsTaskRepository, id);
         String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
-        if (loginUserEmpId != null) {
-            if (pointsTask.getTaskEmpId() != null && pointsTask.getTaskEmpId().contains(loginUserEmpId)) {
-                pointsTask.setTaskStatus(PointsTaskEnum.FINISHED.getCode());
-                pointsTask.setCompleteDate(new Date());
-                pointsTaskRepository.save(pointsTask);
-            } else {
-                throw new BusinessException("登录用户不是参与人，操作失败");
-            }
+        if (loginUserEmpId != null && loginUserEmpId.equals(pointsTask.getChargePersonId())) {
+            pointsTask.setTaskStatus(PointsTaskEnum.FINISHED.getCode());
+            pointsTask.setCompleteDate(new Date());
+            pointsTaskRepository.save(pointsTask);
         } else {
-            throw new BusinessException("没有找到当前登录用户");
+            throw new BusinessException("登录用户不是负责人，操作失败");
         }
     }
 }

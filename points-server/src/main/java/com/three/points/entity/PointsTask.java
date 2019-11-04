@@ -83,11 +83,13 @@ public class PointsTask implements Serializable {
     @ApiModelProperty("责任人姓名")
     private String chargePersonName; // 责任人姓名
 
-    @Column(name = "task_emp_id", columnDefinition = "varchar(255) comment '任务成员ID'")
+    @Lob
+    @Column(name = "task_emp_id", columnDefinition = "text comment '任务成员ID'")
     @ApiModelProperty("任务成员ID")
     private String taskEmpId; // 任务成员ID
 
-    @Column(name = "task_emp_name", columnDefinition = "varchar(255) comment '任务成员姓名'")
+    @Lob
+    @Column(name = "task_emp_name", columnDefinition = "text comment '任务成员姓名'")
     @ApiModelProperty("任务成员姓名")
     private String taskEmpName; // 任务成员姓名
 
