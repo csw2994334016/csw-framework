@@ -157,8 +157,9 @@ public class UserService extends BaseService<User, String> {
             }
             for (Map.Entry<String, MenuVo> entry : menuVoMap.entrySet()) {
                 if (!"-1".equals(entry.getValue().getParentId())) {
-                    MenuVo menuVo = menuVoMap.get(entry.getValue().getParentId());
-                    menuVo.getSubMenus().add(entry.getValue());
+                    MenuVo menuVoParent = menuVoMap.get(entry.getValue().getParentId());
+                    menuVoParent.getSubMenus().add(entry.getValue());
+                    menuVoParent.setUrl("javascript:;");
                 }
             }
             menuVoList.sort(Comparator.comparing(MenuVo::getSort));

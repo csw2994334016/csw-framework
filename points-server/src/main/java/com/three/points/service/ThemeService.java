@@ -448,7 +448,7 @@ public class ThemeService extends BaseService<Theme, String> {
             } else {
                 throw new BusinessException("记录是待初审状态,只有初审人才能通过");
             }
-        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是待终审或驳回状态,只有当前用户是终审人才能通过
+        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode() || theme.getThemeStatus() == ThemeEnum.LOCK.getCode()) { // 记录是待终审、驳回或锁定状态,只有当前用户是终审人才能通过
             if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.SUCCESS.getCode());
                 theme.setAuditOpinion(opinion);
@@ -458,7 +458,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 theme.setAttnPosBScore(attnBScore);
                 themeRepository.save(theme);
             } else {
-                throw new BusinessException("记录是待终审或驳回状态,只有终审人才能通过");
+                throw new BusinessException("记录是待终审、驳回或锁定状态,只有终审人才能通过");
             }
         } else {
             throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能通过");

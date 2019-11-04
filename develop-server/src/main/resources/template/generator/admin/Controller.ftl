@@ -58,7 +58,7 @@ public class ${className}Controller {
     @ApiOperation(value = "查询${menuName}（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页记录数", dataType = "Integer"),
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @GetMapping("/query")
