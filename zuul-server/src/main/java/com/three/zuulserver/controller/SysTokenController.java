@@ -113,7 +113,7 @@ public class SysTokenController {
      * @param username
      */
     private void saveLoginLog(String username, String message) {
-        log.info("{}登录" + message, username);
+        log.info("{}登录|" + message, username);
         Log log = Log.builder().username(username).module("登录").message(message).flag(Boolean.TRUE).time(0L).build();
         LogUtil.setLogRequestInfo(log);
         // 异步

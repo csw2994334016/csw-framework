@@ -374,12 +374,23 @@ public class ThemeService extends BaseService<Theme, String> {
                 } else {
                     throw new BusinessException("记录是待初审状态,只有记录人才能撤回");
                 }
-            } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是待终审/驳回状态,只有当前用户是初审人才能撤回
+            } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode()) { // 记录是待终审状态,只有当前用户是初审人才能撤回
                 if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
                     theme.setThemeStatus(ThemeEnum.ATTN.getCode());
                     themeRepository.save(theme);
                 } else {
-                    throw new BusinessException("记录是待终审/驳回状态,只有初审人才能撤回");
+                    throw new BusinessException("记录是待终审状态,只有初审人才能撤回");
+                }
+            } else if (theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是驳回状态,只有当前用户是初审人或记录人才能撤回
+                if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
+                    theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                    themeRepository.save(theme);
+                }
+                if (StringUtil.isNotBlank(theme.getRecorderId()) && theme.getRecorderId().equals(loginUserEmpId)) {
+                    theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+                    themeRepository.save(theme);
+                } else {
+                    throw new BusinessException("记录是驳回状态,只有初审人或记录人才能撤回");
                 }
             } else if (theme.getThemeStatus() == ThemeEnum.SUCCESS.getCode()) { // 记录是审核通过状态,只有当前用户是终审人才能撤回
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
@@ -400,15 +411,15 @@ public class ThemeService extends BaseService<Theme, String> {
     public void reject(String id, String opinion, Integer recorderBScore, Integer attnBScore) {
         Theme theme = getEntityById(themeRepository, id);
         String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
-        if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是初审人才能驳回
+        if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是待初审或驳回状态,只有当前用户是初审人才能驳回
             if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.SAVE.getCode());
                 theme.setAttnOpinion(opinion);
                 themeRepository.save(theme);
             } else {
-                throw new BusinessException("记录是待初审状态,只有初审人才能驳回");
+                throw new BusinessException("记录是待初审或驳回状态,只有初审人才能驳回");
             }
-        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.LOCK.getCode()) { // 记录是待终审/锁定状态,只有当前用户是终审人才能驳回
+        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.LOCK.getCode()) { // 记录是待终审或锁定状态,只有当前用户是终审人才能驳回
             if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.ATTN.getCode());
                 theme.setAuditOpinion(opinion);
@@ -417,7 +428,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 theme.setAttnNegBScore(attnBScore);
                 themeRepository.save(theme);
             } else {
-                throw new BusinessException("记录是待终审/锁定状态,只有终审人才能驳回");
+                throw new BusinessException("记录是待终审或锁定状态,只有终审人才能驳回");
             }
         } else {
             throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能撤回");
@@ -437,17 +448,17 @@ public class ThemeService extends BaseService<Theme, String> {
             } else {
                 throw new BusinessException("记录是待初审状态,只有初审人才能通过");
             }
-        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode()) { // 记录是待终审状态,只有当前用户是终审人才能通过
+        } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是待终审或驳回状态,只有当前用户是终审人才能通过
             if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                 theme.setThemeStatus(ThemeEnum.SUCCESS.getCode());
                 theme.setAuditOpinion(opinion);
                 theme.setAuditDate(new Date());
-                // 只有终审人驳回才能进行奖分操作
+                // 只有终审人通过才能进行奖分操作
                 theme.setRecorderPosBScore(recorderBScore);
                 theme.setAttnPosBScore(attnBScore);
                 themeRepository.save(theme);
             } else {
-                throw new BusinessException("记录是待终审状态,只有终审人才能通过");
+                throw new BusinessException("记录是待终审或驳回状态,只有终审人才能通过");
             }
         } else {
             throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能通过");
