@@ -78,14 +78,6 @@ public class Theme implements Serializable {
     @ApiModelProperty("记录人姓名")
     private String recorderName; // 记录人姓名
 
-    @Column(name = "recorder_pos_b_score", columnDefinition = "int(11) default 0 comment '记录人奖分'")
-    @ApiModelProperty("记录人奖分")
-    private Integer recorderPosBScore = 0; // 记录人奖分
-
-    @Column(name = "recorder_neg_b_score", columnDefinition = "int(11) default 0 comment '记录人扣分'")
-    @ApiModelProperty("记录人扣分")
-    private Integer recorderNegBScore = 0; // 记录人扣分
-
     @Column(name = "submitter_id", columnDefinition = "varchar(36) comment '提交人ID'")
     @ApiModelProperty("提交人ID")
     private String submitterId; // 提交人ID
@@ -113,14 +105,6 @@ public class Theme implements Serializable {
     @Column(name = "attn_date", columnDefinition = "datetime comment '初审时间'")
     @ApiModelProperty("初审时间")
     private Date attnDate; // 初审时间
-
-    @Column(name = "attn_pos_b_score", columnDefinition = "int(11) default 0 comment '初审人奖分'")
-    @ApiModelProperty("初审人奖分")
-    private Integer attnPosBScore = 0; // 初审人奖分
-
-    @Column(name = "attn_neg_b_score", columnDefinition = "int(11) default 0 comment '初审人扣分'")
-    @ApiModelProperty("初审人扣分")
-    private Integer attnNegBScore = 0; // 初审人扣分
 
     @Column(name = "audit_id", columnDefinition = "varchar(36) comment '终审人ID'")
     @ApiModelProperty("终审人ID")

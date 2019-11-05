@@ -49,7 +49,7 @@ public class SysTokenController {
         parameters.put("password", loginParam.getPassword());
 
         Map<String, Object> tokenInfo = oauth2Client.postAccessToken(parameters);
-        saveLoginLog(loginParam.getUsername(), "用户名密码登陆");
+        saveLoginLog(loginParam.getUsername(), "用户名密码登录");
 
         return tokenInfo;
     }

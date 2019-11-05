@@ -21,4 +21,6 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
     List<String> findThemeIdByEmpId(@Param("loginUserEmpId") String loginUserEmpId);
 
     List<ThemeDetail> findAllByThemeId(String id);
+
+    void deleteByThemeIdAndEmpIdAndEventName(String id, String recorderId, String message);
 }

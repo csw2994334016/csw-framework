@@ -1,6 +1,8 @@
 package com.three.points.service;
 
 import com.three.commonclient.exception.BusinessException;
+import com.three.points.entity.Event;
+import com.three.points.enums.EventEnum;
 import com.three.points.enums.ThemeEnum;
 import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
@@ -395,6 +397,9 @@ public class ThemeService extends BaseService<Theme, String> {
             } else if (theme.getThemeStatus() == ThemeEnum.SUCCESS.getCode()) { // 记录是审核通过状态,只有当前用户是终审人才能撤回
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                     theme.setThemeStatus(ThemeEnum.LOCK.getCode());
+                    // 撤回之前，要删除相应的奖分记录
+                    themeDetailRepository.deleteByThemeIdAndEmpIdAndEventName(theme.getId(), theme.getRecorderId(), EventEnum.RECORDER_POS.getMessage());
+                    themeDetailRepository.deleteByThemeIdAndEmpIdAndEventName(theme.getId(), theme.getAttnId(), EventEnum.ATTN_POS.getMessage());
                     themeRepository.save(theme);
                 } else {
                     throw new BusinessException("记录是审核通过状态,只有终审人才能撤回");
@@ -424,8 +429,28 @@ public class ThemeService extends BaseService<Theme, String> {
                 theme.setThemeStatus(ThemeEnum.ATTN.getCode());
                 theme.setAuditOpinion(opinion);
                 // 只有终审人驳回才能进行扣分操作
-                theme.setRecorderNegBScore(recorderBScore);
-                theme.setAttnNegBScore(attnBScore);
+                List<ThemeDetail> themeDetailList = new ArrayList<>();
+                if (recorderBScore != null && recorderBScore < 0) {
+                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
+                    themeDetail.setEventName(EventEnum.RECORDER_NEG.getMessage());
+                    themeDetail.setEmpId(theme.getRecorderId());
+                    themeDetail.setEmpFullName(theme.getRecorderName());
+                    themeDetail.setBScore(recorderBScore);
+                    themeDetail.setRemark(EventEnum.RECORDER_NEG.getMessage());
+                    themeDetailList.add(themeDetail);
+                }
+                if (attnBScore != null && attnBScore < 0) {
+                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
+                    themeDetail.setEventName(EventEnum.ATTN_NEG.getMessage());
+                    themeDetail.setEmpId(theme.getAttnId());
+                    themeDetail.setEmpFullName(theme.getAttnName());
+                    themeDetail.setBScore(attnBScore);
+                    themeDetail.setRemark(EventEnum.ATTN_NEG.getMessage());
+                    themeDetailList.add(themeDetail);
+                }
+                if (themeDetailList.size() > 0) {
+                    themeDetailRepository.saveAll(themeDetailList);
+                }
                 themeRepository.save(theme);
             } else {
                 throw new BusinessException("记录是待终审或锁定状态,只有终审人才能驳回");
@@ -453,9 +478,29 @@ public class ThemeService extends BaseService<Theme, String> {
                 theme.setThemeStatus(ThemeEnum.SUCCESS.getCode());
                 theme.setAuditOpinion(opinion);
                 theme.setAuditDate(new Date());
-                // 只有终审人通过才能进行奖分操作
-                theme.setRecorderPosBScore(recorderBScore);
-                theme.setAttnPosBScore(attnBScore);
+                // 只有终审人通过才能进行奖分操作，通过新增一条主题详情记录实现对记录人或初审人的加分
+                List<ThemeDetail> themeDetailList = new ArrayList<>();
+                if (recorderBScore != null && recorderBScore > 0) {
+                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
+                    themeDetail.setEventName(EventEnum.RECORDER_POS.getMessage());
+                    themeDetail.setEmpId(theme.getRecorderId());
+                    themeDetail.setEmpFullName(theme.getRecorderName());
+                    themeDetail.setBScore(recorderBScore);
+                    themeDetail.setRemark(EventEnum.RECORDER_POS.getMessage());
+                    themeDetailList.add(themeDetail);
+                }
+                if (attnBScore != null && attnBScore > 0) {
+                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
+                    themeDetail.setEventName(EventEnum.ATTN_POS.getMessage());
+                    themeDetail.setEmpId(theme.getAttnId());
+                    themeDetail.setEmpFullName(theme.getAttnName());
+                    themeDetail.setBScore(attnBScore);
+                    themeDetail.setRemark(EventEnum.ATTN_POS.getMessage());
+                    themeDetailList.add(themeDetail);
+                }
+                if (themeDetailList.size() > 0) {
+                    themeDetailRepository.saveAll(themeDetailList);
+                }
                 themeRepository.save(theme);
             } else {
                 throw new BusinessException("记录是待终审、驳回或锁定状态,只有终审人才能通过");

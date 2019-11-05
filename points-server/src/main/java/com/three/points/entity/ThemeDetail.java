@@ -109,5 +109,14 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("修改时间")
     private Date updateDate; // 修改时间
 
+    public ThemeDetail() {
+    }
 
+    public ThemeDetail(String organizationId, String themeId, String themeName, Date themeDate, String eventTypeName) {
+        this.organizationId = organizationId;
+        this.themeId = themeId;
+        this.themeName = themeName;
+        this.themeDate = themeDate;
+        this.eventTypeName = eventTypeName;
+    }
 }
