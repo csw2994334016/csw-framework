@@ -16,4 +16,5 @@ public interface UserRepository extends BaseRepository<User, String> {
 
     User findByUsername(String username);
 
+    User findByIsAdmin(int code);
 }

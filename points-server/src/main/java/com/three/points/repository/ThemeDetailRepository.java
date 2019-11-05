@@ -22,5 +22,4 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
 
     List<ThemeDetail> findAllByThemeId(String id);
 
-    void deleteByThemeIdAndEmpIdAndEventName(String id, String recorderId, String message);
 }

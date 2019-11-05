@@ -1,11 +1,12 @@
 package com.three.points.service;
 
+import com.three.common.auth.LoginUser;
 import com.three.commonclient.exception.BusinessException;
-import com.three.points.entity.Event;
 import com.three.points.enums.EventEnum;
 import com.three.points.enums.ThemeEnum;
 import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
+import com.three.points.feign.UserClient;
 import com.three.points.param.ThemeEmpParam;
 import com.three.points.param.ThemeEventParam;
 import com.three.points.param.ThemeParam;
@@ -43,6 +44,9 @@ public class ThemeService extends BaseService<Theme, String> {
 
     @Autowired
     private ThemeDetailRepository themeDetailRepository;
+
+    @Autowired
+    private UserClient userClient;
 
     @Transactional
     public void createDraft(ThemeParam themeParam) {
@@ -398,8 +402,10 @@ public class ThemeService extends BaseService<Theme, String> {
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                     theme.setThemeStatus(ThemeEnum.LOCK.getCode());
                     // 撤回之前，要删除相应的奖分记录
-                    themeDetailRepository.deleteByThemeIdAndEmpIdAndEventName(theme.getId(), theme.getRecorderId(), EventEnum.RECORDER_POS.getMessage());
-                    themeDetailRepository.deleteByThemeIdAndEmpIdAndEventName(theme.getId(), theme.getAttnId(), EventEnum.ATTN_POS.getMessage());
+                    Theme theme1 = themeRepository.findByRelationThemeIdAndThemeName(theme.getId(), EventEnum.AUDIT_POS_THEME.getMessage());
+                    themeRepository.delete(theme1);
+                    themeDetailRepository.deleteByThemeId(theme1.getId());
+
                     themeRepository.save(theme);
                 } else {
                     throw new BusinessException("记录是审核通过状态,只有终审人才能撤回");
@@ -429,27 +435,43 @@ public class ThemeService extends BaseService<Theme, String> {
                 theme.setThemeStatus(ThemeEnum.ATTN.getCode());
                 theme.setAuditOpinion(opinion);
                 // 只有终审人驳回才能进行扣分操作
-                List<ThemeDetail> themeDetailList = new ArrayList<>();
-                if (recorderBScore != null && recorderBScore < 0) {
-                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
-                    themeDetail.setEventName(EventEnum.RECORDER_NEG.getMessage());
-                    themeDetail.setEmpId(theme.getRecorderId());
-                    themeDetail.setEmpFullName(theme.getRecorderName());
-                    themeDetail.setBScore(recorderBScore);
-                    themeDetail.setRemark(EventEnum.RECORDER_NEG.getMessage());
-                    themeDetailList.add(themeDetail);
-                }
-                if (attnBScore != null && attnBScore < 0) {
-                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
-                    themeDetail.setEventName(EventEnum.ATTN_NEG.getMessage());
-                    themeDetail.setEmpId(theme.getAttnId());
-                    themeDetail.setEmpFullName(theme.getAttnName());
-                    themeDetail.setBScore(attnBScore);
-                    themeDetail.setRemark(EventEnum.ATTN_NEG.getMessage());
-                    themeDetailList.add(themeDetail);
-                }
-                if (themeDetailList.size() > 0) {
-                    themeDetailRepository.saveAll(themeDetailList);
+                if ((recorderBScore != null && recorderBScore < 0) || (attnBScore != null && attnBScore < 0)) {
+                    // 先生成主题
+                    Theme themeNew = getThemeNew(theme);
+                    themeNew.setThemeName(EventEnum.AUDIT_NEG_THEME.getMessage());
+                    // 汇总分、人次
+                    if (recorderBScore != null && recorderBScore < 0) {
+                        themeNew.setBPosScore(themeNew.getBPosScore() + recorderBScore);
+                        themeNew.setEmpCount(themeNew.getEmpCount() + 1);
+                    }
+                    if (attnBScore != null && attnBScore < 0) {
+                        themeNew.setBPosScore(themeNew.getBPosScore() + attnBScore);
+                        themeNew.setEmpCount(themeNew.getEmpCount() + 1);
+                    }
+                    themeNew = themeRepository.save(themeNew);
+                    // 再生成详情
+                    List<ThemeDetail> themeDetailList = new ArrayList<>();
+                    if (recorderBScore != null && recorderBScore < 0) {
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
+                        themeDetail.setEventName(EventEnum.RECORDER_NEG.getMessage());
+                        themeDetail.setEmpId(theme.getRecorderId());
+                        themeDetail.setEmpFullName(theme.getRecorderName());
+                        themeDetail.setBScore(recorderBScore);
+                        themeDetail.setRemark(EventEnum.RECORDER_NEG.getMessage());
+                        themeDetailList.add(themeDetail);
+                    }
+                    if (attnBScore != null && attnBScore < 0) {
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
+                        themeDetail.setEventName(EventEnum.ATTN_NEG.getMessage());
+                        themeDetail.setEmpId(theme.getAttnId());
+                        themeDetail.setEmpFullName(theme.getAttnName());
+                        themeDetail.setBScore(attnBScore);
+                        themeDetail.setRemark(EventEnum.ATTN_NEG.getMessage());
+                        themeDetailList.add(themeDetail);
+                    }
+                    if (themeDetailList.size() > 0) {
+                        themeDetailRepository.saveAll(themeDetailList);
+                    }
                 }
                 themeRepository.save(theme);
             } else {
@@ -479,27 +501,43 @@ public class ThemeService extends BaseService<Theme, String> {
                 theme.setAuditOpinion(opinion);
                 theme.setAuditDate(new Date());
                 // 只有终审人通过才能进行奖分操作，通过新增一条主题详情记录实现对记录人或初审人的加分
-                List<ThemeDetail> themeDetailList = new ArrayList<>();
-                if (recorderBScore != null && recorderBScore > 0) {
-                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
-                    themeDetail.setEventName(EventEnum.RECORDER_POS.getMessage());
-                    themeDetail.setEmpId(theme.getRecorderId());
-                    themeDetail.setEmpFullName(theme.getRecorderName());
-                    themeDetail.setBScore(recorderBScore);
-                    themeDetail.setRemark(EventEnum.RECORDER_POS.getMessage());
-                    themeDetailList.add(themeDetail);
-                }
-                if (attnBScore != null && attnBScore > 0) {
-                    ThemeDetail themeDetail = new ThemeDetail(theme.getOrganizationId(), theme.getId(), theme.getThemeName(), theme.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
-                    themeDetail.setEventName(EventEnum.ATTN_POS.getMessage());
-                    themeDetail.setEmpId(theme.getAttnId());
-                    themeDetail.setEmpFullName(theme.getAttnName());
-                    themeDetail.setBScore(attnBScore);
-                    themeDetail.setRemark(EventEnum.ATTN_POS.getMessage());
-                    themeDetailList.add(themeDetail);
-                }
-                if (themeDetailList.size() > 0) {
-                    themeDetailRepository.saveAll(themeDetailList);
+                if ((recorderBScore != null && recorderBScore > 0) || (attnBScore != null && attnBScore > 0)) {
+                    // 先生成主题
+                    Theme themeNew = getThemeNew(theme);
+                    themeNew.setThemeName(EventEnum.AUDIT_POS_THEME.getMessage());
+                    // 汇总分、人次
+                    if (recorderBScore != null && recorderBScore > 0) {
+                        themeNew.setBPosScore(themeNew.getBPosScore() + recorderBScore);
+                        themeNew.setEmpCount(themeNew.getEmpCount() + 1);
+                    }
+                    if (attnBScore != null && attnBScore > 0) {
+                        themeNew.setBPosScore(themeNew.getBPosScore() + attnBScore);
+                        themeNew.setEmpCount(themeNew.getEmpCount() + 1);
+                    }
+                    themeNew = themeRepository.save(themeNew);
+                    // 再生成详情
+                    List<ThemeDetail> themeDetailList = new ArrayList<>();
+                    if (recorderBScore != null && recorderBScore > 0) {
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
+                        themeDetail.setEventName(EventEnum.RECORDER_POS.getMessage());
+                        themeDetail.setEmpId(theme.getRecorderId());
+                        themeDetail.setEmpFullName(theme.getRecorderName());
+                        themeDetail.setBScore(recorderBScore);
+                        themeDetail.setRemark(EventEnum.RECORDER_POS.getMessage());
+                        themeDetailList.add(themeDetail);
+                    }
+                    if (attnBScore != null && attnBScore > 0) {
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
+                        themeDetail.setEventName(EventEnum.ATTN_POS.getMessage());
+                        themeDetail.setEmpId(theme.getAttnId());
+                        themeDetail.setEmpFullName(theme.getAttnName());
+                        themeDetail.setBScore(attnBScore);
+                        themeDetail.setRemark(EventEnum.ATTN_POS.getMessage());
+                        themeDetailList.add(themeDetail);
+                    }
+                    if (themeDetailList.size() > 0) {
+                        themeDetailRepository.saveAll(themeDetailList);
+                    }
                 }
                 themeRepository.save(theme);
             } else {
@@ -508,6 +546,28 @@ public class ThemeService extends BaseService<Theme, String> {
         } else {
             throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能通过");
         }
+    }
+
+    private Theme getThemeNew(Theme theme) {
+        LoginUser sysUser = userClient.findByAdmin();
+        Theme themeNew = new Theme();
+        themeNew.setOrganizationId(theme.getOrganizationId());
+        themeNew.setThemeDate(theme.getThemeDate());
+        themeNew.setThemeStatus(ThemeEnum.SUCCESS.getCode());
+        themeNew.setRelationThemeId(theme.getId());
+        themeNew.setRecorderId(sysUser.getId());
+        themeNew.setRecorderName(sysUser.getFullName());
+        themeNew.setSubmitterId(sysUser.getId());
+        themeNew.setSubmitterName(sysUser.getFullName());
+        Date date = new Date();
+        themeNew.setSubmitterDate(date);
+        themeNew.setAttnId(sysUser.getId());
+        themeNew.setAttnName(sysUser.getFullName());
+        themeNew.setAttnDate(date);
+        themeNew.setAuditId(sysUser.getId());
+        themeNew.setAuditName(sysUser.getFullName());
+        themeNew.setAuditDate(date);
+        return themeNew;
     }
 
     public List<ThemeApprovalVo> findApprovalInfo(String id) {

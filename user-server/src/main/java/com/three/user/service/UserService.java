@@ -177,4 +177,12 @@ public class UserService extends BaseService<User, String> {
         }
         return user;
     }
+
+    public User findByIsAdmin(int code) {
+        User user = userRepository.findByIsAdmin(code);
+        if (user == null) {
+            throw new BusinessException("不存在系统管理员");
+        }
+        return user;
+    }
 }

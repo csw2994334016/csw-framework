@@ -50,6 +50,10 @@ public class Theme implements Serializable {
     @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定")
     private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定
 
+    @Column(name = "relation_theme_id", columnDefinition = "varchar(36) comment '相关联主题ID'")
+    @ApiModelProperty("相关联主题ID")
+    private String relationThemeId; // 相关联主题ID
+
     @Column(name = "a_pos_score", columnDefinition = "int(11) default 0 comment 'A分（汇总正分）'")
     @ApiModelProperty("A分（汇总正分）")
     private Integer aPosScore = 0; // A分（汇总正分）
@@ -66,9 +70,9 @@ public class Theme implements Serializable {
     @ApiModelProperty("B分（汇总负分）")
     private Integer bNegScore = 0; // B分（汇总负分）
 
-    @Column(name = "emp_count", nullable = false, columnDefinition = "int(11) comment '人次'")
+    @Column(name = "emp_count", nullable = false, columnDefinition = "int(11) default 0 comment '人次'")
     @ApiModelProperty("人次")
-    private Integer empCount; // 人次
+    private Integer empCount = 0; // 人次
 
     @Column(name = "recorder_id", columnDefinition = "varchar(36) comment '记录人ID'")
     @ApiModelProperty("记录人ID")

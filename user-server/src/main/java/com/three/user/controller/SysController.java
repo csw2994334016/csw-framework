@@ -1,6 +1,7 @@
 package com.three.user.controller;
 
 import com.three.common.auth.*;
+import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -77,6 +78,37 @@ public class SysController {
             sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(user.getEmployee(), sysEmployee);
             loginUser.setSysEmployee(sysEmployee);
         }
+        return loginUser;
+    }
+
+    @ApiOperation(value = "查找系统管理员（内部接口）")
+    @GetMapping(value = "/internal/findByAdmin")
+    public LoginUser findByAdmin() {
+        User user = userService.findByIsAdmin(AdminEnum.YES.getCode());
+
+        LoginUser loginUser = new LoginUser();
+        loginUser = (LoginUser) BeanCopyUtil.copyBean(user, loginUser);
+
+//        for (Role role : user.getRoles()) {
+//            SysRole sysRole = new SysRole();
+//            sysRole = (SysRole) BeanCopyUtil.copyBean(role, sysRole);
+//            loginUser.getSysRoles().add(sysRole);
+//            for (Authority authority : role.getAuthorities()) {
+//                SysAuthority sysAuthority = new SysAuthority();
+//                sysAuthority = (SysAuthority) BeanCopyUtil.copyBean(authority, sysAuthority);
+//                loginUser.getSysAuthorities().add(sysAuthority);
+//            }
+//        }
+//
+//        if (user.getEmployee() != null) { // 除非admin用户，不然一般都会有员工信息
+//            SysOrganization sysOrganization = new SysOrganization();
+//            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(user.getEmployee().getOrganization(), sysOrganization);
+//            loginUser.setSysOrganization(sysOrganization);
+//
+//            SysEmployee sysEmployee = new SysEmployee();
+//            sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(user.getEmployee(), sysEmployee);
+//            loginUser.setSysEmployee(sysEmployee);
+//        }
         return loginUser;
     }
 
