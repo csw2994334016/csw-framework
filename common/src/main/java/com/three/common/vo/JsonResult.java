@@ -49,8 +49,8 @@ public class JsonResult extends HashMap<String, Object> {
     /**
      * 返回失败
      */
-    public static JsonResult error(String messag) {
-        return error(500, messag);
+    public static JsonResult error(String message) {
+        return error(500, message);
     }
 
     /**

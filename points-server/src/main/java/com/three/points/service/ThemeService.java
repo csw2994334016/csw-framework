@@ -33,7 +33,7 @@ import java.util.*;
 
 /**
  * Created by csw on 2019-10-24.
- * Description:
+ * Description: lzqgdgs176
  */
 
 @Service
@@ -78,6 +78,7 @@ public class ThemeService extends BaseService<Theme, String> {
 
     private void saveThemeAndThemeDetailList(String draft, Theme theme, List<ThemeDetail> themeDetailList) {
         theme.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+
         String empId = LoginUserUtil.getLoginUserEmpId();
         String empFullName = LoginUserUtil.getLoginUserEmpFullName();
         theme.setRecorderId(empId);
