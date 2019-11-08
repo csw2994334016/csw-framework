@@ -6,6 +6,7 @@ import ${package}.service.${className}Service;
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
+import com.three.common.vo.JsonData;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import io.swagger.annotations.Api;
@@ -73,7 +74,7 @@ public class ${className}Controller {
     @ApiOperation(value = "查询${menuName}（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "${menuName}信息id", required = true, dataType = "String")
     @GetMapping("/findById")
-    public JsonResult findById(@RequestParam(required = true) String id) {
-        return JsonResult.ok().put("data", ${changeClassName}Service.findById(id));
+    public JsonData<${className}> findById(@RequestParam(required = true) String id) {
+        return new JsonData<>(${changeClassName}Service.findById(id)).success();
     }
 }

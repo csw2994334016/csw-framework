@@ -12,9 +12,9 @@ import java.util.List;
  */
 public interface ManagerTaskRepository extends BaseRepository<ManagerTask, String> {
 
-    int countByTaskNameAndIdNot(String taskName, String id);
+    int countByTaskNameAndOrganizationId(String taskName, String organizationId);
 
-    int countByTaskName(String taskName);
+    List<ManagerTask> findAllByTaskNameAndOrganizationIdAndTaskDateAfter(String taskName, String organizationId, Date taskDate);
 
-    List<ManagerTask> findAllByTaskNameAndTaskDateAfter(String taskName, Date taskDate);
+    int countByTaskNameAndOrganizationIdAndTaskDate(String taskName, String organizationId, Date taskDate);
 }

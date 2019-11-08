@@ -38,6 +38,8 @@ public class EventService extends BaseService<Event, String> {
     @Autowired
     private EventTypeService eventTypeService;
 
+    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+
     @Transactional
     public void create(EventParam eventParam) {
         BeanValidator.check(eventParam);
@@ -45,7 +47,7 @@ public class EventService extends BaseService<Event, String> {
         Event event = new Event();
         event = (Event) BeanCopyUtil.copyBean(eventParam, event);
 
-        event.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+        event.setOrganizationId(firstOrganizationId);
 
         EventType eventType = eventTypeService.getEventTypeById(event.getTypeId());
         event.setTypeName(eventType.getTypeName());
@@ -84,7 +86,7 @@ public class EventService extends BaseService<Event, String> {
         Specification<Event> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
 
-            Specification<Event> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            Specification<Event> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
             // 按事件分类查找事件

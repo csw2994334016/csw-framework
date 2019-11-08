@@ -81,11 +81,10 @@ public class BaseService<T, ID> {
         };
     }
 
-    protected Specification<T> getCodeAndOrganizationSpec(int code) {
+    protected Specification<T> getCodeAndOrganizationSpec(int code, String firstOrganizationId) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
             predicateList.add(criteriaBuilder.equal(root.get("status"), code));
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             if (firstOrganizationId != null) {
                 predicateList.add(criteriaBuilder.equal(root.get("organizationId"), firstOrganizationId));
             }

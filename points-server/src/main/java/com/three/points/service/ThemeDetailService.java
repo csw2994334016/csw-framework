@@ -11,6 +11,7 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.vo.ThemeDetailVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
+import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     @Autowired
     private EventService eventService;
 
+    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+
     @Transactional
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
@@ -52,7 +55,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         Specification<ThemeDetail> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            Specification<ThemeDetail> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
+            Specification<ThemeDetail> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 
             if (StringUtil.isNotBlank(searchValue)) {

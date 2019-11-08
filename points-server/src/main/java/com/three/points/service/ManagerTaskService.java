@@ -1,8 +1,14 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
+import com.three.common.utils.DateUtils;
+import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.ManagerTask;
+import com.three.points.entity.ManagerTaskEmp;
+import com.three.points.param.ManagerTaskEmpParam;
+import com.three.points.param.ManagerTaskParam1;
+import com.three.points.repository.ManagerTaskEmpRepository;
 import com.three.points.repository.ManagerTaskRepository;
 import com.three.points.param.ManagerTaskParam;
 import com.three.common.utils.BeanCopyUtil;
@@ -32,28 +38,29 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     @Autowired
     private ManagerTaskRepository managerTaskRepository;
 
+    @Autowired
+    private ManagerTaskEmpRepository managerTaskEmpRepository;
+
+    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+
     @Transactional
     public void create(ManagerTaskParam managerTaskParam) {
         BeanValidator.check(managerTaskParam);
 
         // 任务名称已经存在
-        if (checkTaskNameExist(managerTaskParam.getTaskName())) {
+        if (checkTaskNameExist(managerTaskParam.getTaskName(), firstOrganizationId)) {
             throw new ParameterException("任务名称已经存在");
         }
 
         ManagerTask managerTask = new ManagerTask();
         managerTask = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask);
 
-        managerTask.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+        managerTask.setOrganizationId(firstOrganizationId);
 
         List<ManagerTask> managerTaskList = new ArrayList<>();
 
         // 当前月份第一天
-        Date date = DateUtil.date();
-        int year = DateUtil.year(date);
-        int month = DateUtil.month(date) + 1;
-        String dateStr = year + "-" + month + "-01";
-        Date taskDate = DateUtil.parse(dateStr);
+        Date taskDate = DateUtil.parse(DateUtils.getMonthFirstDay(DateUtil.date()));
         // 当前月任务
         managerTask.setTaskDate(taskDate);
         managerTaskList.add(managerTask);
@@ -61,7 +68,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         for (int i = 0; i < 2; i++) {
             taskDate = DateUtil.offsetMonth(taskDate, 1);
             ManagerTask managerTask1 = new ManagerTask();
-            managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTask, managerTask1);
+            managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1);
             managerTask1.setTaskDate(taskDate);
             managerTaskList.add(managerTask1);
         }
@@ -69,8 +76,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         managerTaskRepository.saveAll(managerTaskList);
     }
 
-    private boolean checkTaskNameExist(String taskName) {
-        return managerTaskRepository.countByTaskName(taskName) > 0;
+    private boolean checkTaskNameExist(String taskName, String organizationId) {
+        return managerTaskRepository.countByTaskNameAndOrganizationId(taskName, organizationId) > 0;
     }
 
     @Transactional
@@ -78,19 +85,60 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         BeanValidator.check(managerTaskParam);
 
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam.getId());
+        // 同一个月的任务名称不能相同
+        if (managerTaskRepository.countByTaskNameAndOrganizationIdAndTaskDate(managerTaskParam.getTaskName(), firstOrganizationId, managerTask.getTaskDate()) > 0) {
+            throw new ParameterException("任务名称已经存在");
+        }
         managerTask = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask);
 
         List<ManagerTask> managerTaskList = new ArrayList<>();
         managerTaskList.add(managerTask);
 
-        // 根据任务名称查找，然后修改（包括）该该月份之后的任务
-        List<ManagerTask> managerTasks = managerTaskRepository.findAllByTaskNameAndTaskDateAfter(managerTask.getTaskName(), managerTask.getTaskDate());
+        // 根据任务名称，查找该月份之后的任务，然后修改
+        List<ManagerTask> managerTasks = managerTaskRepository.findAllByTaskNameAndOrganizationIdAndTaskDateAfter(managerTask.getTaskName(), firstOrganizationId, managerTask.getTaskDate());
         for (ManagerTask managerTask1 : managerTasks) {
             managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1, Arrays.asList("id"));
             managerTaskList.add(managerTask1);
         }
 
         managerTaskRepository.saveAll(managerTaskList);
+    }
+
+    @Transactional
+    public void updateEmp(ManagerTaskParam1 managerTaskParam1) {
+        BeanValidator.check(managerTaskParam1);
+        Set<String> empIdSet = new HashSet<>();
+        for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskParam1.getManagerTaskEmpParamList()) {
+            BeanValidator.check(managerTaskEmpParam);
+            empIdSet.add(managerTaskEmpParam.getEmpId());
+        }
+
+        ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam1.getTaskId());
+        // 人员在当前月的其它任务中不能出现
+        List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByOrganizationIdAndTaskIdNotAndTaskDateAndEmpIdIn(firstOrganizationId, managerTask.getId(), managerTask.getTaskDate(), empIdSet);
+        if (managerTaskEmpList.size() > 0) {
+            List<String> errorList = new ArrayList<>();
+            for (ManagerTaskEmp managerTaskEmp : managerTaskEmpList) {
+                errorList.add(managerTaskEmp.getEmpFullName() + "在" + managerTaskEmp.getTaskName() + "中存在");
+            }
+            throw new BusinessException("人员在其它任务中出现：" + errorList.toString());
+        }
+
+        // 删除该任务原有的人员信息
+        managerTaskEmpRepository.deleteByTaskId(managerTask.getId());
+        // 重新添加人员
+        managerTaskEmpList.clear();
+        for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskParam1.getManagerTaskEmpParamList()) {
+            ManagerTaskEmp managerTaskEmp = new ManagerTaskEmp();
+            managerTaskEmp = (ManagerTaskEmp) BeanCopyUtil.copyBean(managerTaskEmpParam, managerTaskEmp);
+            managerTaskEmp.setOrganizationId(firstOrganizationId);
+            managerTaskEmp.setTaskId(managerTask.getId());
+            managerTaskEmp.setTaskName(managerTask.getTaskName());
+            managerTaskEmp.setTaskDate(managerTask.getTaskDate());
+            managerTaskEmpList.add(managerTaskEmp);
+        }
+        managerTaskEmpRepository.saveAll(managerTaskEmpList);
+
     }
 
     @Transactional
@@ -106,24 +154,18 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         managerTaskRepository.saveAll(managerTaskList);
     }
 
-    public PageResult<ManagerTask> query(PageQuery pageQuery, int code, String searchValue) {
+    public PageResult<ManagerTask> query(PageQuery pageQuery, int code, Long taskDate) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<ManagerTask> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
-
-            Specification<ManagerTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code);
-            Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
-
-            if (StringUtil.isNotBlank(searchValue)) {
-                List<Predicate> predicateList1 = new ArrayList<>();
-                Predicate p1 = criteriaBuilder.like(root.get("name"), "%" + searchValue + "%");
-                predicateList1.add(criteriaBuilder.or(p1));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
-
-                return criteriaQuery.where(predicate, predicate1).getRestriction();
+            Specification<ManagerTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
+            predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
+            Date taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
+            if (taskDate != null) {
+                taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date(taskDate)));
             }
-            return predicate;
+            predicateList.add(criteriaBuilder.equal(root.get("taskDate"), taskDate1));
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
         if (pageQuery != null) {
             return query(managerTaskRepository, pageQuery, sort, specification);
@@ -134,5 +176,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
 
     public ManagerTask findById(String id) {
         return getEntityById(managerTaskRepository, id);
+    }
+
+    public ManagerTask findNextTask(String id) {
+        return null;
+    }
+
+    public List<ManagerTaskEmp> findNextEmp(String id) {
+        return null;
     }
 }
