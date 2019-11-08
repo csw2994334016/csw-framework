@@ -38,8 +38,8 @@ public class TaskSettingController {
         return JsonResult.ok("管理任务添加成功");
     }
 
-    @LogAnnotation(module = "变更管理任务")
-    @ApiOperation(value = "变更管理任务")
+    @LogAnnotation(module = "变更管理任务配置")
+    @ApiOperation(value = "变更管理任务配置")
     @ApiImplicitParam(name = "managerTaskParam", value = "管理任务信息", required = true, dataType = "ManagerTaskParam")
     @PutMapping()
     public JsonResult update(@RequestBody ManagerTaskParam managerTaskParam) {
@@ -47,8 +47,8 @@ public class TaskSettingController {
         return JsonResult.ok("管理任务变更成功");
     }
 
-    @LogAnnotation(module = "变更考核人员")
-    @ApiOperation(value = "变更考核人员")
+    @LogAnnotation(module = "变更考核人员配置")
+    @ApiOperation(value = "变更考核人员配置")
     @ApiImplicitParam(name = "managerTaskParam1", value = "管理任务信息", required = true, dataType = "ManagerTaskParam1")
     @PostMapping("/updateEmp")
     public JsonResult updateEmp(@RequestBody ManagerTaskParam1 managerTaskParam1) {
@@ -57,14 +57,14 @@ public class TaskSettingController {
     }
 
     @ApiOperation(value = "预览下月任务配置", notes = "")
-    @ApiImplicitParam(name = "id", value = "当前选中管理任务ID", required = true, dataType = "String")
+    @ApiImplicitParam(name = "id", value = "当前月管理任务ID", required = true, dataType = "String")
     @GetMapping("/findNextTask")
     public JsonData<ManagerTask> findNextTask(@RequestParam(required = true) String id) {
         return new JsonData<>(managerTaskService.findNextTask(id)).success();
     }
 
     @ApiOperation(value = "预览下月任务人员配置", notes = "")
-    @ApiImplicitParam(name = "id", value = "当前选中管理任务ID", required = true, dataType = "String")
+    @ApiImplicitParam(name = "id", value = "当前月管理任务ID", required = true, dataType = "String")
     @GetMapping("/findNextEmp")
     public JsonData<List<ManagerTaskEmp>> findNextEmp(@RequestParam(required = true) String id) {
         return new JsonData<>(managerTaskService.findNextEmp(id)).success();

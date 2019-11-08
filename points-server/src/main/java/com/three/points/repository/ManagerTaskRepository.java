@@ -17,4 +17,6 @@ public interface ManagerTaskRepository extends BaseRepository<ManagerTask, Strin
     List<ManagerTask> findAllByTaskNameAndOrganizationIdAndTaskDateAfter(String taskName, String organizationId, Date taskDate);
 
     int countByTaskNameAndOrganizationIdAndTaskDate(String taskName, String organizationId, Date taskDate);
+
+    ManagerTask findByOrganizationIdAndTaskNameAndTaskDate(String firstOrganizationId, String taskName, Date taskDate);
 }

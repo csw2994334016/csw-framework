@@ -1,5 +1,7 @@
 package com.three.common.utils;
 
+import cn.hutool.core.date.DateUtil;
+
 import java.util.Date;
 
 public class DateUtils {
@@ -11,8 +13,8 @@ public class DateUtils {
      * @return
      */
     public static String getMonthFirstDay(Date date) {
-        int year = cn.hutool.core.date.DateUtil.year(date);
-        int month = cn.hutool.core.date.DateUtil.month(date) + 1;
+        int year = DateUtil.year(date);
+        int month = DateUtil.month(date) + 1;
         return year + "-" + month + "-01";
     }
 }

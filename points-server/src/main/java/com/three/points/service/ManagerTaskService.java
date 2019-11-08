@@ -65,7 +65,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         managerTask.setTaskDate(taskDate);
         managerTaskList.add(managerTask);
         // 依次生成未来12个月的任务
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 1; i++) {
             taskDate = DateUtil.offsetMonth(taskDate, 1);
             ManagerTask managerTask1 = new ManagerTask();
             managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1);
@@ -179,10 +179,26 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     }
 
     public ManagerTask findNextTask(String id) {
-        return null;
+        ManagerTask managerTask = getEntityById(managerTaskRepository, id);
+        Date taskDateNext = DateUtil.offsetMonth(managerTask.getTaskDate(), 1);
+        ManagerTask managerTaskNext = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(firstOrganizationId, managerTask.getTaskName(), taskDateNext);
+        if (managerTaskNext == null) {
+            throw new BusinessException("系统中不存在该任务的下个月配置信息");
+        }
+        return managerTaskNext;
     }
 
     public List<ManagerTaskEmp> findNextEmp(String id) {
-        return null;
+        ManagerTask managerTaskNext = findNextTask(id);
+        return managerTaskEmpRepository.findAllByTaskId(managerTaskNext.getId());
+    }
+
+    public Set<String> findCurMonthTaskEmp(Date taskDate) {
+        List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDate(firstOrganizationId, taskDate);
+        Set<String> empIdSet = new HashSet<>();
+        managerTaskEmpList.forEach(e -> {
+            empIdSet.add(e.getEmpId());
+        });
+        return empIdSet;
     }
 }

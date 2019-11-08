@@ -7,6 +7,7 @@ import com.three.user.entity.Employee;
 import com.three.user.entity.Organization;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
+import com.three.user.feign.PointsClient;
 import com.three.user.repository.EmployeeRepository;
 import com.three.user.param.EmployeeParam;
 import com.three.common.utils.BeanCopyUtil;
@@ -50,6 +51,9 @@ public class EmployeeService extends BaseService<Employee, String> {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private PointsClient pointsClient;
 
     @Transactional
     public void create(EmployeeParam employeeParam) {
@@ -104,7 +108,7 @@ public class EmployeeService extends BaseService<Employee, String> {
         employeeRepository.saveAll(employeeList);
     }
 
-    public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag) {
+    public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag, String taskFilterFlag) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
@@ -141,8 +145,12 @@ public class EmployeeService extends BaseService<Employee, String> {
                 organizationList.forEach(in::value);
                 predicateList.add(in);
             }
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            Predicate predicate = criteriaBuilder.and(predicateList.toArray(predicates));
+            // 过滤任务已选择的人员
+            if ("1".equals(taskFilterFlag)) {
+                List<String> empIdList = pointsClient.findCurMonthTaskEmp();
+                predicateList.add(criteriaBuilder.not(root.get("id").in(empIdList)));
+            }
+            Predicate predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
 
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = Lists.newArrayList();
@@ -150,8 +158,7 @@ public class EmployeeService extends BaseService<Employee, String> {
                 Predicate p2 = criteriaBuilder.like(root.get("cellNum"), searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
                 predicateList1.add(criteriaBuilder.or(p2));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
 
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }

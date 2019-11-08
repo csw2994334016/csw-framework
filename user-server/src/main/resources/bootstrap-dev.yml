@@ -1,4 +1,7 @@
 spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
   jpa: # jpa配置
     show-sql: true
     hibernate:
