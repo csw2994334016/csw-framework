@@ -52,7 +52,7 @@ public class TaskSettingController {
     @ApiImplicitParam(name = "managerTaskParam1", value = "管理任务信息", required = true, dataType = "ManagerTaskParam1")
     @PostMapping("/updateEmp")
     public JsonResult updateEmp(@RequestBody ManagerTaskParam1 managerTaskParam1) {
-        managerTaskService.updateEmp(managerTaskParam1);
+        managerTaskService.updateEmpOnly(managerTaskParam1);
         return JsonResult.ok("考核人员变更成功");
     }
 

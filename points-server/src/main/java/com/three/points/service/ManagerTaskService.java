@@ -73,7 +73,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             managerTaskList.add(managerTask1);
         }
 
-        managerTaskRepository.saveAll(managerTaskList);
+        managerTaskList = managerTaskRepository.saveAll(managerTaskList);
+        // 添加参与人员
+        if (managerTaskParam.getManagerTaskEmpParamList().size() > 0) {
+            for (ManagerTask managerTask1 : managerTaskList) {
+                updateEmp(managerTask1, managerTaskParam.getManagerTaskEmpParamList());
+            }
+        }
     }
 
     private boolean checkTaskNameExist(String taskName, String organizationId) {
@@ -85,35 +91,53 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         BeanValidator.check(managerTaskParam);
 
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam.getId());
-        // 同一个月的任务名称不能相同
+        // 同一个月的所有任务名称不能相同
         if (managerTaskRepository.countByTaskNameAndOrganizationIdAndTaskDate(managerTaskParam.getTaskName(), firstOrganizationId, managerTask.getTaskDate()) > 0) {
             throw new ParameterException("任务名称已经存在");
         }
         managerTask = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask);
 
-        List<ManagerTask> managerTaskList = new ArrayList<>();
-        managerTaskList.add(managerTask);
-
-        // 根据任务名称，查找该月份之后的任务，然后修改
-        List<ManagerTask> managerTasks = managerTaskRepository.findAllByTaskNameAndOrganizationIdAndTaskDateAfter(managerTask.getTaskName(), firstOrganizationId, managerTask.getTaskDate());
-        for (ManagerTask managerTask1 : managerTasks) {
-            managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1, Arrays.asList("id"));
-            managerTaskList.add(managerTask1);
+        managerTask = managerTaskRepository.save(managerTask);
+        // 修改参与人员
+        if (managerTaskParam.getManagerTaskEmpParamList().size() > 0) {
+            updateEmp(managerTask, managerTaskParam.getManagerTaskEmpParamList());
         }
 
-        managerTaskRepository.saveAll(managerTaskList);
+//        List<ManagerTask> managerTaskList = new ArrayList<>();
+//        managerTaskList.add(managerTask);
+//
+//        // 根据任务名称，查找该月份之后的任务，然后修改
+//        List<ManagerTask> managerTasks = managerTaskRepository.findAllByTaskNameAndOrganizationIdAndTaskDateAfter(managerTask.getTaskName(), firstOrganizationId, managerTask.getTaskDate());
+//        for (ManagerTask managerTask1 : managerTasks) {
+//            managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1, Arrays.asList("id"));
+//            managerTaskList.add(managerTask1);
+//        }
+//
+//        managerTaskList = managerTaskRepository.saveAll(managerTaskList);
+//        // 添加配置人员
+//        if (managerTaskParam.getManagerTaskEmpParamList().size() > 0) {
+//            for (ManagerTask managerTask1 : managerTaskList) {
+//                updateEmp(managerTask1, managerTaskParam.getManagerTaskEmpParamList());
+//            }
+//        }
     }
 
     @Transactional
-    public void updateEmp(ManagerTaskParam1 managerTaskParam1) {
+    public void updateEmpOnly(ManagerTaskParam1 managerTaskParam1) {
         BeanValidator.check(managerTaskParam1);
+
+        ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam1.getTaskId());
+
+        updateEmp(managerTask, managerTaskParam1.getManagerTaskEmpParamList());
+    }
+
+    @Transactional
+    public void updateEmp(ManagerTask managerTask, List<ManagerTaskEmpParam> managerTaskEmpParamList) {
         Set<String> empIdSet = new HashSet<>();
-        for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskParam1.getManagerTaskEmpParamList()) {
+        for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskEmpParamList) {
             BeanValidator.check(managerTaskEmpParam);
             empIdSet.add(managerTaskEmpParam.getEmpId());
         }
-
-        ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam1.getTaskId());
         // 人员在当前月的其它任务中不能出现
         List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByOrganizationIdAndTaskIdNotAndTaskDateAndEmpIdIn(firstOrganizationId, managerTask.getId(), managerTask.getTaskDate(), empIdSet);
         if (managerTaskEmpList.size() > 0) {
@@ -123,12 +147,11 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             }
             throw new BusinessException("人员在其它任务中出现：" + errorList.toString());
         }
-
         // 删除该任务原有的人员信息
         managerTaskEmpRepository.deleteByTaskId(managerTask.getId());
         // 重新添加人员
         managerTaskEmpList.clear();
-        for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskParam1.getManagerTaskEmpParamList()) {
+        for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskEmpParamList) {
             ManagerTaskEmp managerTaskEmp = new ManagerTaskEmp();
             managerTaskEmp = (ManagerTaskEmp) BeanCopyUtil.copyBean(managerTaskEmpParam, managerTaskEmp);
             managerTaskEmp.setOrganizationId(firstOrganizationId);
@@ -138,7 +161,6 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             managerTaskEmpList.add(managerTaskEmp);
         }
         managerTaskEmpRepository.saveAll(managerTaskEmpList);
-
     }
 
     @Transactional

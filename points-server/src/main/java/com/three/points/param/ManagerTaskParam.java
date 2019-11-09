@@ -5,6 +5,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by csw on 2019-11-06.
@@ -60,5 +62,8 @@ public class ManagerTaskParam {
 
     @ApiModelProperty("描述/备注")
     private String remark; // 描述/备注
+
+    @ApiModelProperty("任务考核人员列表")
+    List<ManagerTaskEmpParam> managerTaskEmpParamList = new ArrayList<>(); // 任务考核人员列表
 
 }

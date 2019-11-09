@@ -148,7 +148,9 @@ public class EmployeeService extends BaseService<Employee, String> {
             // 过滤任务已选择的人员
             if ("1".equals(taskFilterFlag)) {
                 List<String> empIdList = pointsClient.findCurMonthTaskEmp();
-                predicateList.add(criteriaBuilder.not(root.get("id").in(empIdList)));
+                if (empIdList.size() > 0) {
+                    predicateList.add(criteriaBuilder.not(root.get("id").in(empIdList)));
+                }
             }
             Predicate predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
 

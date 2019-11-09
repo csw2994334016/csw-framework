@@ -120,10 +120,6 @@ public class OrganizationService extends BaseService<Organization, String> {
 
     }
 
-    public PageResult<Organization> findAll(int code, String searchKey, String searchValue) {
-        return query(null, code, searchKey, searchValue);
-    }
-
     public List<OrgVo> findAllWithTree(int code) {
         List<Organization> organizationList = new ArrayList<>();
 
@@ -172,7 +168,7 @@ public class OrganizationService extends BaseService<Organization, String> {
 
     List<Organization> getChildOrganizationListByOrgId(String orgId) {
         List<Organization> childOrganizationList = new ArrayList<>();
-        List<Organization> organizationList = findAll(StatusEnum.OK.getCode(), null, null).getData();
+        List<Organization> organizationList = query(null, StatusEnum.OK.getCode(), null, null).getData();
         Map<String, Organization> organizationMap = new HashMap<>();
         for (Organization organization : organizationList) {
             organizationMap.put(organization.getId(), organization);

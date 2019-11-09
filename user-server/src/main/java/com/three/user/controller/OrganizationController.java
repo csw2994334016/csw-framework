@@ -56,28 +56,19 @@ public class OrganizationController {
         return JsonResult.ok("组织机构删除成功");
     }
 
-    @ApiOperation(value = "查询组织机构（分页）", notes = "")
+    @ApiOperation(value = "查询组织机构（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", value = "第几页", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "limit", value = "每页多少条", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
+            @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @GetMapping("/query")
     public PageResult<Organization> query(Integer page, Integer limit, String searchKey, String searchValue) {
-        PageQuery pageQuery = new PageQuery(page, limit);
-        BeanValidator.check(pageQuery);
-        return organizationService.query(pageQuery, StatusEnum.OK.getCode(), searchKey, searchValue);
-    }
-
-    @ApiOperation(value = "查询所有组织机构")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchKey", value = "筛选条件", dataType = "String"),
-            @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
-    })
-    @GetMapping()
-    public PageResult<Organization> findAll(String searchKey, String searchValue) {
-        return organizationService.findAll(StatusEnum.OK.getCode(), searchKey, searchValue);
+        if (page != null && limit != null) {
+            return organizationService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchKey, searchValue);
+        }
+        return organizationService.query(null, StatusEnum.OK.getCode(), searchKey, searchValue);
     }
 
     @ApiOperation(value = "查询所有组织机构(树形结构)")
