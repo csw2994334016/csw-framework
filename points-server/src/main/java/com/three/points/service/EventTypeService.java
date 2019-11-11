@@ -39,8 +39,6 @@ public class EventTypeService extends BaseService<EventType, String> {
     @Autowired
     private EventRepository eventRepository;
 
-    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-
     @Transactional
     public EventType create(EventTypeParam eventTypeParam) {
         BeanValidator.check(eventTypeParam);
@@ -48,6 +46,7 @@ public class EventTypeService extends BaseService<EventType, String> {
         EventType eventType = new EventType();
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
 
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         eventType.setOrganizationId(firstOrganizationId);
 
         eventType = eventTypeRepository.save(eventType);
@@ -90,6 +89,7 @@ public class EventTypeService extends BaseService<EventType, String> {
         Specification<EventType> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<EventType> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 
@@ -159,6 +159,7 @@ public class EventTypeService extends BaseService<EventType, String> {
     public List<EventType> findChildren(int code, String id) {
         List<EventType> eventTypeList;
         String parentId = StringUtil.isNotBlank(id) ? id : "-1";
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         if (firstOrganizationId != null) {
             eventTypeList = eventTypeRepository.findAllByOrganizationIdAndStatusAndParentId(firstOrganizationId, code, parentId);
         } else {

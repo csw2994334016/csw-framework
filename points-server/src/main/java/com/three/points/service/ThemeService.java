@@ -48,8 +48,6 @@ public class ThemeService extends BaseService<Theme, String> {
     @Autowired
     private UserClient userClient;
 
-    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-
     @Transactional
     public void createDraft(ThemeParam themeParam) {
         // 创建主题
@@ -79,6 +77,7 @@ public class ThemeService extends BaseService<Theme, String> {
     }
 
     private void saveThemeAndThemeDetailList(String draft, Theme theme, List<ThemeDetail> themeDetailList) {
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         theme.setOrganizationId(firstOrganizationId);
 
         String empId = LoginUserUtil.getLoginUserEmpId();
@@ -242,6 +241,7 @@ public class ThemeService extends BaseService<Theme, String> {
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
@@ -276,6 +276,7 @@ public class ThemeService extends BaseService<Theme, String> {
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 

@@ -35,8 +35,6 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
     @Autowired
     private ManagerTaskEmpRepository managerTaskEmpRepository;
 
-    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-
     @Transactional
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
@@ -55,6 +53,7 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
         Specification<ManagerTaskEmp> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<ManagerTaskEmp> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 

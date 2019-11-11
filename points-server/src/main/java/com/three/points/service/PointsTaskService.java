@@ -35,8 +35,6 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
     @Autowired
     private PointsTaskRepository pointsTaskRepository;
 
-    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-
     @Transactional
     public void create(PointsTaskParam pointsTaskParam) {
         BeanValidator.check(pointsTaskParam);
@@ -45,6 +43,7 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
         pointsTask = (PointsTask) BeanCopyUtil.copyBean(pointsTaskParam, pointsTask);
         pointsTask.setDeadline(new Date(pointsTaskParam.getDeadline()));
 
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         pointsTask.setOrganizationId(firstOrganizationId);
 
         pointsTask.setCreateId(LoginUserUtil.getLoginUserEmpId());
@@ -85,6 +84,7 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
         Specification<PointsTask> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<PointsTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 

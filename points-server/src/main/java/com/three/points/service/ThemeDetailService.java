@@ -35,8 +35,6 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     @Autowired
     private EventService eventService;
 
-    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-
     @Transactional
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
@@ -55,6 +53,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         Specification<ThemeDetail> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
+            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<ThemeDetail> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
 

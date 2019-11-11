@@ -42,12 +42,11 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     @Autowired
     private ManagerTaskEmpRepository managerTaskEmpRepository;
 
-    private String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-
     @Transactional
     public void create(ManagerTaskParam managerTaskParam) {
         BeanValidator.check(managerTaskParam);
 
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         // 任务名称已经存在
         if (checkTaskNameExist(managerTaskParam.getTaskName(), firstOrganizationId)) {
             throw new ParameterException("任务名称已经存在");
@@ -70,6 +69,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             taskDate = DateUtil.offsetMonth(taskDate, 1);
             ManagerTask managerTask1 = new ManagerTask();
             managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1);
+            managerTask1.setOrganizationId(firstOrganizationId);
             managerTask1.setTaskDate(taskDate);
             managerTaskList.add(managerTask1);
         }
@@ -90,6 +90,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     @Transactional
     public void update(ManagerTaskParam managerTaskParam) {
         BeanValidator.check(managerTaskParam);
+
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
 
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam.getId());
         // 同一个月的所有任务名称不能相同
@@ -139,6 +141,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             BeanValidator.check(managerTaskEmpParam);
             empIdSet.add(managerTaskEmpParam.getEmpId());
         }
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         // 人员在当前月的其它任务中不能出现
         List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByOrganizationIdAndTaskIdNotAndTaskDateAndEmpIdIn(firstOrganizationId, managerTask.getId(), managerTask.getTaskDate(), empIdSet);
         if (managerTaskEmpList.size() > 0) {
@@ -178,6 +181,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     }
 
     public PageResult<ManagerTask> query(PageQuery pageQuery, int code, Long taskDate) {
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<ManagerTask> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -204,6 +208,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     public ManagerTask findNextTask(String id) {
         ManagerTask managerTask = getEntityById(managerTaskRepository, id);
         Date taskDateNext = DateUtil.offsetMonth(managerTask.getTaskDate(), 1);
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         ManagerTask managerTaskNext = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(firstOrganizationId, managerTask.getTaskName(), taskDateNext);
         if (managerTaskNext == null) {
             throw new BusinessException("系统中不存在该任务的下个月配置信息");
@@ -217,6 +222,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     }
 
     public Set<String> findCurMonthTaskEmp(Date taskDate) {
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDate(firstOrganizationId, taskDate);
         Set<String> empIdSet = new HashSet<>();
         managerTaskEmpList.forEach(e -> {
@@ -233,6 +239,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         if (StringUtil.isBlank(empId)) {
             empId = LoginUserUtil.getLoginUserEmpId(); // 当前登录用户
         }
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, taskDate, empId);
         ManagerTask managerTask = findById(managerTaskEmp.getTaskId());
         managerTaskEmp.setManagerTask(managerTask);
