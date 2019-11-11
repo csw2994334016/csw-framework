@@ -9,7 +9,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -93,5 +95,41 @@ public class ManagerTaskEmp implements Serializable {
     @ApiModelProperty("修改时间")
     private Date updateDate; // 修改时间
 
+
+    @Transient
+    @ApiModelProperty("任务信息对象")
+    private ManagerTask managerTask; // 任务信息对象
+
+    @Transient
+    @ApiModelProperty("奖分任务值")
+    private Integer scoreAwardMin; // 奖分任务值
+
+    @Transient
+    @ApiModelProperty("奖分任务已完成值")
+    private Integer scoreAwardCompleted; // 奖分任务已完成值
+
+    @Transient
+    @ApiModelProperty("扣分任务值")
+    private Integer scoreDeductMin; // 扣分任务值
+
+    @Transient
+    @ApiModelProperty("扣分任务已完成值")
+    private Integer scoreDeductCompleted; // 扣分任务已完成值
+
+    @Transient
+    @ApiModelProperty("人次任务值")
+    private Integer empCountValue; // 人次任务值
+
+    @Transient
+    @ApiModelProperty("人次任务已完成值")
+    private Integer empCountValueCompleted; // 人次任务已完成值
+
+    @Transient
+    @ApiModelProperty("比例任务值")
+    private Double ratioValue; // 比例任务值
+
+    @Transient
+    @ApiModelProperty("比例任务已完成值")
+    private Double ratioValueCompleted; // 比例任务已完成值
 
 }

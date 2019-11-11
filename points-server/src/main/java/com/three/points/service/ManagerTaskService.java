@@ -2,6 +2,7 @@ package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
 import com.three.common.utils.DateUtils;
+import com.three.common.vo.JsonData;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.ManagerTask;
@@ -222,5 +223,21 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             empIdSet.add(e.getEmpId());
         });
         return empIdSet;
+    }
+
+    public ManagerTaskEmp queryTaskMySelf(Long taskDateM, String empId) {
+        Date taskDate = DateUtil.parse(DateUtils.getMonthFirstDay(new Date())); // 当前月
+        if (taskDateM != null) {
+            taskDate = DateUtil.parse(DateUtils.getMonthFirstDay(new Date(taskDateM)));
+        }
+        if (StringUtil.isBlank(empId)) {
+            empId = LoginUserUtil.getLoginUserEmpId(); // 当前登录用户
+        }
+        ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, taskDate, empId);
+        ManagerTask managerTask = findById(managerTaskEmp.getTaskId());
+        managerTaskEmp.setManagerTask(managerTask);
+        // 设置相关属性
+
+        return managerTaskEmp;
     }
 }
