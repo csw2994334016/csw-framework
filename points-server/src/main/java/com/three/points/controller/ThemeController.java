@@ -1,5 +1,6 @@
 package com.three.points.controller;
 
+import com.three.common.vo.JsonData;
 import com.three.points.entity.Theme;
 import com.three.points.param.ThemeParam;
 import com.three.points.service.ThemeDetailService;
@@ -9,12 +10,16 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
+import com.three.points.vo.ThemeApprovalVo;
+import com.three.points.vo.ThemeDetailVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by csw on 2019-10-24.
@@ -99,15 +104,15 @@ public class ThemeController {
     @ApiOperation(value = "查询积分奖扣（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "积分奖扣信息id", required = true, dataType = "String")
     @GetMapping("/findById")
-    public JsonResult findById(@RequestParam(required = true) String id) {
-        return JsonResult.ok().put("data", themeService.findById(id));
+    public JsonData<Theme> findById(@RequestParam(required = true) String id) {
+        return new JsonData<>(themeService.findById(id)).success();
     }
 
     @ApiOperation(value = "查询积分奖扣审批流程", notes = "")
     @ApiImplicitParam(name = "id", value = "积分奖扣id", required = true, dataType = "String")
     @GetMapping("/findApprovalInfo")
-    public JsonResult findApprovalInfo(@RequestParam() String id) {
-        return JsonResult.ok().put("data", themeService.findApprovalInfo(id));
+    public JsonData<List<ThemeApprovalVo>> findApprovalInfo(@RequestParam() String id) {
+        return new JsonData<>(themeService.findApprovalInfo(id)).success();
     }
 
     @LogAnnotation(module = "提交积分奖扣")
@@ -132,7 +137,7 @@ public class ThemeController {
     @ApiOperation(value = "查询积分奖扣详情（根据主题ID查找事件及参与人员）", notes = "")
     @ApiImplicitParam(name = "themeId", value = "积分奖扣id", required = true, dataType = "String")
     @GetMapping("/themeDetails/findByThemeId")
-    public JsonResult findByThemeId(@RequestParam() String themeId) {
-        return JsonResult.ok().put("data", themeDetailService.findByThemeId(themeId));
+    public JsonData<List<ThemeDetailVo>> findByThemeId(@RequestParam() String themeId) {
+        return new JsonData<>(themeDetailService.findByThemeId(themeId)).success();
     }
 }

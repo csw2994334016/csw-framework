@@ -1,5 +1,6 @@
 package com.three.user.controller;
 
+import com.three.common.vo.JsonData;
 import com.three.user.entity.Employee;
 import com.three.user.param.EmployeeParam;
 import com.three.user.service.EmployeeService;
@@ -127,7 +128,7 @@ public class EmployeeController {
     @ApiOperation(value = "查找员工信息（根据Id）", notes = "")
     @ApiImplicitParam(name = "id", value = "员工ID", required = true, dataType = "String")
     @GetMapping("/findById")
-    public JsonResult findById(String id) {
-        return JsonResult.ok().put("data", employeeService.findById(id));
+    public JsonData<Employee> findById(String id) {
+        return new JsonData<>(employeeService.findById(id)).success();
     }
 }

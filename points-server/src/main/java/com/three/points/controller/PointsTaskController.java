@@ -1,5 +1,6 @@
 package com.three.points.controller;
 
+import com.three.common.vo.JsonData;
 import com.three.points.entity.PointsTask;
 import com.three.points.param.PointsTaskParam;
 import com.three.points.service.PointsTaskService;
@@ -74,7 +75,7 @@ public class PointsTaskController {
     @ApiOperation(value = "查询我发布的任务详情（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "积分任务信息id", required = true, dataType = "String")
     @GetMapping("/findById")
-    public JsonResult findById(@RequestParam(required = true) String id) {
-        return JsonResult.ok().put("data", pointsTaskService.findById(id));
+    public JsonData<PointsTask> findById(@RequestParam(required = true) String id) {
+        return new JsonData<>(pointsTaskService.findById(id)).success();
     }
 }

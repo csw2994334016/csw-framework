@@ -1,5 +1,6 @@
 package com.three.user.controller;
 
+import com.three.common.vo.JsonData;
 import com.three.user.entity.Organization;
 import com.three.user.param.OrganizationParam;
 import com.three.user.service.OrganizationService;
@@ -9,12 +10,15 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.user.vo.OrgVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by csw on 2019-09-25.
@@ -73,8 +77,8 @@ public class OrganizationController {
 
     @ApiOperation(value = "查询所有组织机构(树形结构)")
     @GetMapping("/tree")
-    public JsonResult findAllWithTree() {
-        return JsonResult.ok("查找成功").put("data", organizationService.findAllWithTree(StatusEnum.OK.getCode()));
+    public JsonData<List<OrgVo>> findAllWithTree() {
+        return new JsonData<>(organizationService.findAllWithTree(StatusEnum.OK.getCode())).success();
     }
 
     @ApiOperation(value = "上移")

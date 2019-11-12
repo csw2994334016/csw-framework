@@ -4,6 +4,7 @@ import com.three.common.auth.*;
 import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
+import com.three.common.vo.JsonData;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
@@ -39,15 +40,14 @@ public class SysController {
 
     @ApiOperation(value = "获取个人信息")
     @GetMapping("/sys/userInfo")
-    public JsonResult userInfo() {
-        return JsonResult.ok().put("user", LoginUserUtil.getLoginUser());
+    public JsonData<LoginUser> userInfo() {
+        return new JsonData<>(LoginUserUtil.getLoginUser()).success();
     }
 
     @ApiOperation(value = "获取左侧菜单信息")
     @GetMapping("/sys/menuInfo")
-    public JsonResult menuInfo() {
-        List<MenuVo> menuVoList = userService.getMenuInfo();
-        return JsonResult.ok().put("data", menuVoList);
+    public JsonData<List<MenuVo>> menuInfo() {
+        return new JsonData<>(userService.getMenuInfo()).success();
     }
 
     @ApiOperation(value = "按用户名查找用户（内部接口）")

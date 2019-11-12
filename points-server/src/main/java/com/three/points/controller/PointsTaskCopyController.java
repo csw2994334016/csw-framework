@@ -1,6 +1,7 @@
 package com.three.points.controller;
 
 import com.three.common.enums.StatusEnum;
+import com.three.common.vo.JsonData;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
@@ -48,7 +49,7 @@ public class PointsTaskCopyController {
     @ApiOperation(value = "查询抄送给我的任务详情（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "积分任务信息id", required = true, dataType = "String")
     @GetMapping("/findById")
-    public JsonResult findById(@RequestParam(required = true) String id) {
-        return JsonResult.ok().put("data", pointsTaskService.findById(id));
+    public JsonData<PointsTask> findById(@RequestParam(required = true) String id) {
+        return new JsonData<>(pointsTaskService.findById(id)).success();
     }
 }

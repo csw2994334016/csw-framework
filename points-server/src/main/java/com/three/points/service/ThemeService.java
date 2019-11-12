@@ -368,7 +368,7 @@ public class ThemeService extends BaseService<Theme, String> {
             theme.setSubmitterDate(new Date());
             themeRepository.save(theme);
         } else {
-            throw new BusinessException("只有保存状态才能提交");
+            throw new BusinessException("只有拟稿状态才能提交");
         }
     }
 
@@ -415,7 +415,7 @@ public class ThemeService extends BaseService<Theme, String> {
                     throw new BusinessException("记录是审核通过状态,只有终审人才能撤回");
                 }
             } else {
-                throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能撤回");
+                throw new BusinessException("该状态[" + ThemeEnum.getMessageByCode(theme.getThemeStatus()) + "]不能撤回");
             }
         } else {
             throw new BusinessException("锁定状态不能撤回");
@@ -482,7 +482,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 throw new BusinessException("记录是待终审或锁定状态,只有终审人才能驳回");
             }
         } else {
-            throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能撤回");
+            throw new BusinessException("该状态[" + ThemeEnum.getMessageByCode(theme.getThemeStatus()) + "]不能撤回");
         }
     }
 
@@ -548,7 +548,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 throw new BusinessException("记录是待终审、驳回或锁定状态,只有终审人才能通过");
             }
         } else {
-            throw new BusinessException("该状态[" + theme.getThemeStatus() + "]不能通过");
+            throw new BusinessException("该状态[" + ThemeEnum.getMessageByCode(theme.getThemeStatus()) + "]不能通过");
         }
     }
 

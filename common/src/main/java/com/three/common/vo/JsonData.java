@@ -15,6 +15,8 @@ public class JsonData<T> {
     private T data;
 
     public JsonData(T data) {
+        this.code = ResultCodeEnum.SUCCESS.getCode();
+        this.msg = ResultCodeEnum.SUCCESS.getMessage();
         this.data = data;
     }
 
@@ -24,9 +26,21 @@ public class JsonData<T> {
         return this;
     }
 
+    public JsonData<T> success(String msg) {
+        this.code = ResultCodeEnum.SUCCESS.getCode();
+        this.msg = msg;
+        return this;
+    }
+
     public JsonData<T> error() {
         this.code = ResultCodeEnum.FAIL.getCode();
         this.msg = ResultCodeEnum.FAIL.getMessage();
+        return this;
+    }
+
+    public JsonData<T> error(String msg) {
+        this.code = ResultCodeEnum.FAIL.getCode();
+        this.msg = msg;
         return this;
     }
 

@@ -7,6 +7,8 @@ import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
+import com.three.points.entity.Theme;
+import com.three.points.enums.ThemeEnum;
 import com.three.points.param.ManagerTaskEmpParam;
 import com.three.points.param.ManagerTaskParam1;
 import com.three.points.repository.ManagerTaskEmpRepository;
@@ -17,6 +19,7 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.repository.ThemeRepository;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,9 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
 
     @Autowired
     private ManagerTaskEmpRepository managerTaskEmpRepository;
+
+    @Autowired
+    private ThemeRepository themeRepository;
 
     @Transactional
     public void create(ManagerTaskParam managerTaskParam) {
@@ -234,7 +240,12 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskEmp.getTaskId());
         managerTaskEmp.setManagerTask(managerTask);
         // 设置相关任务完成情况
+        Date taskDateNext = DateUtil.offsetMonth(taskDate, 1);
+        // 查找主题，条件：初审人ID、审核通过、奖扣时间在管理任务月份
+        List<Theme> themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), taskDate, taskDateNext);
+        for (Theme theme : themeList) {
 
+        }
         return managerTaskEmp;
     }
 }

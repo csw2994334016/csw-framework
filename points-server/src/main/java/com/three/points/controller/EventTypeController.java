@@ -1,5 +1,6 @@
 package com.three.points.controller;
 
+import com.three.common.vo.JsonData;
 import com.three.points.entity.EventType;
 import com.three.points.param.EventTypeParam;
 import com.three.points.service.EventTypeService;
@@ -9,12 +10,15 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.vo.EventTypeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by csw on 2019-10-20.
@@ -75,14 +79,14 @@ public class EventTypeController {
 
     @ApiOperation(value = "查询所有事件分类(树形结构)")
     @GetMapping("/tree")
-    public JsonResult findAllWithTree() {
-        return JsonResult.ok("查找成功").put("data", eventTypeService.findAllWithTree(StatusEnum.OK.getCode()));
+    public JsonData<List<EventTypeVo>> findAllWithTree() {
+        return new JsonData<>(eventTypeService.findAllWithTree(StatusEnum.OK.getCode())).success().setMsg("查找成功");
     }
 
     @ApiOperation(value = "查询子事件分类(根据ID)")
     @ApiImplicitParam(name = "id", value = "事件分类ID(id没有表示查找一级事件分类)", dataType = "String")
     @GetMapping("/findChildren")
-    public JsonResult findChildren(String id) {
-        return JsonResult.ok("查找成功").put("data", eventTypeService.findChildren(StatusEnum.OK.getCode(), id));
+    public JsonData<List<EventType>> findChildren(String id) {
+        return new JsonData<>(eventTypeService.findChildren(StatusEnum.OK.getCode(), id)).success().setMsg("查找成功");
     }
 }

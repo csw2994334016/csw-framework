@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.three.common.log.LogAnnotation;
+import com.three.common.vo.JsonData;
 import com.three.user.entity.Authority;
 import com.three.user.param.AuthSyncParam;
 import com.three.user.param.AuthorityParam;
@@ -98,8 +99,8 @@ public class AuthorityController {
 
     @ApiOperation(value = "查询所有菜单权限(上级权限)")
     @GetMapping("/menuAuth")
-    public JsonResult menuAuth() {
-        return JsonResult.ok().put("data", authorityService.findMenuAuth());
+    public JsonData<List<Authority>> menuAuth() {
+        return new JsonData<>(authorityService.findMenuAuth()).success();
     }
 
 }
