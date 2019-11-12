@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "管理任务查询", tags = "管理任务查询")
 @RestController
 @RequestMapping("/points/taskQueries")
-public class TaskQueryController {
+public class ManagerTaskQueryController {
 
     @Autowired
     private ManagerTaskEmpService managerTaskEmpService;

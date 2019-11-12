@@ -10,7 +10,7 @@ import lombok.Getter;
 public enum  ThemeEnum {
 
     DRAFT(0, "草稿"),
-    SAVE(1, "保存"),
+    SAVE(1, "拟稿"),
     ATTN(2, "待初审"),
     AUDIT(3, "待终审"),
     REJECT(4, "驳回"),

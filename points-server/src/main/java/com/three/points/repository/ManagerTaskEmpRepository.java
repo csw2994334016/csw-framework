@@ -24,4 +24,6 @@ public interface ManagerTaskEmpRepository extends BaseRepository<ManagerTaskEmp,
     List<ManagerTaskEmp> findAllByOrganizationIdAndTaskDate(String firstOrganizationId, Date taskDate);
 
     ManagerTaskEmp findAllByOrganizationIdAndTaskDateAndEmpId(String firstOrganizationId, Date taskDate, String empId);
+
+    void deleteAllByTaskId(String id);
 }

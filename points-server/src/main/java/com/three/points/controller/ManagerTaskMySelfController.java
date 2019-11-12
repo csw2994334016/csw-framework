@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "我的管理任务", tags = "我的管理任务")
 @RestController
 @RequestMapping("/points/taskMySelf")
-public class TaskMySelfController {
+public class ManagerTaskMySelfController {
 
     @Autowired
     private ManagerTaskService managerTaskService;

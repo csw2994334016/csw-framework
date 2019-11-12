@@ -30,14 +30,15 @@ public class ManagerTaskController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页记录数", dataType = "Integer"),
-            @ApiImplicitParam(name = "taskDate", value = "任务日期（毫秒,为空默认返回当月任务）", dataType = "Long")
+            @ApiImplicitParam(name = "taskDate", value = "任务日期（毫秒,为空默认返回当月任务）", dataType = "Long"),
+            @ApiImplicitParam(name = "taskName", value = "任务名称", dataType = "String"),
     })
     @GetMapping("/query")
-    public PageResult<ManagerTask> query(Integer page, Integer limit, Long taskDate) {
+    public PageResult<ManagerTask> query(Integer page, Integer limit, Long taskDate, String taskName) {
         if (page != null && limit != null) {
-            return managerTaskService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskDate);
+            return managerTaskService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskDate, taskName);
         } else {
-            return managerTaskService.query(null, StatusEnum.OK.getCode(), taskDate);
+            return managerTaskService.query(null, StatusEnum.OK.getCode(), taskDate, taskName);
         }
     }
 

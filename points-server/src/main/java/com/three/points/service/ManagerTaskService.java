@@ -95,7 +95,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
 
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskParam.getId());
         // 同一个月的所有任务名称不能相同
-        if (managerTaskRepository.countByTaskNameAndOrganizationIdAndTaskDate(managerTaskParam.getTaskName(), firstOrganizationId, managerTask.getTaskDate()) > 0) {
+        if (managerTaskRepository.countByTaskNameAndOrganizationIdAndTaskDateAndIdNot(managerTaskParam.getTaskName(), firstOrganizationId, managerTask.getTaskDate(), managerTask.getId()) > 0) {
             throw new ParameterException("任务名称已经存在");
         }
         managerTask = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask);
@@ -105,24 +105,6 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         if (managerTaskParam.getManagerTaskEmpParamList().size() > 0) {
             updateEmp(managerTask, managerTaskParam.getManagerTaskEmpParamList());
         }
-
-//        List<ManagerTask> managerTaskList = new ArrayList<>();
-//        managerTaskList.add(managerTask);
-//
-//        // 根据任务名称，查找该月份之后的任务，然后修改
-//        List<ManagerTask> managerTasks = managerTaskRepository.findAllByTaskNameAndOrganizationIdAndTaskDateAfter(managerTask.getTaskName(), firstOrganizationId, managerTask.getTaskDate());
-//        for (ManagerTask managerTask1 : managerTasks) {
-//            managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1, Arrays.asList("id"));
-//            managerTaskList.add(managerTask1);
-//        }
-//
-//        managerTaskList = managerTaskRepository.saveAll(managerTaskList);
-//        // 添加配置人员
-//        if (managerTaskParam.getManagerTaskEmpParamList().size() > 0) {
-//            for (ManagerTask managerTask1 : managerTaskList) {
-//                updateEmp(managerTask1, managerTaskParam.getManagerTaskEmpParamList());
-//            }
-//        }
     }
 
     @Transactional
@@ -152,7 +134,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             throw new BusinessException("人员在其它任务中出现：" + errorList.toString());
         }
         // 删除该任务原有的人员信息
-        managerTaskEmpRepository.deleteByTaskId(managerTask.getId());
+        managerTaskEmpRepository.deleteAllByTaskId(managerTask.getId());
         // 重新添加人员
         managerTaskEmpList.clear();
         for (ManagerTaskEmpParam managerTaskEmpParam : managerTaskEmpParamList) {
@@ -180,7 +162,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         managerTaskRepository.saveAll(managerTaskList);
     }
 
-    public PageResult<ManagerTask> query(PageQuery pageQuery, int code, Long taskDate) {
+    public PageResult<ManagerTask> query(PageQuery pageQuery, int code, Long taskDate, String taskName) {
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<ManagerTask> specification = (root, criteriaQuery, criteriaBuilder) -> {
@@ -192,6 +174,9 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
                 taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date(taskDate)));
             }
             predicateList.add(criteriaBuilder.equal(root.get("taskDate"), taskDate1));
+            if (StringUtil.isNotBlank(taskName)) {
+                predicateList.add(criteriaBuilder.like(root.get("taskName"), "%" + taskName + "%"));
+            }
             return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
         if (pageQuery != null) {
@@ -216,6 +201,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         if (managerTaskNext == null) {
             throw new BusinessException("系统中不存在该任务的下个月配置信息");
         }
+        List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(managerTaskNext.getId());
+        managerTaskNext.setManagerTaskEmpList(managerTaskEmpList);
         return managerTaskNext;
     }
 
@@ -246,7 +233,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, taskDate, empId);
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskEmp.getTaskId());
         managerTaskEmp.setManagerTask(managerTask);
-        // 设置相关属性
+        // 设置相关任务完成情况
 
         return managerTaskEmp;
     }

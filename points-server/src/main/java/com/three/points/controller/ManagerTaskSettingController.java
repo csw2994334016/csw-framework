@@ -24,7 +24,7 @@ import java.util.List;
 @Api(value = "管理任务设置", tags = "管理任务设置")
 @RestController
 @RequestMapping("/points/taskSettings")
-public class TaskSettingController {
+public class ManagerTaskSettingController {
 
     @Autowired
     private ManagerTaskService managerTaskService;
