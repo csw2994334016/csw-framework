@@ -13,6 +13,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by csw on 2019-11-06.
@@ -115,4 +116,6 @@ public class ManagerTask implements Serializable {
     private Date updateDate; // 修改时间
 
 
+    @Transient
+    private List<ManagerTaskEmp> managerTaskEmpList;
 }

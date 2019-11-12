@@ -202,7 +202,10 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     }
 
     public ManagerTask findById(String id) {
-        return getEntityById(managerTaskRepository, id);
+        ManagerTask managerTask = getEntityById(managerTaskRepository, id);
+        List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(managerTask.getId());
+        managerTask.setManagerTaskEmpList(managerTaskEmpList);
+        return managerTask;
     }
 
     public ManagerTask findNextTask(String id) {
@@ -241,7 +244,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         }
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, taskDate, empId);
-        ManagerTask managerTask = findById(managerTaskEmp.getTaskId());
+        ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskEmp.getTaskId());
         managerTaskEmp.setManagerTask(managerTask);
         // 设置相关属性
 

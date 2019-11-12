@@ -78,6 +78,10 @@ public class ManagerTaskEmp implements Serializable {
     @ApiModelProperty("职位")
     private String titleLevel; // 职位
 
+    @Column(name = "gender", columnDefinition = "varchar(2) comment '性别'")
+    @ApiModelProperty("性别")
+    private String gender; // 性别
+
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
     @ApiModelProperty("描述/备注")

@@ -40,4 +40,7 @@ public class ManagerTaskEmpParam {
     @ApiModelProperty("职位")
     private String titleLevel; // 职位
 
+    @ApiModelProperty("性别")
+    private String gender; // 性别
+
 }
