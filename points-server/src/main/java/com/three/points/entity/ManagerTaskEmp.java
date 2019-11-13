@@ -105,35 +105,26 @@ public class ManagerTaskEmp implements Serializable {
     private ManagerTask managerTask; // 任务信息对象
 
     @Transient
-    @ApiModelProperty("奖分任务值")
-    private Integer scoreAwardMin; // 奖分任务值
-
-    @Transient
     @ApiModelProperty("奖分任务已完成值")
-    private Integer scoreAwardCompleted; // 奖分任务已完成值
-
-    @Transient
-    @ApiModelProperty("扣分任务值")
-    private Integer scoreDeductMin; // 扣分任务值
+    private Integer scoreAwardCompleted = 0; // 奖分任务已完成值
 
     @Transient
     @ApiModelProperty("扣分任务已完成值")
-    private Integer scoreDeductCompleted; // 扣分任务已完成值
-
-    @Transient
-    @ApiModelProperty("人次任务值")
-    private Integer empCountValue; // 人次任务值
+    private Integer scoreDeductCompleted = 0; // 扣分任务已完成值
 
     @Transient
     @ApiModelProperty("人次任务已完成值")
-    private Integer empCountValueCompleted; // 人次任务已完成值
-
-    @Transient
-    @ApiModelProperty("比例任务值")
-    private Double ratioValue; // 比例任务值
+    private Integer empCountValueCompleted = 0; // 人次任务已完成值
 
     @Transient
     @ApiModelProperty("比例任务已完成值")
-    private Double ratioValueCompleted; // 比例任务已完成值
+    private Double ratioValueCompleted = 0.0; // 比例任务已完成值
 
+    @Transient
+    @ApiModelProperty("比例任务奖分值")
+    private Integer ratioTaskAwardScore = 0; // 比例任务奖分值
+
+    @Transient
+    @ApiModelProperty("比例任务扣分值")
+    private Integer ratioTaskDeductScore = 0; // 比例任务扣分值
 }

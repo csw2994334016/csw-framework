@@ -1,6 +1,7 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
+import com.three.common.enums.YesNoEnum;
 import com.three.common.utils.DateUtils;
 import com.three.common.vo.JsonData;
 import com.three.commonclient.exception.BusinessException;
@@ -8,6 +9,7 @@ import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
 import com.three.points.entity.Theme;
+import com.three.points.enums.ManagerTaskEnum;
 import com.three.points.enums.ThemeEnum;
 import com.three.points.param.ManagerTaskEmpParam;
 import com.three.points.param.ManagerTaskParam1;
@@ -228,23 +230,69 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
     }
 
     public ManagerTaskEmp queryTaskMySelf(Long taskDateM, String empId) {
-        Date taskDate = DateUtil.parse(DateUtils.getMonthFirstDay(new Date())); // 当前月
+        Date date = new Date();
         if (taskDateM != null) {
-            taskDate = DateUtil.parse(DateUtils.getMonthFirstDay(new Date(taskDateM)));
+            date = new Date(taskDateM);
         }
+        Date stD = DateUtil.beginOfDay(date);
+        Date etD = DateUtil.endOfDay(date);
+        Date stW = DateUtil.beginOfWeek(date);
+        Date etW = DateUtil.endOfWeek(date);
+        Date stM = DateUtil.beginOfMonth(date); // 查找任务日期月份第一天
+        Date etM = DateUtil.endOfMonth(date); // 任务月份最后时间
         if (StringUtil.isBlank(empId)) {
             empId = LoginUserUtil.getLoginUserEmpId(); // 当前登录用户
         }
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, taskDate, empId);
+        ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, stM, empId);
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskEmp.getTaskId());
         managerTaskEmp.setManagerTask(managerTask);
-        // 设置相关任务完成情况
-        Date taskDateNext = DateUtil.offsetMonth(taskDate, 1);
-        // 查找主题，条件：初审人ID、审核通过、奖扣时间在管理任务月份
-        List<Theme> themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), taskDate, taskDateNext);
-        for (Theme theme : themeList) {
 
+        // 设置相关任务完成情况
+        // 查找主题，条件：初审人ID、审核通过、奖扣时间范围
+        List<Theme> themeList = new ArrayList<>();
+        // 奖/扣分任务
+        if (YesNoEnum.YES.getCode() == managerTask.getScoreTaskFlag()) {
+            if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getScoreCycle()) {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stD, etD);
+            } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getScoreCycle()) {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stW, etW);
+            } else {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stM, etM);
+            }
+        }
+        for (Theme theme : themeList) {
+            managerTaskEmp.setScoreAwardCompleted(managerTaskEmp.getScoreAwardCompleted() + theme.getBPosScore());
+            managerTaskEmp.setScoreDeductCompleted(managerTaskEmp.getScoreDeductCompleted() + theme.getBNegScore());
+        }
+        // 人次任务
+        themeList.clear();
+        if (YesNoEnum.YES.getCode() == managerTask.getEmpCountTaskFlag()) {
+            if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getEmpCountCycle()) {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stD, etD);
+            } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getEmpCountCycle()) {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stW, etW);
+            } else {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stM, etM);
+            }
+        }
+        for (Theme theme : themeList) {
+            managerTaskEmp.setEmpCountValueCompleted(managerTaskEmp.getEmpCountValueCompleted() + theme.getEmpCount());
+        }
+        // 比例任务
+        themeList.clear();
+        if (YesNoEnum.YES.getCode() == managerTask.getRatioTaskFlag()) {
+            if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getRatioCycle()) {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stD, etD);
+            } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getRatioCycle()) {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stW, etW);
+            } else {
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stM, etM);
+            }
+        }
+        for (Theme theme : themeList) {
+            managerTaskEmp.setRatioTaskAwardScore(managerTaskEmp.getRatioTaskAwardScore() + theme.getBPosScore());
+            managerTaskEmp.setRatioTaskDeductScore(managerTaskEmp.getRatioTaskDeductScore() + theme.getBNegScore());
         }
         return managerTaskEmp;
     }

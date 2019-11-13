@@ -9,15 +9,15 @@ import lombok.Getter;
 @Getter
 public enum EventEnum {
 
-    AUDIT_POS_TYPE(1, "终审人奖分事件分类"),
-    AUDIT_NEG_TYPE(2, "终审人扣分事件分类"),
-    RECORDER_POS(3, "终审人通过，系统自动对记录人奖分事件"),
-    RECORDER_NEG(4, "终审人驳回，系统自动对记录人扣分事件"),
-    ATTN_POS(5, "终审人通过，系统自动对初审人奖分事件"),
-    ATTN_NEG(6, "终审人驳回，系统自动对初审人扣分事件"),
+    EVENT_TYPE_AUDIT_POS(1, "终审人奖分事件分类"),
+    EVENT_TYPE_AUDIT_NEG(2, "终审人扣分事件分类"),
+    EVENT_RECORDER_POS(3, "终审人通过，系统自动对记录人奖分事件"),
+    EVENT_RECORDER_NEG(4, "终审人驳回，系统自动对记录人扣分事件"),
+    EVENT_ATTN_POS(5, "终审人通过，系统自动对初审人奖分事件"),
+    EVENT_ATTN_NEG(6, "终审人驳回，系统自动对初审人扣分事件"),
 
-    AUDIT_POS_THEME(7, "终审人通过，系统自动生成主题"),
-    AUDIT_NEG_THEME(8, "终审人驳回，系统自动生成主题");
+    THEME_AUDIT_POS(7, "终审人通过，系统自动生成主题"),
+    THEME_AUDIT_NEG(8, "终审人驳回，系统自动生成主题");
 
     private int code;
 

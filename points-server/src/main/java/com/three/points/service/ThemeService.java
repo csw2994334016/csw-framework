@@ -406,7 +406,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                     theme.setThemeStatus(ThemeEnum.LOCK.getCode());
                     // 撤回之前，要删除相应的奖分记录
-                    Theme theme1 = themeRepository.findByRelationThemeIdAndThemeName(theme.getId(), EventEnum.AUDIT_POS_THEME.getMessage());
+                    Theme theme1 = themeRepository.findByRelationThemeIdAndThemeName(theme.getId(), EventEnum.THEME_AUDIT_POS.getMessage());
                     themeRepository.delete(theme1);
                     themeDetailRepository.deleteByThemeId(theme1.getId());
 
@@ -442,7 +442,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 if ((recorderBScore != null && recorderBScore < 0) || (attnBScore != null && attnBScore < 0)) {
                     // 先生成主题
                     Theme themeNew = getThemeNew(theme);
-                    themeNew.setThemeName(EventEnum.AUDIT_NEG_THEME.getMessage());
+                    themeNew.setThemeName(EventEnum.THEME_AUDIT_NEG.getMessage());
                     // 汇总分、人次
                     if (recorderBScore != null && recorderBScore < 0) {
                         themeNew.setBPosScore(themeNew.getBPosScore() + recorderBScore);
@@ -456,21 +456,21 @@ public class ThemeService extends BaseService<Theme, String> {
                     // 再生成详情
                     List<ThemeDetail> themeDetailList = new ArrayList<>();
                     if (recorderBScore != null && recorderBScore < 0) {
-                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
-                        themeDetail.setEventName(EventEnum.RECORDER_NEG.getMessage());
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_NEG.getMessage());
+                        themeDetail.setEventName(EventEnum.EVENT_RECORDER_NEG.getMessage());
                         themeDetail.setEmpId(theme.getRecorderId());
                         themeDetail.setEmpFullName(theme.getRecorderName());
                         themeDetail.setBScore(recorderBScore);
-                        themeDetail.setRemark(EventEnum.RECORDER_NEG.getMessage());
+                        themeDetail.setRemark(EventEnum.EVENT_RECORDER_NEG.getMessage());
                         themeDetailList.add(themeDetail);
                     }
                     if (attnBScore != null && attnBScore < 0) {
-                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_NEG_TYPE.getMessage());
-                        themeDetail.setEventName(EventEnum.ATTN_NEG.getMessage());
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_NEG.getMessage());
+                        themeDetail.setEventName(EventEnum.EVENT_ATTN_NEG.getMessage());
                         themeDetail.setEmpId(theme.getAttnId());
                         themeDetail.setEmpFullName(theme.getAttnName());
                         themeDetail.setBScore(attnBScore);
-                        themeDetail.setRemark(EventEnum.ATTN_NEG.getMessage());
+                        themeDetail.setRemark(EventEnum.EVENT_ATTN_NEG.getMessage());
                         themeDetailList.add(themeDetail);
                     }
                     if (themeDetailList.size() > 0) {
@@ -508,7 +508,7 @@ public class ThemeService extends BaseService<Theme, String> {
                 if ((recorderBScore != null && recorderBScore > 0) || (attnBScore != null && attnBScore > 0)) {
                     // 先生成主题
                     Theme themeNew = getThemeNew(theme);
-                    themeNew.setThemeName(EventEnum.AUDIT_POS_THEME.getMessage());
+                    themeNew.setThemeName(EventEnum.THEME_AUDIT_POS.getMessage());
                     // 汇总分、人次
                     if (recorderBScore != null && recorderBScore > 0) {
                         themeNew.setBPosScore(themeNew.getBPosScore() + recorderBScore);
@@ -522,21 +522,21 @@ public class ThemeService extends BaseService<Theme, String> {
                     // 再生成详情
                     List<ThemeDetail> themeDetailList = new ArrayList<>();
                     if (recorderBScore != null && recorderBScore > 0) {
-                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
-                        themeDetail.setEventName(EventEnum.RECORDER_POS.getMessage());
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_POS.getMessage());
+                        themeDetail.setEventName(EventEnum.EVENT_RECORDER_POS.getMessage());
                         themeDetail.setEmpId(theme.getRecorderId());
                         themeDetail.setEmpFullName(theme.getRecorderName());
                         themeDetail.setBScore(recorderBScore);
-                        themeDetail.setRemark(EventEnum.RECORDER_POS.getMessage());
+                        themeDetail.setRemark(EventEnum.EVENT_RECORDER_POS.getMessage());
                         themeDetailList.add(themeDetail);
                     }
                     if (attnBScore != null && attnBScore > 0) {
-                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.AUDIT_POS_TYPE.getMessage());
-                        themeDetail.setEventName(EventEnum.ATTN_POS.getMessage());
+                        ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_POS.getMessage());
+                        themeDetail.setEventName(EventEnum.EVENT_ATTN_POS.getMessage());
                         themeDetail.setEmpId(theme.getAttnId());
                         themeDetail.setEmpFullName(theme.getAttnName());
                         themeDetail.setBScore(attnBScore);
-                        themeDetail.setRemark(EventEnum.ATTN_POS.getMessage());
+                        themeDetail.setRemark(EventEnum.EVENT_ATTN_POS.getMessage());
                         themeDetailList.add(themeDetail);
                     }
                     if (themeDetailList.size() > 0) {

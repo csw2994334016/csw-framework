@@ -54,13 +54,13 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("奖扣分周期（1=日任务；2=周任务；3=月任务）")
     private Integer scoreCycle; // 奖扣分周期（1=日任务；2=周任务；3=月任务）
 
-    @Column(name = "score_award_min", columnDefinition = "int(11) comment '奖分下限'")
+    @Column(name = "score_award_min", columnDefinition = "int(11) default 0 comment '奖分下限'")
     @ApiModelProperty("奖分下限")
-    private Integer scoreAwardMin; // 奖分下限
+    private Integer scoreAwardMin = 0; // 奖分下限
 
-    @Column(name = "score_deduct_min", columnDefinition = "int(11) comment '扣分下限'")
+    @Column(name = "score_deduct_min", columnDefinition = "int(11) default 0 comment '扣分下限'")
     @ApiModelProperty("扣分下限")
-    private Integer scoreDeductMin; // 扣分下限
+    private Integer scoreDeductMin = 0; // 扣分下限
 
     @Column(name = "score_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣分任务扣分'")
     @ApiModelProperty("未完成奖扣分任务扣分")
@@ -74,9 +74,9 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("奖扣比例周期（1=日任务；2=周任务；3=月任务）")
     private Integer ratioCycle; // 奖扣比例周期（1=日任务；2=周任务；3=月任务）
 
-    @Column(name = "ratio_value", columnDefinition = "double comment '奖扣比例值'")
+    @Column(name = "ratio_value", columnDefinition = "double default 1.0 comment '奖扣比例值'")
     @ApiModelProperty("奖扣比例值")
-    private Double ratioValue; // 奖扣比例值
+    private Double ratioValue = 1.0; // 奖扣比例值
 
     @Column(name = "ratio_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣比例任务扣分'")
     @ApiModelProperty("未完成奖扣比例任务扣分")
@@ -90,13 +90,13 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("奖扣人次周期（日任务；周任务；月任务）")
     private Integer empCountCycle; // 奖扣人次周期（1=日任务；2=周任务；3=月任务）
 
-    @Column(name = "emp_count_value", columnDefinition = "int(11) comment '奖扣人次值'")
+    @Column(name = "emp_count_value", columnDefinition = "int(11) default 0 comment '奖扣人次值'")
     @ApiModelProperty("奖扣人次值")
-    private Integer empCountValue; // 奖扣人次值
+    private Integer empCountValue = 0; // 奖扣人次值
 
-    @Column(name = "emp_count_neg_score", nullable = false, columnDefinition = "int(11) comment '未完成奖扣人次任务扣分'")
+    @Column(name = "emp_count_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣人次任务扣分'")
     @ApiModelProperty("未完成奖扣人次任务扣分")
-    private Integer empCountNegScore; // 未完成奖扣人次任务扣分
+    private Integer empCountNegScore = 0; // 未完成奖扣人次任务扣分
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
