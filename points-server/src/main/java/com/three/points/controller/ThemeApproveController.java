@@ -33,7 +33,7 @@ public class ThemeApproveController {
     @LogAnnotation(module = "驳回积分奖扣")
     @ApiOperation(value = "驳回积分奖扣", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "积分奖扣主题id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "积分奖扣主题id(多条记录用英文逗号隔开)", required = true, dataType = "String"),
             @ApiImplicitParam(name = "opinion", value = "驳回意见", required = true, dataType = "String"),
             @ApiImplicitParam(name = "recorderBScore", value = "记录人(B-)", dataType = "Integer"),
             @ApiImplicitParam(name = "attnBScore", value = "初审人(B-)", dataType = "Integer")
@@ -47,7 +47,7 @@ public class ThemeApproveController {
     @LogAnnotation(module = "通过积分奖扣")
     @ApiOperation(value = "通过积分奖扣", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "积分奖扣主题id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "积分奖扣主题id(多条记录用英文逗号隔开)", required = true, dataType = "String"),
             @ApiImplicitParam(name = "opinion", value = "通过意见", dataType = "String"),
             @ApiImplicitParam(name = "recorderBScore", value = "记录人(B+)", dataType = "Integer"),
             @ApiImplicitParam(name = "attnBScore", value = "初审人(B+)", dataType = "Integer")
@@ -56,6 +56,15 @@ public class ThemeApproveController {
     public JsonResult approve(@RequestParam(required = true) String id, String opinion, Integer recorderBScore, Integer attnBScore) {
         themeService.approve(id, opinion, recorderBScore, attnBScore);
         return JsonResult.ok("通过成功");
+    }
+
+    @LogAnnotation(module = "撤回积分奖扣（审核人）")
+    @ApiOperation(value = "撤回积分奖扣（审核人）", notes = "")
+    @ApiImplicitParam(name = "id", value = "积分奖扣主题id(多条记录用英文逗号隔开)", required = true, dataType = "String")
+    @GetMapping("/retreat")
+    public JsonResult retreat(@RequestParam(required = true) String id) {
+        themeService.retreat(id);
+        return JsonResult.ok("撤回成功");
     }
 
     @ApiOperation(value = "查询积分审批（分页,page/limit不给表示不分页）", notes = "")

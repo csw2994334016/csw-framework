@@ -117,7 +117,7 @@ public class ThemeController {
 
     @LogAnnotation(module = "提交积分奖扣")
     @ApiOperation(value = "提交积分奖扣", notes = "")
-    @ApiImplicitParam(name = "id", value = "积分奖扣id", required = true, dataType = "String")
+    @ApiImplicitParam(name = "id", value = "积分奖扣主题id(多条记录用英文逗号隔开)", required = true, dataType = "String")
     @GetMapping("/submit")
     public JsonResult submit(@RequestParam(required = true) String id) {
         themeService.submit(id);
@@ -126,7 +126,7 @@ public class ThemeController {
 
     @LogAnnotation(module = "撤回积分奖扣")
     @ApiOperation(value = "撤回积分奖扣", notes = "")
-    @ApiImplicitParam(name = "id", value = "积分奖扣主题id", required = true, dataType = "String")
+    @ApiImplicitParam(name = "id", value = "积分奖扣主题id(多条记录用英文逗号隔开)", required = true, dataType = "String")
     @GetMapping("/retreat")
     public JsonResult retreat(@RequestParam(required = true) String id) {
         themeService.retreat(id);
@@ -135,7 +135,7 @@ public class ThemeController {
 
 
     @ApiOperation(value = "查询积分奖扣详情（根据主题ID查找事件及参与人员）", notes = "")
-    @ApiImplicitParam(name = "themeId", value = "积分奖扣id", required = true, dataType = "String")
+    @ApiImplicitParam(name = "themeId", value = "积分奖扣主题id(多条记录用英文逗号隔开)", required = true, dataType = "String")
     @GetMapping("/themeDetails/findByThemeId")
     public JsonData<List<ThemeDetailVo>> findByThemeId(@RequestParam() String themeId) {
         return new JsonData<>(themeDetailService.findByThemeId(themeId)).success();
