@@ -237,7 +237,16 @@ public class ThemeService extends BaseService<Theme, String> {
     public PageResult<Theme> query(PageQuery pageQuery, int code, String whoFlag, String themeName,
                                    Long recordDateSt, Long recordDateEt, Long themeDateSt, Long themeDateEt,
                                    String attnName, String auditName, String recorderName, Integer themeStatus) {
+        String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        List<String> themeIdList = new ArrayList<>();
+        if ("2".equals(whoFlag)) { // 我参与的奖扣、并且状态是审核通过
+            themeIdList = themeDetailRepository.findThemeIdByEmpIdAndThemeStatus(loginUserEmpId, ThemeEnum.SUCCESS.getCode());
+            if (themeIdList == null || themeIdList.size() == 0) { // 没有我参与的奖扣
+                return new PageResult<>(new ArrayList<>());
+            }
+        }
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        List<String> finalThemeIdList = themeIdList;
         Specification<Theme> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
@@ -245,18 +254,13 @@ public class ThemeService extends BaseService<Theme, String> {
             Specification<Theme> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
-            String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
             if (loginUserEmpId != null) {
                 if ("2".equals(whoFlag)) { // 我参与的奖扣
-                    List<String> themeIdList = themeDetailRepository.findThemeIdByEmpId(loginUserEmpId);
-                    if (themeIdList != null) {
-                        predicateList.add(root.get("id").in(themeIdList));
-                    }
+                    predicateList.add(root.get("id").in(finalThemeIdList));
                 } else { // 我提交的奖扣
                     predicateList.add(criteriaBuilder.equal(root.get("submitterId"), loginUserEmpId));
                 }
             }
-
             addPredicateToList(predicateList, criteriaBuilder, root,
                     themeName, attnName, auditName, recorderName, themeStatus, recordDateSt, recordDateEt, themeDateSt, themeDateEt);
 
@@ -289,16 +293,21 @@ public class ThemeService extends BaseService<Theme, String> {
                     predicateList.add(criteriaBuilder.like(root.get("copyPersonId"), "%" + loginUserEmpId + "%"));
                 } else {
                     List<Predicate> predicateList1 = new ArrayList<>();
-                    // 初审人或终审人
-                    Predicate p1 = criteriaBuilder.equal(root.get("attnId"), loginUserEmpId);
-                    predicateList1.add(criteriaBuilder.or(p1));
-                    Predicate p2 = criteriaBuilder.equal(root.get("auditId"), loginUserEmpId);
-                    predicateList1.add(criteriaBuilder.or(p2));
-                    if ("2".equals(whoFlag)) { // 我已审核
-                        predicateList.add(root.get("themeStatus").in(Arrays.asList(ThemeEnum.AUDIT.getCode(), ThemeEnum.SUCCESS.getCode())));
-                    } else { // 待我审核
-                        predicateList.add(root.get("themeStatus").in(Arrays.asList(ThemeEnum.ATTN.getCode(), ThemeEnum.AUDIT.getCode())));
+                    List<Predicate> predicateList2 = new ArrayList<>();
+                    List<Predicate> predicateList3 = new ArrayList<>();
+                    if ("2".equals(whoFlag)) { // 我已审核：当前登录用户是初审人、状态码大于AUDIT(3, "待终审")；当前登录用户是终审人、状态码大于REJECT(4, "驳回")
+                        predicateList2.add(criteriaBuilder.equal(root.get("attnId"), loginUserEmpId));
+                        predicateList2.add(criteriaBuilder.greaterThan(root.get("themeStatus"), ThemeEnum.AUDIT.getCode()));
+                        predicateList3.add(criteriaBuilder.equal(root.get("auditId"), loginUserEmpId));
+                        predicateList3.add(criteriaBuilder.greaterThan(root.get("themeStatus"), ThemeEnum.REJECT.getCode()));
+                    } else { // 待我审核：当前登录用户是初审人、状态码等于ATTN(2, "待初审")；当前登录用户是终审人、状态码等于AUDIT(3, "待终审")
+                        predicateList2.add(criteriaBuilder.equal(root.get("attnId"), loginUserEmpId));
+                        predicateList2.add(criteriaBuilder.equal(root.get("themeStatus"), ThemeEnum.ATTN.getCode()));
+                        predicateList3.add(criteriaBuilder.equal(root.get("auditId"), loginUserEmpId));
+                        predicateList3.add(criteriaBuilder.equal(root.get("themeStatus"), ThemeEnum.AUDIT.getCode()));
                     }
+                    predicateList1.add(criteriaBuilder.and(predicateList2.toArray(new Predicate[0])));
+                    predicateList1.add(criteriaBuilder.and(predicateList3.toArray(new Predicate[0])));
                     return criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])), criteriaBuilder.or(predicateList1.toArray(new Predicate[0]))).getRestriction();
                 }
             }

@@ -3,7 +3,6 @@ package com.three.points.service;
 import cn.hutool.core.date.DateUtil;
 import com.three.common.enums.YesNoEnum;
 import com.three.common.utils.DateUtils;
-import com.three.common.vo.JsonData;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.ManagerTask;
@@ -295,5 +294,9 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             managerTaskEmp.setRatioTaskDeductScore(managerTaskEmp.getRatioTaskDeductScore() + theme.getBNegScore());
         }
         return managerTaskEmp;
+    }
+
+    public ManagerTaskEmp queryTaskStatistics(Long taskDate, String empId) {
+        return null;
     }
 }
