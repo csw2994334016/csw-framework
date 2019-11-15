@@ -5,6 +5,7 @@ import com.three.resource_jpa.jpa.base.repository.BaseRepository;
 import com.three.user.entity.Organization;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by csw on 2019-09-27.
@@ -13,4 +14,6 @@ import java.util.List;
 public interface EmployeeRepository extends BaseRepository<Employee, String> {
 
     List<Employee> findAllByOrganization(Organization organization);
+
+    List<Employee> findAllByIdIn(Set<String> empIdSet);
 }

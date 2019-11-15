@@ -1,5 +1,6 @@
 package com.three.points.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -16,9 +17,9 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Entity
-@Table(name = "points_award_privilege_employee")
+@Table(name = "points_award_privilege_emp")
 @EntityListeners(AuditingEntityListener.class)
-public class AwardPrivilegeEmployee implements Serializable {
+public class AwardPrivilegeEmp implements Serializable {
 
     @Id
     @GeneratedValue(generator = "system-guid")
@@ -28,9 +29,11 @@ public class AwardPrivilegeEmployee implements Serializable {
 
 
     @Column(name = "award_privilege_id", nullable = false, columnDefinition = "varchar(36) comment '奖扣权限id'")
+    @ApiModelProperty("奖扣权限id")
     private String awardPrivilegeId; // 奖扣权限id
 
-    @Column(name = "employee_id", nullable = false, columnDefinition = "varchar(36) comment '员工id'")
-    private String employeeId; // 员工id
+    @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '员工id'")
+    @ApiModelProperty("员工id")
+    private String empId; // 员工id
 
 }

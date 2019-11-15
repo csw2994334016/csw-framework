@@ -241,4 +241,12 @@ public class EmployeeService extends BaseService<Employee, String> {
     public Employee findById(String id) {
         return getEntityById(employeeRepository, id);
     }
+
+    public List<Employee> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
+        Set<String> empIdSet = pointsClient.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
+        if (empIdSet.size() > 0) {
+            return employeeRepository.findAllByIdIn(empIdSet);
+        }
+        return new ArrayList<>();
+    }
 }

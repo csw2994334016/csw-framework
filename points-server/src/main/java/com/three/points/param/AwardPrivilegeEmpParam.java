@@ -13,7 +13,7 @@ import java.util.List;
  * Description:
  */
 @Data
-public class AwardPrivilegeEmployeeParam {
+public class AwardPrivilegeEmpParam {
 
 
     @NotBlank(message = "奖扣权限id不可以为空")

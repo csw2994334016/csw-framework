@@ -20,12 +20,12 @@ public class AwardPrivilegeParam {
     private String name; // 奖扣权限名称
 
     @NotBlank(message = "A分权限不可以为空")
-    @ApiModelProperty("A分权限")
-    private String aScore; // A分权限
+    @ApiModelProperty("分A权限（正数）")
+    private Integer aScore; // 分A权限（正数）
 
     @NotBlank(message = "B分权限不可以为空")
-    @ApiModelProperty("B分权限")
-    private String bScore; // B分权限
+    @ApiModelProperty("分B权限（正数）")
+    private Integer bScore; // 分B权限（正数）
 
 
     private String remark;

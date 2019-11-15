@@ -131,4 +131,18 @@ public class EmployeeController {
     public JsonData<Employee> findById(String id) {
         return new JsonData<>(employeeService.findById(id)).success();
     }
+
+    @ApiOperation(value = "查找积分奖扣审核人员列表", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "attnOrAuditFlag", value = "查初审人/终审人标记：0=查初审人；1=查终审人（默认0）", defaultValue = "0", dataType = "String"),
+            @ApiImplicitParam(name = "attnId", value = "初审人Id", dataType = "String"),
+            @ApiImplicitParam(name = "aPosScoreMax", value = "临时事件下,参与人员中奖A分(正分)最大值", dataType = "Integer"),
+            @ApiImplicitParam(name = "aNegScoreMin", value = "临时事件下,参与人员中扣A分(负分)最小值", dataType = "Integer"),
+            @ApiImplicitParam(name = "bPosScoreMax", value = "临时事件下,参与人员中奖B分(正分)最大值", dataType = "Integer"),
+            @ApiImplicitParam(name = "bNegScoreMin", value = "临时事件下,参与人员中扣B分(负分)最小值", dataType = "Integer"),
+    })
+    @GetMapping("/findAuditor")
+    public JsonData<List<Employee>> findAuditor(@RequestParam(defaultValue = "0") String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
+        return new JsonData<>(employeeService.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin));
+    }
 }

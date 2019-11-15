@@ -1,6 +1,8 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
+import com.three.common.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -20,6 +22,6 @@ public class Test {
         System.out.println(etW);
         System.out.println(stM);
         System.out.println(etM);
-
+        System.out.println(StringUtil.getStrToIdSet1("222"));
     }
 }

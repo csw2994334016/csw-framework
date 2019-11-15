@@ -2,6 +2,7 @@ package com.three.points.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.three.common.utils.DateUtils;
+import com.three.points.service.AwardPrivilegeService;
 import com.three.points.service.ManagerTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Api(value = "积分制管理", tags = "积分制管理")
 @RestController
@@ -22,11 +24,20 @@ public class SysController {
     @Autowired
     private ManagerTaskService managerTaskService;
 
+    @Autowired
+    private AwardPrivilegeService awardPrivilegeService;
+
     @ApiOperation(value = "查询当前月任务已分配人员（内部接口）")
     @GetMapping(value = "/internal/findCurMonthTaskEmp")
     List<String> findCurMonthTaskEmp() {
         Date date = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
         Date taskDateNext = DateUtil.offsetMonth(date, 1);
         return new ArrayList<>(managerTaskService.findCurMonthTaskEmp(taskDateNext));
+    }
+
+    @ApiOperation(value = "查找积分奖扣审核人员列表（内部接口）")
+    @GetMapping(value = "/internal/findAuditor")
+    Set<String> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
+        return awardPrivilegeService.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
     }
 }

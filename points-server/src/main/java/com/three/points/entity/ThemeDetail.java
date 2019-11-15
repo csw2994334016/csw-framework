@@ -9,7 +9,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -63,6 +65,10 @@ public class ThemeDetail implements Serializable {
     @Column(name = "event_name", nullable = false, columnDefinition = "varchar(255) comment '事件名称'")
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称
+
+    @Column(name = "event_flag", columnDefinition = "int(1) default 1 comment '事件类型：1=标准事件；0=临时事件'")
+    @ApiModelProperty("事件类型：1=标准事件；0=临时事件")
+    private Integer eventFlag = 1; // 事件类型：1=标准事件；0=临时事件
 
     @Column(name = "prize_flag", columnDefinition = "int(1) default 0 comment '奖票事件：1=是；0=否'")
     @ApiModelProperty("奖票事件：1=是；0=否")
