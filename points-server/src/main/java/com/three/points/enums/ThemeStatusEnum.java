@@ -7,7 +7,7 @@ import lombok.Getter;
  * Description:
  */
 @Getter
-public enum  ThemeEnum {
+public enum ThemeStatusEnum {
 
     DRAFT(0, "草稿"),
     SAVE(1, "拟稿"),
@@ -21,15 +21,15 @@ public enum  ThemeEnum {
 
     private String message;
 
-    ThemeEnum(int code, String message) {
+    ThemeStatusEnum(int code, String message) {
         this.code = code;
         this.message = message;
     }
 
     public static String getMessageByCode(Integer code) {
-        for (ThemeEnum themeEnum : ThemeEnum.values()) {
-            if (themeEnum.getCode() == code) {
-                return themeEnum.getMessage();
+        for (ThemeStatusEnum themeStatusEnum : ThemeStatusEnum.values()) {
+            if (themeStatusEnum.getCode() == code) {
+                return themeStatusEnum.getMessage();
             }
         }
         return null;

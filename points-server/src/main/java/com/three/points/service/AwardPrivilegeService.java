@@ -114,10 +114,10 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
     public Set<String> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
         Set<String> empIdSet = new HashSet<>();
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        Set<String> awardPrivilegeIdSet = new HashSet<>();
+        Set<String> awardPrivilegeIdSet;
         if ("0".equals(attnOrAuditFlag)) { // 查找初审人：有奖扣权限的人员
             awardPrivilegeIdSet = awardPrivilegeRepository.findAllByOrganizationIdAndStatus(firstOrganizationId, StatusEnum.OK.getCode());
-        } else {
+        } else { // 查找终审人：
             int aScore = Math.max(aPosScoreMax != null ? aPosScoreMax : 0, aNegScoreMin != null ? Math.abs(aNegScoreMin) : 0);
             int bScore = Math.max(bPosScoreMax != null ? bPosScoreMax : 0, bNegScoreMin != null ? Math.abs(bNegScoreMin) : 0);
             awardPrivilegeIdSet = awardPrivilegeRepository.findAllByAScoreGreaterThanEqualAndBScoreGreaterThanEqualAndOrganizationIdAndStatus(aScore, bScore, firstOrganizationId, StatusEnum.OK.getCode());

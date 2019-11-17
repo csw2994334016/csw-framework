@@ -1,6 +1,9 @@
 package com.three.points.service;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateRange;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.three.common.enums.YesNoEnum;
 import com.three.common.utils.DateUtils;
 import com.three.commonclient.exception.BusinessException;
@@ -9,7 +12,7 @@ import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
 import com.three.points.entity.Theme;
 import com.three.points.enums.ManagerTaskEnum;
-import com.three.points.enums.ThemeEnum;
+import com.three.points.enums.ThemeStatusEnum;
 import com.three.points.param.ManagerTaskEmpParam;
 import com.three.points.param.ManagerTaskParam1;
 import com.three.points.repository.ManagerTaskEmpRepository;
@@ -21,6 +24,8 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.points.repository.ThemeRepository;
+import com.three.points.vo.DateVo;
+import com.three.points.vo.TaskStatisticsVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -253,11 +258,11 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         // 奖/扣分任务
         if (YesNoEnum.YES.getCode() == managerTask.getScoreTaskFlag()) {
             if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getScoreCycle()) {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stD, etD);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stD, etD);
             } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getScoreCycle()) {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stW, etW);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stW, etW);
             } else {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stM, etM);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stM, etM);
             }
         }
         for (Theme theme : themeList) {
@@ -268,11 +273,11 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         themeList.clear();
         if (YesNoEnum.YES.getCode() == managerTask.getEmpCountTaskFlag()) {
             if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getEmpCountCycle()) {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stD, etD);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stD, etD);
             } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getEmpCountCycle()) {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stW, etW);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stW, etW);
             } else {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stM, etM);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stM, etM);
             }
         }
         for (Theme theme : themeList) {
@@ -282,11 +287,11 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         themeList.clear();
         if (YesNoEnum.YES.getCode() == managerTask.getRatioTaskFlag()) {
             if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getRatioCycle()) {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stD, etD);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stD, etD);
             } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getRatioCycle()) {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stW, etW);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stW, etW);
             } else {
-                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeEnum.SUCCESS.getCode(), stM, etM);
+                themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(managerTaskEmp.getEmpId(), ThemeStatusEnum.SUCCESS.getCode(), stM, etM);
             }
         }
         for (Theme theme : themeList) {
@@ -296,7 +301,92 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         return managerTaskEmp;
     }
 
-    public ManagerTaskEmp queryTaskStatistics(Long taskDate, String empId) {
-        return null;
+    public TaskStatisticsVo queryTaskStatistics(Long taskDate, String statisticsFlag, String empId) {
+        TaskStatisticsVo taskStatisticsVo = new TaskStatisticsVo();
+        Date date = new Date();
+        if (taskDate != null) {
+            date = new Date(taskDate);
+        }
+        if (StringUtil.isBlank(empId)) {
+            empId = LoginUserUtil.getLoginUserEmpId(); // 当前登录用户
+        }
+        taskStatisticsVo.setEmpId(empId);
+        Date st, et;
+        Map<String, DateVo> dayMap = new LinkedHashMap<>();
+        Map<String, Integer> awardValueMap = new LinkedHashMap<>();
+        Map<String, Integer> deductValueMap = new LinkedHashMap<>();
+        Map<String, Integer> empCountValueMap = new LinkedHashMap<>();
+        Map<String, Double> ratioValueMap = new LinkedHashMap<>();
+        if ("2".equals(statisticsFlag)) { // 月统计
+            st = DateUtil.beginOfYear(date);
+            et = DateUtil.endOfYear(date);
+            // 一年有多少个月
+            for (int i = DateUtil.month(st); i <= DateUtil.month(et); i++) {
+                Date date1 = DateUtil.offsetMonth(st, i);
+                DateVo dateVo = new DateVo(DateUtil.beginOfMonth(date1), DateUtil.endOfMonth(date1));
+                dayMap.put(String.format("%02d", i + 1), dateVo);
+                awardValueMap.put(String.format("%02d", i + 1), 0);
+                deductValueMap.put(String.format("%02d", i + 1), 0);
+                empCountValueMap.put(String.format("%02d", i + 1), 0);
+                ratioValueMap.put(String.format("%02d", i + 1), 0.0);
+            }
+        } else if ("3".equals(statisticsFlag)) { // 年统计
+            st = DateUtil.parse("2019-01-01 00:00:00");
+            et = DateUtil.endOfYear(date);
+            // 系统使用了几年
+            for (int i = DateUtil.year(st); i <= DateUtil.year(et); i++) {
+                Date date1 = DateUtil.parse(i + "-01-01 00:00:00");
+                DateVo dateVo = new DateVo(DateUtil.beginOfYear(date1), DateUtil.endOfYear(date1));
+                dayMap.put(i + "", dateVo);
+                awardValueMap.put(i + "", 0);
+                deductValueMap.put(i + "", 0);
+                empCountValueMap.put(i + "", 0);
+                ratioValueMap.put(i + "", 0.0);
+            }
+        } else { // 默认日统计
+            st = DateUtil.beginOfMonth(date);
+            et = DateUtil.endOfMonth(date);
+            // 一个月有多少天
+            for (int i = DateUtil.dayOfMonth(st); i <= DateUtil.dayOfMonth(et); i++) {
+                Date date1 = DateUtil.offsetDay(st, i - 1);
+                DateVo dateVo = new DateVo(DateUtil.beginOfDay(date1), DateUtil.endOfDay(date1));
+                dayMap.put(String.format("%02d", i), dateVo);
+                awardValueMap.put(String.format("%02d", i), 0);
+                deductValueMap.put(String.format("%02d", i), 0);
+                empCountValueMap.put(String.format("%02d", i), 0);
+                ratioValueMap.put(String.format("%02d", i), 0.0);
+            }
+        }
+        // 统计结果
+        List<Theme> themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(empId, ThemeStatusEnum.SUCCESS.getCode(), st, et);
+        for (Theme theme : themeList) {
+            taskStatisticsVo.setAllAwardScore(taskStatisticsVo.getAllAwardScore() + theme.getBPosScore());
+            taskStatisticsVo.setAllDeductScore(taskStatisticsVo.getAllDeductScore() + theme.getBNegScore());
+            taskStatisticsVo.setAllEmpCount(taskStatisticsVo.getAllEmpCount() + theme.getEmpCount());
+            for (Map.Entry<String, DateVo> entry : dayMap.entrySet()) {
+                if (theme.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && theme.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
+                    int value1 = awardValueMap.get(entry.getKey()) + theme.getBPosScore();
+                    awardValueMap.put(entry.getKey(), value1);
+                    int value2 = deductValueMap.get(entry.getKey()) + theme.getBNegScore();
+                    deductValueMap.put(entry.getKey(), value2);
+                    int value3 = empCountValueMap.get(entry.getKey()) + theme.getEmpCount();
+                    empCountValueMap.put(entry.getKey(), value3);
+                    if (value1 > 0) {
+                        ratioValueMap.put(entry.getKey(), NumberUtil.div(value2, value1, 2));
+                    }
+                    break;
+                }
+            }
+        }
+        // 得到结果
+        taskStatisticsVo.setSeriesList(new ArrayList<>(dayMap.keySet()));
+        taskStatisticsVo.setAwardValueTrendList(new ArrayList<>(awardValueMap.values()));
+        taskStatisticsVo.setDeductValueTrendList(new ArrayList<>(deductValueMap.values()));
+        taskStatisticsVo.setEmpCountValueTrendList(new ArrayList<>(empCountValueMap.values()));
+        taskStatisticsVo.setRatioValueTrendList(new ArrayList<>(ratioValueMap.values()));
+        if (taskStatisticsVo.getAllAwardScore() > 0) {
+            taskStatisticsVo.setAllRatio(NumberUtil.div(taskStatisticsVo.getAllDeductScore().doubleValue(), taskStatisticsVo.getAllAwardScore().doubleValue(), 2));
+        }
+        return taskStatisticsVo;
     }
 }

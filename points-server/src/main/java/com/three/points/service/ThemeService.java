@@ -3,7 +3,8 @@ package com.three.points.service;
 import com.three.common.auth.LoginUser;
 import com.three.commonclient.exception.BusinessException;
 import com.three.points.enums.EventEnum;
-import com.three.points.enums.ThemeEnum;
+import com.three.points.enums.EventFlagEnum;
+import com.three.points.enums.ThemeStatusEnum;
 import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.feign.UserClient;
@@ -56,7 +57,7 @@ public class ThemeService extends BaseService<Theme, String> {
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         createTheme(theme, themeDetailList, themeParam);
 
-        theme.setThemeStatus(ThemeEnum.DRAFT.getCode());
+        theme.setThemeStatus(ThemeStatusEnum.DRAFT.getCode());
 
         saveThemeAndThemeDetailList("draft", theme, themeDetailList);
     }
@@ -71,7 +72,7 @@ public class ThemeService extends BaseService<Theme, String> {
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         createTheme(theme, themeDetailList, themeParam);
 
-        theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+        theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
 
         saveThemeAndThemeDetailList(null, theme, themeDetailList);
     }
@@ -89,7 +90,7 @@ public class ThemeService extends BaseService<Theme, String> {
             theme.setSubmitterName(empFullName);
             theme.setSubmitterDate(new Date());
             if (theme.getAttnId().equals(theme.getRecorderId())) {
-                theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+                theme.setThemeStatus(ThemeStatusEnum.AUDIT.getCode());
             }
         }
 
@@ -107,7 +108,7 @@ public class ThemeService extends BaseService<Theme, String> {
         checkAttnIdAndAuditId(themeParam);
 
         Theme theme = getEntityById(themeRepository, themeParam.getId());
-        if (theme.getThemeStatus() != ThemeEnum.DRAFT.getCode() && theme.getThemeStatus() != ThemeEnum.SAVE.getCode()) {
+        if (theme.getThemeStatus() != ThemeStatusEnum.DRAFT.getCode() && theme.getThemeStatus() != ThemeStatusEnum.SAVE.getCode()) {
             throw new BusinessException("记录只有在草稿或保存状态下才能编辑");
         }
 
@@ -120,7 +121,7 @@ public class ThemeService extends BaseService<Theme, String> {
         theme.setSubmitterName(empFullName);
         theme.setSubmitterDate(new Date());
         if (theme.getAttnId().equals(theme.getRecorderId())) {
-            theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+            theme.setThemeStatus(ThemeStatusEnum.AUDIT.getCode());
         }
 
         // 删除原有记录
@@ -166,6 +167,10 @@ public class ThemeService extends BaseService<Theme, String> {
                 themeDetail.setEventTypeName(themeEventParam.getEventTypeName());
                 themeDetail.setEventId(themeEventParam.getEventId());
                 themeDetail.setEventName(themeEventParam.getEventName());
+                themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
+                if (StringUtil.isNotBlank(themeEventParam.getEventId())) {
+                    themeDetail.setEventFlag(EventFlagEnum.STANDARD.getCode());
+                }
                 themeDetail.setPrizeFlag(themeEventParam.getPrizeFlag());
                 themeDetail.setCountFlag(themeEventParam.getCountFlag());
                 themeDetail.setAuditFlag(themeEventParam.getAuditFlag());
@@ -240,7 +245,7 @@ public class ThemeService extends BaseService<Theme, String> {
         String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
         List<String> themeIdList = new ArrayList<>();
         if ("2".equals(whoFlag)) { // 我参与的奖扣、并且状态是审核通过
-            themeIdList = themeDetailRepository.findThemeIdByEmpIdAndThemeStatus(loginUserEmpId, ThemeEnum.SUCCESS.getCode());
+            themeIdList = themeDetailRepository.findThemeIdByEmpIdAndThemeStatus(loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode());
             if (themeIdList == null || themeIdList.size() == 0) { // 没有我参与的奖扣
                 return new PageResult<>(new ArrayList<>());
             }
@@ -297,14 +302,14 @@ public class ThemeService extends BaseService<Theme, String> {
                     List<Predicate> predicateList3 = new ArrayList<>();
                     if ("2".equals(whoFlag)) { // 我已审核：当前登录用户是初审人、状态码大于ATTN(2, "待初审")；当前登录用户是终审人、状态码大于AUDIT(3, "待终审")
                         predicateList2.add(criteriaBuilder.equal(root.get("attnId"), loginUserEmpId));
-                        predicateList2.add(criteriaBuilder.greaterThan(root.get("themeStatus"), ThemeEnum.ATTN.getCode()));
+                        predicateList2.add(criteriaBuilder.greaterThan(root.get("themeStatus"), ThemeStatusEnum.ATTN.getCode()));
                         predicateList3.add(criteriaBuilder.equal(root.get("auditId"), loginUserEmpId));
-                        predicateList3.add(criteriaBuilder.greaterThan(root.get("themeStatus"), ThemeEnum.AUDIT.getCode()));
+                        predicateList3.add(criteriaBuilder.greaterThan(root.get("themeStatus"), ThemeStatusEnum.AUDIT.getCode()));
                     } else { // 待我审核：当前登录用户是初审人、状态码等于ATTN(2, "待初审")；当前登录用户是终审人、状态码等于AUDIT(3, "待终审")
                         predicateList2.add(criteriaBuilder.equal(root.get("attnId"), loginUserEmpId));
-                        predicateList2.add(criteriaBuilder.equal(root.get("themeStatus"), ThemeEnum.ATTN.getCode()));
+                        predicateList2.add(criteriaBuilder.equal(root.get("themeStatus"), ThemeStatusEnum.ATTN.getCode()));
                         predicateList3.add(criteriaBuilder.equal(root.get("auditId"), loginUserEmpId));
-                        predicateList3.add(criteriaBuilder.equal(root.get("themeStatus"), ThemeEnum.AUDIT.getCode()));
+                        predicateList3.add(criteriaBuilder.equal(root.get("themeStatus"), ThemeStatusEnum.AUDIT.getCode()));
                     }
                     predicateList1.add(criteriaBuilder.and(predicateList2.toArray(new Predicate[0])));
                     predicateList1.add(criteriaBuilder.and(predicateList3.toArray(new Predicate[0])));
@@ -369,11 +374,11 @@ public class ThemeService extends BaseService<Theme, String> {
         List<String> errorList = new ArrayList<>();
         for (String id : idSet) {
             Theme theme = getEntityById(themeRepository, id);
-            if (theme.getThemeStatus() == ThemeEnum.SAVE.getCode()) { // 只有保存状态才能提交
+            if (theme.getThemeStatus() == ThemeStatusEnum.SAVE.getCode()) { // 只有保存状态才能提交
                 // 当前用户是初审人,则直接到待终审状态
-                theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
                 if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
-                    theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+                    theme.setThemeStatus(ThemeStatusEnum.AUDIT.getCode());
                 }
                 theme.setSubmitterId(loginUserEmpId);
                 theme.setSubmitterName(LoginUserUtil.getLoginUserEmpFullName());
@@ -395,35 +400,35 @@ public class ThemeService extends BaseService<Theme, String> {
         List<String> errorList = new ArrayList<>();
         for (String id : idSet) {
             Theme theme = getEntityById(themeRepository, id);
-            if (theme.getThemeStatus() != ThemeEnum.LOCK.getCode()) {
-                if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是记录人才能撤回
+            if (theme.getThemeStatus() != ThemeStatusEnum.LOCK.getCode()) {
+                if (theme.getThemeStatus() == ThemeStatusEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是记录人才能撤回
                     if (theme.getRecorderId().equals(loginUserEmpId)) {
-                        theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+                        theme.setThemeStatus(ThemeStatusEnum.SAVE.getCode());
                         themeRepository.save(theme);
                     } else {
                         errorList.add("主题(" + theme.getThemeName() + ")是待初审状态,只有记录人才能撤回");
                     }
-                } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode()) { // 记录是待终审状态,只有当前用户是初审人才能撤回
+                } else if (theme.getThemeStatus() == ThemeStatusEnum.AUDIT.getCode()) { // 记录是待终审状态,只有当前用户是初审人才能撤回
                     if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
-                        theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                        theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
                         themeRepository.save(theme);
                     } else {
                         errorList.add("主题(" + theme.getThemeName() + ")是待终审状态,只有初审人才能撤回");
                     }
-                } else if (theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是驳回状态,只有当前用户是初审人或记录人才能撤回
+                } else if (theme.getThemeStatus() == ThemeStatusEnum.REJECT.getCode()) { // 记录是驳回状态,只有当前用户是初审人或记录人才能撤回
                     if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
-                        theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                        theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
                         themeRepository.save(theme);
                     }
                     if (StringUtil.isNotBlank(theme.getRecorderId()) && theme.getRecorderId().equals(loginUserEmpId)) {
-                        theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+                        theme.setThemeStatus(ThemeStatusEnum.SAVE.getCode());
                         themeRepository.save(theme);
                     } else {
                         errorList.add("主题(" + theme.getThemeName() + ")是驳回状态,只有初审人或记录人才能撤回");
                     }
-                } else if (theme.getThemeStatus() == ThemeEnum.SUCCESS.getCode()) { // 记录是审核通过状态,只有当前用户是终审人才能撤回
+                } else if (theme.getThemeStatus() == ThemeStatusEnum.SUCCESS.getCode()) { // 记录是审核通过状态,只有当前用户是终审人才能撤回
                     if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
-                        theme.setThemeStatus(ThemeEnum.LOCK.getCode());
+                        theme.setThemeStatus(ThemeStatusEnum.LOCK.getCode());
                         // 撤回之前，要删除相应的奖分记录
                         Theme theme1 = themeRepository.findByRelationThemeIdAndThemeName(theme.getId(), EventEnum.THEME_AUDIT_POS.getMessage());
                         themeRepository.delete(theme1);
@@ -433,7 +438,7 @@ public class ThemeService extends BaseService<Theme, String> {
                         errorList.add("主题(" + theme.getThemeName() + ")是审核通过状态,只有终审人才能撤回");
                     }
                 } else {
-                    errorList.add("主题(" + theme.getThemeName() + ")是状态[" + ThemeEnum.getMessageByCode(theme.getThemeStatus()) + "]不能撤回");
+                    errorList.add("主题(" + theme.getThemeName() + ")是状态[" + ThemeStatusEnum.getMessageByCode(theme.getThemeStatus()) + "]不能撤回");
                 }
             } else {
                 errorList.add("主题(" + theme.getThemeName() + ")是锁定状态不能撤回");
@@ -451,17 +456,17 @@ public class ThemeService extends BaseService<Theme, String> {
         List<String> errorList = new ArrayList<>();
         for (String id : idSet) {
             Theme theme = getEntityById(themeRepository, id);
-            if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode()) { // 记录是待初审或驳回状态,只有当前用户是初审人才能驳回
+            if (theme.getThemeStatus() == ThemeStatusEnum.ATTN.getCode() || theme.getThemeStatus() == ThemeStatusEnum.REJECT.getCode()) { // 记录是待初审或驳回状态,只有当前用户是初审人才能驳回
                 if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
-                    theme.setThemeStatus(ThemeEnum.SAVE.getCode());
+                    theme.setThemeStatus(ThemeStatusEnum.SAVE.getCode());
                     theme.setAttnOpinion(opinion);
                     themeRepository.save(theme);
                 } else {
                     errorList.add("主题(" + theme.getThemeName() + ")是待初审或驳回状态,只有初审人才能驳回");
                 }
-            } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.LOCK.getCode()) { // 记录是待终审或锁定状态,只有当前用户是终审人才能驳回
+            } else if (theme.getThemeStatus() == ThemeStatusEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeStatusEnum.LOCK.getCode()) { // 记录是待终审或锁定状态,只有当前用户是终审人才能驳回
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
-                    theme.setThemeStatus(ThemeEnum.ATTN.getCode());
+                    theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
                     theme.setAuditOpinion(opinion);
                     // 只有终审人驳回才能进行扣分操作
                     if ((recorderBScore != null && recorderBScore < 0) || (attnBScore != null && attnBScore < 0)) {
@@ -483,6 +488,7 @@ public class ThemeService extends BaseService<Theme, String> {
                         if (recorderBScore != null && recorderBScore < 0) {
                             ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_NEG.getMessage());
                             themeDetail.setEventName(EventEnum.EVENT_RECORDER_NEG.getMessage());
+                            themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getRecorderId());
                             themeDetail.setEmpFullName(theme.getRecorderName());
                             themeDetail.setBScore(recorderBScore);
@@ -492,6 +498,7 @@ public class ThemeService extends BaseService<Theme, String> {
                         if (attnBScore != null && attnBScore < 0) {
                             ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_NEG.getMessage());
                             themeDetail.setEventName(EventEnum.EVENT_ATTN_NEG.getMessage());
+                            themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getAttnId());
                             themeDetail.setEmpFullName(theme.getAttnName());
                             themeDetail.setBScore(attnBScore);
@@ -507,7 +514,7 @@ public class ThemeService extends BaseService<Theme, String> {
                     errorList.add("主题(" + theme.getThemeName() + ")是待终审或锁定状态,只有终审人才能驳回");
                 }
             } else {
-                errorList.add("主题(" + theme.getThemeName() + ")状态(" + ThemeEnum.getMessageByCode(theme.getThemeStatus()) + ")不能撤回");
+                errorList.add("主题(" + theme.getThemeName() + ")状态(" + ThemeStatusEnum.getMessageByCode(theme.getThemeStatus()) + ")不能撤回");
             }
         }
         if (errorList.size() > 0) {
@@ -522,18 +529,18 @@ public class ThemeService extends BaseService<Theme, String> {
         List<String> errorList = new ArrayList<>();
         for (String id : idSet) {
             Theme theme = getEntityById(themeRepository, id);
-            if (theme.getThemeStatus() == ThemeEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是初审人才能通过
+            if (theme.getThemeStatus() == ThemeStatusEnum.ATTN.getCode()) { // 记录是待初审状态,只有当前用户是初审人才能通过
                 if (StringUtil.isNotBlank(theme.getAttnId()) && theme.getAttnId().equals(loginUserEmpId)) {
-                    theme.setThemeStatus(ThemeEnum.AUDIT.getCode());
+                    theme.setThemeStatus(ThemeStatusEnum.AUDIT.getCode());
                     theme.setAttnOpinion(opinion);
                     theme.setAttnDate(new Date());
                     themeRepository.save(theme);
                 } else {
                     errorList.add("主题(" + theme.getThemeName() + ")是待初审状态,只有初审人才能通过");
                 }
-            } else if (theme.getThemeStatus() == ThemeEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeEnum.REJECT.getCode() || theme.getThemeStatus() == ThemeEnum.LOCK.getCode()) { // 记录是待终审、驳回或锁定状态,只有当前用户是终审人才能通过
+            } else if (theme.getThemeStatus() == ThemeStatusEnum.AUDIT.getCode() || theme.getThemeStatus() == ThemeStatusEnum.REJECT.getCode() || theme.getThemeStatus() == ThemeStatusEnum.LOCK.getCode()) { // 记录是待终审、驳回或锁定状态,只有当前用户是终审人才能通过
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
-                    theme.setThemeStatus(ThemeEnum.SUCCESS.getCode());
+                    theme.setThemeStatus(ThemeStatusEnum.SUCCESS.getCode());
                     theme.setAuditOpinion(opinion);
                     theme.setAuditDate(new Date());
                     // 只有终审人通过才能进行奖分操作，通过新增一条主题详情记录实现对记录人或初审人的加分
@@ -556,6 +563,7 @@ public class ThemeService extends BaseService<Theme, String> {
                         if (recorderBScore != null && recorderBScore > 0) {
                             ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_POS.getMessage());
                             themeDetail.setEventName(EventEnum.EVENT_RECORDER_POS.getMessage());
+                            themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getRecorderId());
                             themeDetail.setEmpFullName(theme.getRecorderName());
                             themeDetail.setBScore(recorderBScore);
@@ -565,6 +573,7 @@ public class ThemeService extends BaseService<Theme, String> {
                         if (attnBScore != null && attnBScore > 0) {
                             ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), EventEnum.EVENT_TYPE_AUDIT_POS.getMessage());
                             themeDetail.setEventName(EventEnum.EVENT_ATTN_POS.getMessage());
+                            themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getAttnId());
                             themeDetail.setEmpFullName(theme.getAttnName());
                             themeDetail.setBScore(attnBScore);
@@ -580,7 +589,7 @@ public class ThemeService extends BaseService<Theme, String> {
                     errorList.add("主题(" + theme.getThemeName() + ")是待终审、驳回或锁定状态,只有终审人才能通过");
                 }
             } else {
-                errorList.add("主题(" + theme.getThemeName() + ")是状态[" + ThemeEnum.getMessageByCode(theme.getThemeStatus()) + "]不能通过");
+                errorList.add("主题(" + theme.getThemeName() + ")是状态[" + ThemeStatusEnum.getMessageByCode(theme.getThemeStatus()) + "]不能通过");
             }
         }
         if (errorList.size() > 0) {
@@ -593,7 +602,7 @@ public class ThemeService extends BaseService<Theme, String> {
         Theme themeNew = new Theme();
         themeNew.setOrganizationId(theme.getOrganizationId());
         themeNew.setThemeDate(theme.getThemeDate());
-        themeNew.setThemeStatus(ThemeEnum.SUCCESS.getCode());
+        themeNew.setThemeStatus(ThemeStatusEnum.SUCCESS.getCode());
         themeNew.setRelationThemeId(theme.getId());
         themeNew.setRecorderId(sysUser.getId());
         themeNew.setRecorderName(sysUser.getFullName());
@@ -614,21 +623,21 @@ public class ThemeService extends BaseService<Theme, String> {
         Theme theme = getEntityById(themeRepository, id);
         List<ThemeApprovalVo> themeApprovalVoList = new ArrayList<>();
         // 记录人
-        String state1 = ThemeEnum.getMessageByCode(theme.getThemeStatus());
+        String state1 = ThemeStatusEnum.getMessageByCode(theme.getThemeStatus());
         if (theme.getThemeStatus() > 1) {
             state1 = "已完成";
         }
         ThemeApprovalVo themeApprovalVo1 = new ThemeApprovalVo("记录人", state1, theme.getRecorderId(), theme.getRecorderName(), theme.getCreateDate());
         themeApprovalVoList.add(themeApprovalVo1);
         // 初审
-        String state2 = ThemeEnum.getMessageByCode(theme.getThemeStatus());
+        String state2 = ThemeStatusEnum.getMessageByCode(theme.getThemeStatus());
         if (theme.getThemeStatus() > 2) {
             state2 = "已完成";
         }
         ThemeApprovalVo themeApprovalVo2 = new ThemeApprovalVo("初审", state2, theme.getAttnId(), theme.getAttnName(), theme.getAttnDate());
         themeApprovalVoList.add(themeApprovalVo2);
         // 终审
-        String state3 = ThemeEnum.getMessageByCode(theme.getThemeStatus());
+        String state3 = ThemeStatusEnum.getMessageByCode(theme.getThemeStatus());
         if (theme.getThemeStatus() == 5) {
             state3 = "已完成";
         }
