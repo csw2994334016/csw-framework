@@ -16,8 +16,8 @@ import java.util.Set;
 public interface PointsClient {
 
     @GetMapping(value = "/internal/findCurMonthTaskEmp")
-    List<String> findCurMonthTaskEmp();
+    List<String> findCurMonthTaskEmp(@RequestParam() String firstOrganizationId);
 
     @GetMapping(value = "/internal/findAuditor")
-    Set<String> findAuditor(@RequestParam() String attnOrAuditFlag, @RequestParam() String attnId, @RequestParam() Integer aPosScoreMax, @RequestParam() Integer aNegScoreMin, @RequestParam() Integer bPosScoreMax, @RequestParam() Integer bNegScoreMin);
+    Set<String> findAuditor(@RequestParam() String firstOrganizationId, @RequestParam() String attnOrAuditFlag, @RequestParam() String attnId, @RequestParam() Integer aPosScoreMax, @RequestParam() Integer aNegScoreMin, @RequestParam() Integer bPosScoreMax, @RequestParam() Integer bNegScoreMin);
 }

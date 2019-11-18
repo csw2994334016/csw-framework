@@ -16,6 +16,6 @@ public interface AwardPrivilegeRepository extends BaseRepository<AwardPrivilege,
     @Query("select distinct t.id from AwardPrivilege t where t.organizationId = :firstOrganizationId and t.status = :code")
     Set<String> findAllByOrganizationIdAndStatus(String firstOrganizationId, int code);
 
-    @Query("select distinct t.id from AwardPrivilege t where t.aScore >= :aScore and t.bScore >= :bScore and t.organizationId = :firstOrganizationId and t.status = :code")
+    @Query("select distinct t.id from AwardPrivilege t where t.ascore >= :aScore and t.bscore >= :bScore and t.organizationId = :firstOrganizationId and t.status = :code")
     Set<String> findAllByAScoreGreaterThanEqualAndBScoreGreaterThanEqualAndOrganizationIdAndStatus(int aScore, int bScore, String firstOrganizationId, int code);
 }

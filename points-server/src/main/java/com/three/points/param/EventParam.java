@@ -27,19 +27,19 @@ public class EventParam {
 
     @NotNull(message = "A分最小值不可以为空")
     @ApiModelProperty("A分最小值")
-    private Integer aScoreMin; // A分最小值
+    private Integer ascoreMin; // A分最小值
 
     @NotNull(message = "A分最大值不可以为空")
     @ApiModelProperty("A分最大值")
-    private Integer aScoreMax; // A分最大值
+    private Integer ascoreMax; // A分最大值
 
     @NotNull(message = "B分最小值不可以为空")
     @ApiModelProperty("B分最小值")
-    private Integer bScoreMin; // B分最小值
+    private Integer bscoreMin; // B分最小值
 
     @NotNull(message = "B分最大值不可以为空")
     @ApiModelProperty("B分最大值")
-    private Integer bScoreMax; // B分最大值
+    private Integer bscoreMax; // B分最大值
 
     @ApiModelProperty("奖票事件：1=是；0=否")
     private Integer prizeFlag; // 奖票事件：1=是；0=否

@@ -29,15 +29,15 @@ public class SysController {
 
     @ApiOperation(value = "查询当前月任务已分配人员（内部接口）")
     @GetMapping(value = "/internal/findCurMonthTaskEmp")
-    List<String> findCurMonthTaskEmp() {
+    List<String> findCurMonthTaskEmp(String firstOrganizationId) {
         Date date = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
         Date taskDateNext = DateUtil.offsetMonth(date, 1);
-        return new ArrayList<>(managerTaskService.findCurMonthTaskEmp(taskDateNext));
+        return new ArrayList<>(managerTaskService.findCurMonthTaskEmp(firstOrganizationId, taskDateNext));
     }
 
     @ApiOperation(value = "查找积分奖扣审核人员列表（内部接口）")
     @GetMapping(value = "/internal/findAuditor")
-    Set<String> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
-        return awardPrivilegeService.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
+    Set<String> findAuditor(String firstOrganizationId, String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
+        return awardPrivilegeService.findAuditor(firstOrganizationId, attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
     }
 }

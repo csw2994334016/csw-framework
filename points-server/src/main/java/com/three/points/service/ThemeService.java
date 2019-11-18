@@ -176,8 +176,8 @@ public class ThemeService extends BaseService<Theme, String> {
                 themeDetail.setAuditFlag(themeEventParam.getAuditFlag());
                 themeDetail.setEmpId(themeEmpParam.getEmpId());
                 themeDetail.setEmpFullName(themeEmpParam.getEmpFullName());
-                themeDetail.setAScore(themeEmpParam.getAScore());
-                themeDetail.setBScore(themeEmpParam.getBScore());
+                themeDetail.setAscore(themeEmpParam.getAscore());
+                themeDetail.setBscore(themeEmpParam.getBscore());
                 themeDetail.setRemark(themeEventParam.getRemark());
                 themeDetailList.add(themeDetail);
             }
@@ -200,24 +200,24 @@ public class ThemeService extends BaseService<Theme, String> {
         int bPosScore = 0;
         int bNegScore = 0;
         for (ThemeDetail themeDetail : themeDetailList) {
-            if (themeDetail.getAScore() > 0) {
-                aPosScore += themeDetail.getAScore();
+            if (themeDetail.getAscore() > 0) {
+                aPosScore += themeDetail.getAscore();
             } else {
-                aNegScore += themeDetail.getAScore();
+                aNegScore += themeDetail.getAscore();
             }
-            if (themeDetail.getBScore() > 0) {
-                bPosScore += themeDetail.getBScore();
+            if (themeDetail.getBscore() > 0) {
+                bPosScore += themeDetail.getBscore();
             } else {
-                bNegScore += themeDetail.getBScore();
+                bNegScore += themeDetail.getBscore();
             }
             if (themeDetail.getEmpId().equals(theme.getAuditId())) {
                 throw new BusinessException("终审人不能是奖扣对象");
             }
         }
-        theme.setAPosScore(aPosScore);
-        theme.setANegScore(aNegScore);
-        theme.setBPosScore(bPosScore);
-        theme.setBNegScore(bNegScore);
+        theme.setAposScore(aPosScore);
+        theme.setAnegScore(aNegScore);
+        theme.setBposScore(bPosScore);
+        theme.setBnegScore(bNegScore);
     }
 
     @Transactional
@@ -475,11 +475,11 @@ public class ThemeService extends BaseService<Theme, String> {
                         themeNew.setThemeName(EventEnum.THEME_AUDIT_NEG.getMessage());
                         // 汇总分、人次
                         if (recorderBScore != null && recorderBScore < 0) {
-                            themeNew.setBPosScore(themeNew.getBPosScore() + recorderBScore);
+                            themeNew.setBposScore(themeNew.getBposScore() + recorderBScore);
                             themeNew.setEmpCount(themeNew.getEmpCount() + 1);
                         }
                         if (attnBScore != null && attnBScore < 0) {
-                            themeNew.setBPosScore(themeNew.getBPosScore() + attnBScore);
+                            themeNew.setBposScore(themeNew.getBposScore() + attnBScore);
                             themeNew.setEmpCount(themeNew.getEmpCount() + 1);
                         }
                         themeNew = themeRepository.save(themeNew);
@@ -491,7 +491,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getRecorderId());
                             themeDetail.setEmpFullName(theme.getRecorderName());
-                            themeDetail.setBScore(recorderBScore);
+                            themeDetail.setBscore(recorderBScore);
                             themeDetail.setRemark(EventEnum.EVENT_RECORDER_NEG.getMessage());
                             themeDetailList.add(themeDetail);
                         }
@@ -501,7 +501,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getAttnId());
                             themeDetail.setEmpFullName(theme.getAttnName());
-                            themeDetail.setBScore(attnBScore);
+                            themeDetail.setBscore(attnBScore);
                             themeDetail.setRemark(EventEnum.EVENT_ATTN_NEG.getMessage());
                             themeDetailList.add(themeDetail);
                         }
@@ -550,11 +550,11 @@ public class ThemeService extends BaseService<Theme, String> {
                         themeNew.setThemeName(EventEnum.THEME_AUDIT_POS.getMessage());
                         // 汇总分、人次
                         if (recorderBScore != null && recorderBScore > 0) {
-                            themeNew.setBPosScore(themeNew.getBPosScore() + recorderBScore);
+                            themeNew.setBposScore(themeNew.getBposScore() + recorderBScore);
                             themeNew.setEmpCount(themeNew.getEmpCount() + 1);
                         }
                         if (attnBScore != null && attnBScore > 0) {
-                            themeNew.setBPosScore(themeNew.getBPosScore() + attnBScore);
+                            themeNew.setBposScore(themeNew.getBposScore() + attnBScore);
                             themeNew.setEmpCount(themeNew.getEmpCount() + 1);
                         }
                         themeNew = themeRepository.save(themeNew);
@@ -566,7 +566,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getRecorderId());
                             themeDetail.setEmpFullName(theme.getRecorderName());
-                            themeDetail.setBScore(recorderBScore);
+                            themeDetail.setBscore(recorderBScore);
                             themeDetail.setRemark(EventEnum.EVENT_RECORDER_POS.getMessage());
                             themeDetailList.add(themeDetail);
                         }
@@ -576,7 +576,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getAttnId());
                             themeDetail.setEmpFullName(theme.getAttnName());
-                            themeDetail.setBScore(attnBScore);
+                            themeDetail.setBscore(attnBScore);
                             themeDetail.setRemark(EventEnum.EVENT_ATTN_POS.getMessage());
                             themeDetailList.add(themeDetail);
                         }

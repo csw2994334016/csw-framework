@@ -56,19 +56,19 @@ public class Theme implements Serializable {
 
     @Column(name = "a_pos_score", columnDefinition = "int(11) default 0 comment 'A分（汇总正分）'")
     @ApiModelProperty("A分（汇总正分）")
-    private Integer aPosScore = 0; // A分（汇总正分）
+    private Integer aposScore = 0; // A分（汇总正分）
 
     @Column(name = "a_neg_score", columnDefinition = "int(11) default 0 comment 'A分（汇总负分）'")
     @ApiModelProperty("A分（汇总负分）")
-    private Integer aNegScore = 0; // A分（汇总负分）
+    private Integer anegScore = 0; // A分（汇总负分）
 
     @Column(name = "b_pos_score", columnDefinition = "int(11) default 0 comment 'B分（汇总正分）'")
     @ApiModelProperty("B分（汇总正分）")
-    private Integer bPosScore = 0; // B分（汇总正分）
+    private Integer bposScore = 0; // B分（汇总正分）
 
     @Column(name = "b_neg_score", columnDefinition = "int(11) default 0 comment 'B分（汇总负分）'")
     @ApiModelProperty("B分（汇总负分）")
-    private Integer bNegScore = 0; // B分（汇总负分）
+    private Integer bnegScore = 0; // B分（汇总负分）
 
     @Column(name = "emp_count", nullable = false, columnDefinition = "int(11) default 0 comment '人次'")
     @ApiModelProperty("人次")

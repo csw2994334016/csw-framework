@@ -16,6 +16,7 @@ import java.util.Date;
 @Data
 public class ${className}Param {
 
+    @ApiModelProperty("主键ID")
     private ${pkColumnType} id;
 
 <#if columns??>

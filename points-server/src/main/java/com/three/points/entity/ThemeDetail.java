@@ -66,9 +66,9 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称
 
-    @Column(name = "event_flag", columnDefinition = "int(1) default 1 comment '事件类型：1=标准事件；0=临时事件'")
+    @Column(name = "event_flag", columnDefinition = "int(1) default 0 comment '事件类型：1=标准事件；0=临时事件'")
     @ApiModelProperty("事件类型：1=标准事件；0=临时事件")
-    private Integer eventFlag = 1; // 事件类型：1=标准事件；0=临时事件
+    private Integer eventFlag = 0; // 事件类型：1=标准事件；0=临时事件
 
     @Column(name = "prize_flag", columnDefinition = "int(1) default 0 comment '奖票事件：1=是；0=否'")
     @ApiModelProperty("奖票事件：1=是；0=否")
@@ -92,11 +92,11 @@ public class ThemeDetail implements Serializable {
 
     @Column(name = "a_score", nullable = false, columnDefinition = "int(11) default 0 comment 'A分'")
     @ApiModelProperty("A分")
-    private Integer aScore = 0; // A分
+    private Integer ascore = 0; // A分
 
     @Column(name = "b_score", nullable = false, columnDefinition = "int(11) default 0 comment 'B分'")
     @ApiModelProperty("B分")
-    private Integer bScore = 0; // B分
+    private Integer bscore = 0; // B分
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")

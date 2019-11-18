@@ -90,10 +90,10 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
                 // 查找事件
                 if (themeDetail.getEventId() != null) {
                     Event event = eventService.findById(themeDetail.getEventId());
-                    themeDetailVo.setAScoreMin(event.getAScoreMin());
-                    themeDetailVo.setAScoreMax(event.getAScoreMax());
-                    themeDetailVo.setBScoreMin(event.getBScoreMin());
-                    themeDetailVo.setBScoreMax(event.getBScoreMax());
+                    themeDetailVo.setAscoreMin(event.getAscoreMin());
+                    themeDetailVo.setAscoreMax(event.getAscoreMax());
+                    themeDetailVo.setBscoreMin(event.getBscoreMin());
+                    themeDetailVo.setBscoreMax(event.getBscoreMax());
                 }
                 themeDetailVoMap.put(themeDetail.getEventName(), themeDetailVo);
             }

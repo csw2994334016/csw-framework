@@ -1,7 +1,5 @@
 package com.three.points.service;
 
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateRange;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.three.common.enums.YesNoEnum;
@@ -223,8 +221,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         return managerTaskEmpRepository.findAllByTaskId(managerTaskNext.getId());
     }
 
-    public Set<String> findCurMonthTaskEmp(Date taskDate) {
-        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+    public Set<String> findCurMonthTaskEmp(String firstOrganizationId, Date taskDate) {
         List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDate(firstOrganizationId, taskDate);
         Set<String> empIdSet = new HashSet<>();
         managerTaskEmpList.forEach(e -> {
@@ -266,8 +263,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             }
         }
         for (Theme theme : themeList) {
-            managerTaskEmp.setScoreAwardCompleted(managerTaskEmp.getScoreAwardCompleted() + theme.getBPosScore());
-            managerTaskEmp.setScoreDeductCompleted(managerTaskEmp.getScoreDeductCompleted() + theme.getBNegScore());
+            managerTaskEmp.setScoreAwardCompleted(managerTaskEmp.getScoreAwardCompleted() + theme.getBposScore());
+            managerTaskEmp.setScoreDeductCompleted(managerTaskEmp.getScoreDeductCompleted() + theme.getBnegScore());
         }
         // 人次任务
         themeList.clear();
@@ -295,8 +292,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             }
         }
         for (Theme theme : themeList) {
-            managerTaskEmp.setRatioTaskAwardScore(managerTaskEmp.getRatioTaskAwardScore() + theme.getBPosScore());
-            managerTaskEmp.setRatioTaskDeductScore(managerTaskEmp.getRatioTaskDeductScore() + theme.getBNegScore());
+            managerTaskEmp.setRatioTaskAwardScore(managerTaskEmp.getRatioTaskAwardScore() + theme.getBposScore());
+            managerTaskEmp.setRatioTaskDeductScore(managerTaskEmp.getRatioTaskDeductScore() + theme.getBnegScore());
         }
         return managerTaskEmp;
     }
@@ -360,14 +357,14 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         // 统计结果
         List<Theme> themeList = themeRepository.findAllByAttnIdAndThemeStatusAndThemeDateBetween(empId, ThemeStatusEnum.SUCCESS.getCode(), st, et);
         for (Theme theme : themeList) {
-            taskStatisticsVo.setAllAwardScore(taskStatisticsVo.getAllAwardScore() + theme.getBPosScore());
-            taskStatisticsVo.setAllDeductScore(taskStatisticsVo.getAllDeductScore() + theme.getBNegScore());
+            taskStatisticsVo.setAllAwardScore(taskStatisticsVo.getAllAwardScore() + theme.getBposScore());
+            taskStatisticsVo.setAllDeductScore(taskStatisticsVo.getAllDeductScore() + theme.getBnegScore());
             taskStatisticsVo.setAllEmpCount(taskStatisticsVo.getAllEmpCount() + theme.getEmpCount());
             for (Map.Entry<String, DateVo> entry : dayMap.entrySet()) {
                 if (theme.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && theme.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
-                    int value1 = awardValueMap.get(entry.getKey()) + theme.getBPosScore();
+                    int value1 = awardValueMap.get(entry.getKey()) + theme.getBposScore();
                     awardValueMap.put(entry.getKey(), value1);
-                    int value2 = deductValueMap.get(entry.getKey()) + theme.getBNegScore();
+                    int value2 = deductValueMap.get(entry.getKey()) + theme.getBnegScore();
                     deductValueMap.put(entry.getKey(), value2);
                     int value3 = empCountValueMap.get(entry.getKey()) + theme.getEmpCount();
                     empCountValueMap.put(entry.getKey(), value3);

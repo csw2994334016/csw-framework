@@ -2,10 +2,10 @@ package com.three.points.controller;
 
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
+import com.three.common.vo.JsonData;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
 import com.three.points.entity.AwardPrivilege;
 import com.three.points.param.AwardPrivilegeEmpParam;
 import com.three.points.param.AwardPrivilegeParam;
@@ -79,5 +79,12 @@ public class AwardPrivilegeController {
     public JsonResult bindEmployee(@RequestBody AwardPrivilegeEmpParam awardPrivilegeEmpParam) {
         awardPrivilegeService.bindEmployee(awardPrivilegeEmpParam);
         return JsonResult.ok("添加人员成功");
+    }
+
+    @ApiOperation(value = "查询奖扣权限设置（根据ID查找）", notes = "")
+    @ApiImplicitParam(name = "id", value = "奖扣权限设置id", required = true, dataType = "String")
+    @GetMapping("/findById")
+    public JsonData<AwardPrivilege> findById(@RequestParam(required = true) String id) {
+        return new JsonData<>(awardPrivilegeService.findById(id));
     }
 }

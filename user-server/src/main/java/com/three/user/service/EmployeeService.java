@@ -116,11 +116,11 @@ public class EmployeeService extends BaseService<Employee, String> {
             predicateList.add(criteriaBuilder.equal(root.get("status"), code));
 
             // 按组织机构查询人员信息
+            String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
             List<Organization> organizationList = new ArrayList<>();
             if (StringUtil.isNotBlank(organizationId)) {
                 organizationList = organizationService.getChildOrganizationListByOrgId(organizationId);
             } else {
-                String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
                 if (firstParentId != null) {
                     organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
                 }
@@ -130,7 +130,6 @@ public class EmployeeService extends BaseService<Employee, String> {
                 if (StringUtil.isNotBlank(organizationId)) {
                     organization = organizationService.getEntityById(organizationId);
                 } else {
-                    String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
                     if (firstParentId != null) {
                         organization = organizationService.getEntityById(firstParentId);
                     }
@@ -147,7 +146,7 @@ public class EmployeeService extends BaseService<Employee, String> {
             }
             // 过滤任务已选择的人员
             if ("1".equals(taskFilterFlag)) {
-                List<String> empIdList = pointsClient.findCurMonthTaskEmp();
+                List<String> empIdList = pointsClient.findCurMonthTaskEmp(firstParentId);
                 if (empIdList.size() > 0) {
                     predicateList.add(criteriaBuilder.not(root.get("id").in(empIdList)));
                 }
@@ -243,7 +242,8 @@ public class EmployeeService extends BaseService<Employee, String> {
     }
 
     public List<Employee> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
-        Set<String> empIdSet = pointsClient.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        Set<String> empIdSet = pointsClient.findAuditor(firstOrganizationId, attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
         if (empIdSet.size() > 0) {
             return employeeRepository.findAllByIdIn(empIdSet);
         }

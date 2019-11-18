@@ -42,6 +42,7 @@ public class ${className} implements Serializable {
     @GeneratedValue(generator = "system-guid")
     @GenericGenerator(name = "system-guid", strategy = "guid")
     @Column(name = "id", columnDefinition = "varchar(36) comment '主键ID'")
+    @ApiModelProperty("主键ID")
     private String id;
     </#if>
 

@@ -22,9 +22,9 @@ public class ThemeEmpParam {
     private String empFullName; // 人员姓名
 
     @ApiModelProperty("A分")
-    private Integer aScore = 0; // A分
+    private Integer ascore = 0; // A分
 
     @ApiModelProperty("B分")
-    private Integer bScore = 0; // B分
+    private Integer bscore = 0; // B分
 
 }

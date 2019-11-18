@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csw on 2019-09-29.
@@ -44,7 +41,7 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         BeanValidator.check(awardPrivilegeParam);
 
         AwardPrivilege awardPrivilege = new AwardPrivilege();
-        awardPrivilege = (AwardPrivilege) BeanCopyUtil.copyBean(awardPrivilegeParam, awardPrivilege);
+        awardPrivilege = (AwardPrivilege) BeanCopyUtil.copyBean(awardPrivilegeParam, awardPrivilege, Arrays.asList("empNum"));
 
         awardPrivilege.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
@@ -56,7 +53,7 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         BeanValidator.check(awardPrivilegeParam);
 
         AwardPrivilege awardPrivilege = getEntityById(awardPrivilegeRepository, awardPrivilegeParam.getId());
-        awardPrivilege = (AwardPrivilege) BeanCopyUtil.copyBean(awardPrivilegeParam, awardPrivilege);
+        awardPrivilege = (AwardPrivilege) BeanCopyUtil.copyBean(awardPrivilegeParam, awardPrivilege, Arrays.asList("empNum"));
 
         awardPrivilegeRepository.save(awardPrivilege);
     }
@@ -111,9 +108,8 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         }
     }
 
-    public Set<String> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
+    public Set<String> findAuditor(String firstOrganizationId, String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
         Set<String> empIdSet = new HashSet<>();
-        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Set<String> awardPrivilegeIdSet;
         if ("0".equals(attnOrAuditFlag)) { // 查找初审人：有奖扣权限的人员
             awardPrivilegeIdSet = awardPrivilegeRepository.findAllByOrganizationIdAndStatus(firstOrganizationId, StatusEnum.OK.getCode());
@@ -132,5 +128,9 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
             awardPrivilegeEmpList.forEach(e -> empIdSet.add(e.getEmpId()));
         }
         return empIdSet;
+    }
+
+    public AwardPrivilege findById(String id) {
+        return getEntityById(awardPrivilegeRepository, id);
     }
 }

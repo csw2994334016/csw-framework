@@ -42,11 +42,11 @@ public class AwardPrivilege implements Serializable {
 
     @Column(name = "a_score", nullable = false, columnDefinition = "int(2) default 0 comment 'A分权限'")
     @ApiModelProperty("分A权限（正数）")
-    private Integer aScore = 0; // 分A权限（正数）
+    private Integer ascore = 0; // 分A权限（正数）
 
     @Column(name = "b_score", nullable = false, columnDefinition = "int(2) default 0 comment 'B分权限'")
     @ApiModelProperty("分B权限（正数）")
-    private Integer bScore = 0; // 分B权限（正数）
+    private Integer bscore = 0; // 分B权限（正数）
 
     @Column(name = "emp_num", columnDefinition = "int(2) default 0 comment '人数'")
     @ApiModelProperty("人数")

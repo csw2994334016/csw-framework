@@ -50,19 +50,19 @@ public class Event implements Serializable {
 
     @Column(name = "a_score_min", nullable = false, columnDefinition = "int(11) comment 'A分最小值'")
     @ApiModelProperty("A分最小值")
-    private Integer aScoreMin; // A分最小值
+    private Integer ascoreMin; // A分最小值
 
     @Column(name = "a_score_max", nullable = false, columnDefinition = "int(11) comment 'A分最大值'")
     @ApiModelProperty("A分最大值")
-    private Integer aScoreMax; // A分最大值
+    private Integer ascoreMax; // A分最大值
 
     @Column(name = "b_score_min", nullable = false, columnDefinition = "int(11) comment 'B分最小值'")
     @ApiModelProperty("B分最小值")
-    private Integer bScoreMin; // B分最小值
+    private Integer bscoreMin; // B分最小值
 
     @Column(name = "b_score_max", nullable = false, columnDefinition = "int(11) comment 'B分最大值'")
     @ApiModelProperty("B分最大值")
-    private Integer bScoreMax; // B分最大值
+    private Integer bscoreMax; // B分最大值
 
     @Column(name = "prize_flag", columnDefinition = "int(1) default 0 comment '奖票事件：1=是；0=否'")
     @ApiModelProperty("奖票事件：1=是；0=否")
