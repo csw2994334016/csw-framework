@@ -18,6 +18,8 @@ public class OrgVo {
 
     private String id;
 
+    private String key;
+
     private String parentId;
 
     @Builder.Default

@@ -3,8 +3,8 @@ package com.three.points.controller;
 import com.three.common.enums.StatusEnum;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.points.entity.ManagerTaskEmp;
 import com.three.points.service.ManagerTaskEmpService;
+import com.three.points.vo.ManagerTaskEmpVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,17 +31,18 @@ public class ManagerTaskQueryController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页记录数", dataType = "Integer"),
+            @ApiImplicitParam(name = "orgId", value = "组织机构ID", dataType = "String"),
             @ApiImplicitParam(name = "taskId", value = "任务ID", dataType = "String"),
             @ApiImplicitParam(name = "taskName", value = "任务名称", dataType = "String"),
             @ApiImplicitParam(name = "taskDate", value = "任务日期（毫秒）", dataType = "Long"),
             @ApiImplicitParam(name = "empFullName", value = "员工姓名", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<ManagerTaskEmp> query(Integer page, Integer limit, String taskId, String taskName, Long taskDate, String empFullName) {
+    public PageResult<ManagerTaskEmpVo> query(Integer page, Integer limit, String orgId, String taskId, String taskName, Long taskDate, String empFullName) {
         if (page != null && limit != null) {
-            return managerTaskEmpService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskId, taskName, taskDate, empFullName);
+            return managerTaskEmpService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), orgId, taskId, taskName, taskDate, empFullName);
         } else {
-            return managerTaskEmpService.query(null, StatusEnum.OK.getCode(), taskId, taskName, taskDate, empFullName);
+            return managerTaskEmpService.query(null, StatusEnum.OK.getCode(), orgId, taskId, taskName, taskDate, empFullName);
         }
     }
 }

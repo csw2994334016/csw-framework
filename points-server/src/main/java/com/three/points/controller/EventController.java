@@ -58,6 +58,14 @@ public class EventController {
         return JsonResult.ok("事件删除成功");
     }
 
+    @ApiOperation(value = "验证事件是否被使用")
+    @ApiImplicitParam(name = "ids", value = "事件信息ids", required = true, dataType = "String")
+    @GetMapping("/validateUsed")
+    public JsonResult validateUsed(@RequestParam(required = true) String ids) {
+        eventService.validateUsed(ids);
+        return JsonResult.ok("事件没有被使用，可以使用");
+    }
+
     @ApiOperation(value = "查询事件（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),

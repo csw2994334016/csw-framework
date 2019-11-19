@@ -1,8 +1,11 @@
 package com.three.points.service;
 
 import com.google.common.collect.Lists;
+import com.three.common.enums.StatusEnum;
+import com.three.commonclient.exception.BusinessException;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
+import com.three.points.entity.ThemeDetail;
 import com.three.points.param.MoveEventParam;
 import com.three.points.repository.EventRepository;
 import com.three.points.param.EventParam;
@@ -11,6 +14,7 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.repository.ThemeDetailRepository;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,9 @@ public class EventService extends BaseService<Event, String> {
 
     @Autowired
     private EventTypeService eventTypeService;
+
+    @Autowired
+    private ThemeDetailRepository themeDetailRepository;
 
     @Transactional
     public void create(EventParam eventParam) {
@@ -76,8 +83,23 @@ public class EventService extends BaseService<Event, String> {
             event.setStatus(code);
             eventList.add(event);
         }
-
         eventRepository.saveAll(eventList);
+    }
+
+    public void validateUsed(String ids) {
+        Set<String> idSet = StringUtil.getStrToIdSet1(ids);
+        List<String> errorList = new ArrayList<>();
+        for (String id : idSet) {
+            Event event = getEntityById(eventRepository, id);
+            // 事件是否被使用
+            int count = themeDetailRepository.countByEventIdAndStatus(event.getId(), StatusEnum.OK.getCode());
+            if (count > 0) {
+                errorList.add(event.getEventName());
+            }
+        }
+        if (errorList.size() > 0) {
+            throw new BusinessException("事件被积分奖扣详情使用，请确认是否删除？");
+        }
     }
 
     public PageResult<Event> query(PageQuery pageQuery, int code, String typeId, String searchValue) {

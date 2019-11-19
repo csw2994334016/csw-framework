@@ -24,4 +24,6 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
     List<String> findThemeIdByEmpIdAndThemeStatus(String loginUserEmpId, int code);
 
     List<ThemeDetail> findAllByThemeId(String id);
+
+    int countByEventIdAndStatus(String id, int code);
 }

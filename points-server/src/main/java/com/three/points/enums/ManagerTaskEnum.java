@@ -9,9 +9,9 @@ import lombok.Getter;
 @Getter
 public enum ManagerTaskEnum {
 
-    TASK_DAY(1, "日任务"),
-    TASK_WEEK(2, "周任务"),
-    TASK_MONTH(3, "月任务");
+    TASK_DAY(1, "日"),
+    TASK_WEEK(2, "周"),
+    TASK_MONTH(3, "月");
 
     private int code;
 

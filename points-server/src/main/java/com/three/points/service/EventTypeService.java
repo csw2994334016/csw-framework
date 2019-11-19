@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
 import com.three.commonclient.exception.BusinessException;
+import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
 import com.three.points.repository.EventRepository;
 import com.three.points.repository.EventTypeRepository;
@@ -68,19 +69,17 @@ public class EventTypeService extends BaseService<EventType, String> {
     public void delete(String ids, int code) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<EventType> eventTypeList = new ArrayList<>();
-        List<String> eventTypeNameList = new ArrayList<>();
+        List<Event> eventList = new ArrayList<>();
         for (String id : idSet) {
             EventType eventType = getEntityById(eventTypeRepository, String.valueOf(id));
             eventType.setStatus(code);
             eventTypeList.add(eventType);
-            int count = eventRepository.countByTypeId(id);
-            if (count > 0) {
-                eventTypeNameList.add(eventType.getTypeName());
-            }
+            // 删除该分类下的事件
+            List<Event> events = eventRepository.findAllByTypeId(eventType.getId());
+            events.forEach(e -> e.setStatus(code));
+            eventList.addAll(events);
         }
-        if (eventTypeNameList.size() > 0) {
-            throw new BusinessException("事件分类" + eventTypeNameList.toString() + "下绑定了具体事件，不能删除！");
-        }
+        eventRepository.saveAll(eventList);
         eventTypeRepository.saveAll(eventTypeList);
     }
 

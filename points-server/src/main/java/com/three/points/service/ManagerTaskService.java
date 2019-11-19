@@ -321,24 +321,33 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             for (int i = DateUtil.month(st); i <= DateUtil.month(et); i++) {
                 Date date1 = DateUtil.offsetMonth(st, i);
                 DateVo dateVo = new DateVo(DateUtil.beginOfMonth(date1), DateUtil.endOfMonth(date1));
-                dayMap.put(String.format("%02d", i + 1), dateVo);
-                awardValueMap.put(String.format("%02d", i + 1), 0);
-                deductValueMap.put(String.format("%02d", i + 1), 0);
-                empCountValueMap.put(String.format("%02d", i + 1), 0);
-                ratioValueMap.put(String.format("%02d", i + 1), 0.0);
+                initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
+//                dayMap.put(String.format("%02d", i + 1), dateVo);
+//                awardValueMap.put(String.format("%02d", i + 1), 0);
+//                deductValueMap.put(String.format("%02d", i + 1), 0);
+//                empCountValueMap.put(String.format("%02d", i + 1), 0);
+//                ratioValueMap.put(String.format("%02d", i + 1), 0.0);
             }
-        } else if ("3".equals(statisticsFlag)) { // 年统计
-            st = DateUtil.parse("2019-01-01 00:00:00");
-            et = DateUtil.endOfYear(date);
-            // 系统使用了几年
-            for (int i = DateUtil.year(st); i <= DateUtil.year(et); i++) {
-                Date date1 = DateUtil.parse(i + "-01-01 00:00:00");
-                DateVo dateVo = new DateVo(DateUtil.beginOfYear(date1), DateUtil.endOfYear(date1));
-                dayMap.put(i + "", dateVo);
-                awardValueMap.put(i + "", 0);
-                deductValueMap.put(i + "", 0);
-                empCountValueMap.put(i + "", 0);
-                ratioValueMap.put(i + "", 0.0);
+        } else if ("3".equals(statisticsFlag)) { // 周统计
+//            st = DateUtil.parse("2019-01-01 00:00:00");
+//            et = DateUtil.endOfYear(date);
+//            // 系统使用了几年
+//            for (int i = DateUtil.year(st); i <= DateUtil.year(et); i++) {
+//                Date date1 = DateUtil.parse(i + "-01-01 00:00:00");
+//                DateVo dateVo = new DateVo(DateUtil.beginOfYear(date1), DateUtil.endOfYear(date1));
+//                dayMap.put(i + "", dateVo);
+//                awardValueMap.put(i + "", 0);
+//                deductValueMap.put(i + "", 0);
+//                empCountValueMap.put(i + "", 0);
+//                ratioValueMap.put(i + "", 0.0);
+//            }
+            st = DateUtil.beginOfMonth(date);
+            et = DateUtil.endOfMonth(date);
+            // 这个月有几周
+            for (int i = DateUtil.weekOfMonth(st); i <= DateUtil.weekOfMonth(et); i++) {
+                Date date1 = DateUtil.offsetWeek(st, i - 1);
+                DateVo dateVo = new DateVo(DateUtil.beginOfWeek(date1), DateUtil.endOfWeek(date1));
+                initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
             }
         } else { // 默认日统计
             st = DateUtil.beginOfMonth(date);
@@ -347,11 +356,12 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             for (int i = DateUtil.dayOfMonth(st); i <= DateUtil.dayOfMonth(et); i++) {
                 Date date1 = DateUtil.offsetDay(st, i - 1);
                 DateVo dateVo = new DateVo(DateUtil.beginOfDay(date1), DateUtil.endOfDay(date1));
-                dayMap.put(String.format("%02d", i), dateVo);
-                awardValueMap.put(String.format("%02d", i), 0);
-                deductValueMap.put(String.format("%02d", i), 0);
-                empCountValueMap.put(String.format("%02d", i), 0);
-                ratioValueMap.put(String.format("%02d", i), 0.0);
+                initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
+//                dayMap.put(String.format("%02d", i), dateVo);
+//                awardValueMap.put(String.format("%02d", i), 0);
+//                deductValueMap.put(String.format("%02d", i), 0);
+//                empCountValueMap.put(String.format("%02d", i), 0);
+//                ratioValueMap.put(String.format("%02d", i), 0.0);
             }
         }
         // 统计结果
@@ -385,5 +395,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             taskStatisticsVo.setAllRatio(NumberUtil.div(taskStatisticsVo.getAllDeductScore().doubleValue(), taskStatisticsVo.getAllAwardScore().doubleValue(), 2));
         }
         return taskStatisticsVo;
+    }
+
+    private void initMap(DateVo dateVo, int i, Map<String, DateVo> dayMap, Map<String, Integer> awardValueMap, Map<String, Integer> deductValueMap, Map<String, Integer> empCountValueMap, Map<String, Double> ratioValueMap) {
+        dayMap.put(String.format("%02d", i), dateVo);
+        awardValueMap.put(String.format("%02d", i), 0);
+        deductValueMap.put(String.format("%02d", i), 0);
+        empCountValueMap.put(String.format("%02d", i), 0);
+        ratioValueMap.put(String.format("%02d", i), 0.0);
     }
 }

@@ -115,6 +115,8 @@ public class ThemeService extends BaseService<Theme, String> {
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         createTheme(theme, themeDetailList, themeParam);
 
+        theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
+
         String empId = LoginUserUtil.getLoginUserEmpId();
         String empFullName = LoginUserUtil.getLoginUserEmpFullName();
         theme.setSubmitterId(empId);

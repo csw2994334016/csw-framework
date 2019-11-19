@@ -2,7 +2,9 @@ package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
 import com.three.common.utils.DateUtils;
+import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
+import com.three.points.enums.ManagerTaskEnum;
 import com.three.points.repository.ManagerTaskEmpRepository;
 import com.three.points.param.ManagerTaskEmpParam;
 import com.three.common.utils.BeanCopyUtil;
@@ -10,6 +12,8 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.repository.ManagerTaskRepository;
+import com.three.points.vo.ManagerTaskEmpVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csw on 2019-11-07.
@@ -34,6 +35,9 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
 
     @Autowired
     private ManagerTaskEmpRepository managerTaskEmpRepository;
+
+    @Autowired
+    private ManagerTaskRepository managerTaskRepository;
 
     @Transactional
     public void delete(String ids, int code) {
@@ -48,15 +52,16 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
         managerTaskEmpRepository.saveAll(managerTaskEmpList);
     }
 
-    public PageResult<ManagerTaskEmp> query(PageQuery pageQuery, int code, String taskId, String taskName, Long taskDate, String empFullName) {
+    public PageResult<ManagerTaskEmpVo> query(PageQuery pageQuery, int code, String orgId, String taskId, String taskName, Long taskDate, String empFullName) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<ManagerTaskEmp> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
-
             String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<ManagerTaskEmp> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
-
+            if (StringUtil.isNotBlank(orgId)) {
+                predicateList.add(criteriaBuilder.equal(root.get("empOrgId"), orgId));
+            }
             if (StringUtil.isNotBlank(taskId)) {
                 predicateList.add(criteriaBuilder.equal(root.get("taskId"), taskId));
             }
@@ -72,11 +77,36 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
             }
             return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
+        PageResult<ManagerTaskEmp> pageResult;
         if (pageQuery != null) {
-            return query(managerTaskEmpRepository, pageQuery, sort, specification);
+            pageResult = query(managerTaskEmpRepository, pageQuery, sort, specification);
         } else {
-            return query(managerTaskEmpRepository, sort, specification);
+            pageResult = query(managerTaskEmpRepository, sort, specification);
         }
+        List<ManagerTaskEmpVo> managerTaskEmpVoList = new ArrayList<>();
+        Map<String, ManagerTask> managerTaskMap = new HashMap<>();
+        for (ManagerTaskEmp managerTaskEmp : pageResult.getData()) {
+            ManagerTaskEmpVo managerTaskEmpVo = new ManagerTaskEmpVo();
+            managerTaskEmpVo = (ManagerTaskEmpVo) BeanCopyUtil.copyBean(managerTaskEmp, managerTaskEmpVo);
+            managerTaskMap.computeIfAbsent(managerTaskEmp.getTaskId(), k -> managerTaskRepository.findById(managerTaskEmp.getTaskId()).orElse(null));
+            managerTaskEmpVoList.add(managerTaskEmpVo);
+        }
+        // 任务指标、完成得分
+        for (ManagerTaskEmpVo managerTaskEmpVo : managerTaskEmpVoList) {
+            ManagerTask managerTask = managerTaskMap.get(managerTaskEmpVo.getTaskId());
+            if (managerTask != null) {
+                managerTaskEmpVo.setTaskIndex(getTaskIndex(managerTask));
+            }
+        }
+
+        return new PageResult<>(managerTaskEmpVoList.size(), managerTaskEmpVoList);
+    }
+
+    private String getTaskIndex(ManagerTask managerTask) {
+        return "奖分:" + managerTask.getScoreAwardMin() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getScoreCycle()) +
+                " 扣分:" + managerTask.getScoreDeductMin() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getScoreCycle()) +
+                " 人次:" + managerTask.getEmpCountValue() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getEmpCountCycle()) +
+                " 比例:" + managerTask.getRatioValue() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getRatioCycle());
     }
 
     public ManagerTaskEmp findById(String id) {
