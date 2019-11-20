@@ -314,7 +314,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         Map<String, Integer> deductValueMap = new LinkedHashMap<>();
         Map<String, Integer> empCountValueMap = new LinkedHashMap<>();
         Map<String, Double> ratioValueMap = new LinkedHashMap<>();
-        if ("2".equals(statisticsFlag)) { // 月统计
+        if ("3".equals(statisticsFlag)) { // 月统计
             st = DateUtil.beginOfYear(date);
             et = DateUtil.endOfYear(date);
             // 一年有多少个月
@@ -322,13 +322,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
                 Date date1 = DateUtil.offsetMonth(st, i);
                 DateVo dateVo = new DateVo(DateUtil.beginOfMonth(date1), DateUtil.endOfMonth(date1));
                 initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
-//                dayMap.put(String.format("%02d", i + 1), dateVo);
-//                awardValueMap.put(String.format("%02d", i + 1), 0);
-//                deductValueMap.put(String.format("%02d", i + 1), 0);
-//                empCountValueMap.put(String.format("%02d", i + 1), 0);
-//                ratioValueMap.put(String.format("%02d", i + 1), 0.0);
             }
-        } else if ("3".equals(statisticsFlag)) { // 周统计
+        } else if ("2".equals(statisticsFlag)) { // 周统计
 //            st = DateUtil.parse("2019-01-01 00:00:00");
 //            et = DateUtil.endOfYear(date);
 //            // 系统使用了几年

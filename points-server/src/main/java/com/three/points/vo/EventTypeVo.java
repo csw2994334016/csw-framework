@@ -20,8 +20,12 @@ public class EventTypeVo {
 
     private String parentId;
 
+    private String parentName;
+
     @Builder.Default
     private List<EventTypeVo> children = new ArrayList<>();
 
     private Integer sort;
+
+    private String remark;
 }

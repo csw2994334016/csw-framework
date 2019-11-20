@@ -14,8 +14,8 @@ public class EventTypeParam {
 
     private String id;
 
-    @ApiModelProperty("父级分类ID")
-    private String parentId = "-1"; // 父级分类ID
+    @ApiModelProperty("父级分类ID，默认\"-1\"")
+    private String parentId = "-1"; // 父级分类ID，默认"-1"
 
     private String parentName; // 父级分类名称
 
@@ -23,8 +23,8 @@ public class EventTypeParam {
     @ApiModelProperty("分类名称")
     private String typeName; // 分类名称
 
-    @ApiModelProperty("排序")
-    private Integer sort = 100; // 排序
+    @ApiModelProperty("排序，默认100")
+    private Integer sort = 100; // 排序，默认100
 
 
     private String remark;

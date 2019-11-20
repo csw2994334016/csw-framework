@@ -125,7 +125,8 @@ public class EventTypeService extends BaseService<EventType, String> {
 
         Map<String, EventTypeVo> voMap = new HashMap<>();
         for (EventType eventType : eventTypeList) {
-            EventTypeVo vo = EventTypeVo.builder().title(eventType.getTypeName()).id(eventType.getId()).parentId(eventType.getParentId()).sort(eventType.getSort()).build();
+            EventTypeVo vo = EventTypeVo.builder().title(eventType.getTypeName()).id(eventType.getId()).parentId(eventType.getParentId()).parentName(eventType.getParentName())
+                    .sort(eventType.getSort()).remark(eventType.getRemark()).build();
             voMap.put(vo.getId(), vo);
         }
         List<EventTypeVo> parentVoList = new ArrayList<>();

@@ -87,7 +87,7 @@ public class ManagerTask implements Serializable {
     private Integer empCountTaskFlag = 2; // 奖扣人次考核任务（1=是；2=否）
 
     @Column(name = "emp_count_cycle", columnDefinition = "int(1) comment '奖扣人次周期（1=日任务；2=周任务；3=月任务）'")
-    @ApiModelProperty("奖扣人次周期（日任务；周任务；月任务）")
+    @ApiModelProperty("奖扣人次周期（1=日任务；2=周任务；3=月任务）")
     private Integer empCountCycle; // 奖扣人次周期（1=日任务；2=周任务；3=月任务）
 
     @Column(name = "emp_count_value", columnDefinition = "int(11) default 0 comment '奖扣人次值'")
@@ -117,5 +117,22 @@ public class ManagerTask implements Serializable {
 
 
     @Transient
-    private List<ManagerTaskEmp> managerTaskEmpList;
+    @ApiModelProperty("管理任务下的考核人员")
+    private List<ManagerTaskEmp> managerTaskEmpList; // 管理任务下的考核人员
+
+    @Transient
+    @ApiModelProperty("key值，跟id同值")
+    private String key; // key值，跟id同值
+
+    @Transient
+    @ApiModelProperty("title值，跟taskName同值")
+    private String title; // title值，跟taskName同值
+
+    public String getKey() {
+        return id;
+    }
+
+    public String getTitle() {
+        return taskName;
+    }
 }
