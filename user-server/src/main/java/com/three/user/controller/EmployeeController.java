@@ -64,16 +64,17 @@ public class EmployeeController {
             @ApiImplicitParam(name = "organizationId", value = "组织/公司/部门ID", dataType = "String"),
             @ApiImplicitParam(name = "searchValue", value = "搜索值（姓名/手机号）", dataType = "String"),
             @ApiImplicitParam(name = "containChildFlag", value = "包含子部门人员标记：0=不包含；1=包含（默认0）", defaultValue = "0", dataType = "String"),
-            @ApiImplicitParam(name = "taskFilterFlag", value = "过滤已分配任务的人员：0=不过滤；1=过滤（默认0）", defaultValue = "0", dataType = "String")
+            @ApiImplicitParam(name = "taskFilterFlag", value = "过滤已分配管理任务的人员：0=不过滤；1=过滤（默认0）", defaultValue = "0", dataType = "String"),
+            @ApiImplicitParam(name = "awardPrivilegeFilterFlag", value = "过滤已分配积分奖扣权限的人员：0=不过滤；1=过滤（默认0）", defaultValue = "0", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<Employee> query(Integer page, Integer limit, String organizationId, String searchValue, @RequestParam(defaultValue = "0") String containChildFlag, @RequestParam(defaultValue = "0") String taskFilterFlag) {
+    public PageResult<Employee> query(Integer page, Integer limit, String organizationId, String searchValue, @RequestParam(defaultValue = "0") String containChildFlag, @RequestParam(defaultValue = "0") String taskFilterFlag, @RequestParam(defaultValue = "0") String awardPrivilegeFilterFlag) {
         if (page != null && limit != null) {
             PageQuery pageQuery = new PageQuery(page, limit);
             BeanValidator.check(pageQuery);
-            return employeeService.query(pageQuery, StatusEnum.OK.getCode(), organizationId, searchValue, containChildFlag, taskFilterFlag);
+            return employeeService.query(pageQuery, StatusEnum.OK.getCode(), organizationId, searchValue, containChildFlag, taskFilterFlag, awardPrivilegeFilterFlag);
         } else {
-            return employeeService.query(null, StatusEnum.OK.getCode(), organizationId, searchValue, containChildFlag, taskFilterFlag);
+            return employeeService.query(null, StatusEnum.OK.getCode(), organizationId, searchValue, containChildFlag, taskFilterFlag, awardPrivilegeFilterFlag);
         }
     }
 

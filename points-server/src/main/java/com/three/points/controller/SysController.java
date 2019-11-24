@@ -29,10 +29,16 @@ public class SysController {
 
     @ApiOperation(value = "查询当前月任务已分配人员（内部接口）")
     @GetMapping(value = "/internal/findCurMonthTaskEmp")
-    List<String> findCurMonthTaskEmp(String firstOrganizationId) {
+    Set<String> findCurMonthTaskEmp(String firstOrganizationId) {
         Date date = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
         Date taskDateNext = DateUtil.offsetMonth(date, 1);
-        return new ArrayList<>(managerTaskService.findCurMonthTaskEmp(firstOrganizationId, taskDateNext));
+        return managerTaskService.findCurMonthTaskEmp(firstOrganizationId, taskDateNext);
+    }
+
+    @ApiOperation(value = "查询奖扣权限设置已分配人员（内部接口）")
+    @GetMapping(value = "/internal/findAwardPrivilegeEmp")
+    Set<String> findAwardPrivilegeEmp(String firstOrganizationId) {
+        return awardPrivilegeService.findAwardPrivilegeEmp(firstOrganizationId);
     }
 
     @ApiOperation(value = "查找积分奖扣审核人员列表（内部接口）")

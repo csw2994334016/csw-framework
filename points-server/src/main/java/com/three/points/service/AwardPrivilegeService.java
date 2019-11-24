@@ -10,6 +10,7 @@ import com.three.commonclient.utils.BeanValidator;
 import com.three.points.entity.AwardPrivilege;
 import com.three.points.entity.AwardPrivilegeEmp;
 import com.three.points.param.AwardPrivilegeEmpParam;
+import com.three.points.param.AwardPrivilegeEmpParam1;
 import com.three.points.param.AwardPrivilegeParam;
 import com.three.points.repository.AwardPrivilegeEmpRepository;
 import com.three.points.repository.AwardPrivilegeRepository;
@@ -91,10 +92,14 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         AwardPrivilege awardPrivilege = getEntityById(awardPrivilegeRepository, awardPrivilegeEmpParam.getAwardPrivilegeId());
 
         List<AwardPrivilegeEmp> awardPrivilegeEmpList = new ArrayList<>();
-        for (String employeeId : awardPrivilegeEmpParam.getEmployeeIdList()) {
+        for (AwardPrivilegeEmpParam1 awardPrivilegeEmpParam1 : awardPrivilegeEmpParam.getAwardPrivilegeEmpParam1List()) {
             AwardPrivilegeEmp awardPrivilegeEmp = new AwardPrivilegeEmp();
-            awardPrivilegeEmp.setAwardPrivilegeId(awardPrivilegeEmpParam.getAwardPrivilegeId());
-            awardPrivilegeEmp.setEmpId(employeeId);
+            awardPrivilegeEmp.setOrganizationId(awardPrivilege.getOrganizationId());
+            awardPrivilegeEmp.setAwardPrivilegeId(awardPrivilege.getId());
+            awardPrivilegeEmp.setAwardPrivilegeName(awardPrivilege.getAwardPrivilegeName());
+            awardPrivilegeEmp.setEmpId(awardPrivilegeEmpParam1.getEmpId());
+            awardPrivilegeEmp.setEmpNum(awardPrivilegeEmpParam1.getEmpNum());
+            awardPrivilegeEmp.setEmpFullName(awardPrivilegeEmpParam1.getEmpFullName());
             awardPrivilegeEmpList.add(awardPrivilegeEmp);
         }
 
@@ -130,7 +135,18 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         return empIdSet;
     }
 
+    public Set<String> findAwardPrivilegeEmp(String firstOrganizationId) {
+        Set<String> empIdSet = new HashSet<>();
+        Set<String> awardPrivilegeIdSet = awardPrivilegeRepository.findAllByOrganizationIdAndStatus(firstOrganizationId, StatusEnum.OK.getCode());
+        if (awardPrivilegeIdSet.size() > 0) {
+            List<AwardPrivilegeEmp> awardPrivilegeEmpList = awardPrivilegeEmpRepository.findAllByAwardPrivilegeIdIn(awardPrivilegeIdSet);
+            awardPrivilegeEmpList.forEach(e -> empIdSet.add(e.getEmpId()));
+        }
+        return empIdSet;
+    }
+
     public AwardPrivilege findById(String id) {
         return getEntityById(awardPrivilegeRepository, id);
     }
+
 }

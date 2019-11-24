@@ -20,7 +20,7 @@ public class AwardPrivilegeEmpParam {
     @ApiModelProperty("奖扣权限id")
     private String awardPrivilegeId; // 奖扣权限id
 
-    @ApiModelProperty("员工idList")
-    private List<String> employeeIdList = new ArrayList<>(); // 员工idList
+    @ApiModelProperty("奖扣权限绑定员工对象List")
+    private List<AwardPrivilegeEmpParam1> awardPrivilegeEmpParam1List = new ArrayList<>(); // 奖扣权限绑定员工对象List
 
 }

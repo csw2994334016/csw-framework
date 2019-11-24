@@ -110,7 +110,7 @@ public class EmployeeService extends BaseService<Employee, String> {
         employeeRepository.saveAll(employeeList);
     }
 
-    public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag, String taskFilterFlag) {
+    public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag, String taskFilterFlag, String awardPrivilegeFilterFlag) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
@@ -146,12 +146,17 @@ public class EmployeeService extends BaseService<Employee, String> {
                 organizationList.forEach(in::value);
                 predicateList.add(in);
             }
-            // 过滤任务已选择的人员
+            Set<String> empIdSet = new HashSet<>();
+            // 过滤管理任务已选择的人员
             if ("1".equals(taskFilterFlag)) {
-                List<String> empIdList = pointsClient.findCurMonthTaskEmp(firstParentId);
-                if (empIdList.size() > 0) {
-                    predicateList.add(criteriaBuilder.not(root.get("id").in(empIdList)));
-                }
+                empIdSet = pointsClient.findCurMonthTaskEmp(firstParentId);
+            }
+            // 过滤积分奖扣权限已选择的人员
+            if ("1".equals(awardPrivilegeFilterFlag)) {
+                empIdSet.addAll(pointsClient.findAwardPrivilegeEmp(firstParentId));
+            }
+            if (empIdSet.size() > 0) {
+                predicateList.add(criteriaBuilder.not(root.get("id").in(empIdSet)));
             }
             Predicate predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
 
