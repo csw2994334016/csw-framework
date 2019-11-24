@@ -1,6 +1,8 @@
 package com.three.user.service;
 
 import com.google.common.collect.Lists;
+import com.three.common.auth.LoginUser;
+import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Employee;
@@ -202,8 +204,25 @@ public class EmployeeService extends BaseService<Employee, String> {
         employeeRepository.saveAll(employeeList);
     }
 
-    public void updatePsw(String finalSecret, String newPsw) {
-
+    @Transactional
+    public void updatePsw(String oldPsw, String newPsw) {
+        LoginUser loginUser = LoginUserUtil.getLoginUser();
+        if (loginUser != null) {
+            String finalOldPsw = new BCryptPasswordEncoder().encode(oldPsw);
+            String finalNewPsw = new BCryptPasswordEncoder().encode(newPsw);
+            Optional<User> optionalUser = userRepository.findById(loginUser.getId());
+            if (!optionalUser.isPresent()) {
+                throw new BusinessException("数据库中不存在当前用户");
+            }
+            User user = optionalUser.get();
+            if (!finalOldPsw.equals(user.getPassword())) {
+                throw new BusinessException("旧密码不正确");
+            }
+            user.setPassword(finalNewPsw);
+            userRepository.save(user);
+        } else {
+            throw new BusinessException("当前用户不存在");
+        }
     }
 
     public PageResult<Employee> findByRole(PageQuery pageQuery, int code, String searchKey, String searchValue, String roleId) {

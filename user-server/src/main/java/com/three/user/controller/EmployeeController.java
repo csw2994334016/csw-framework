@@ -104,10 +104,9 @@ public class EmployeeController {
             @ApiImplicitParam(name = "oldPsw", value = "原密码", required = true, dataType = "String"),
             @ApiImplicitParam(name = "newPsw", value = "新密码", required = true, dataType = "String")
     })
-    @PutMapping("/psw")
-    public JsonResult updatePsw(String oldPsw, String newPsw) {
-        String finalSecret = new BCryptPasswordEncoder().encode(oldPsw);
-        employeeService.updatePsw(finalSecret, newPsw);
+    @GetMapping("/psw")
+    public JsonResult updatePsw(@RequestParam(required = true) String oldPsw, @RequestParam(required = true) String newPsw) {
+        employeeService.updatePsw(oldPsw, newPsw);
         return JsonResult.ok("密码修改成功");
     }
 

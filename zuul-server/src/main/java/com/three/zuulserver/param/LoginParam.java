@@ -19,6 +19,6 @@ public class LoginParam {
     @ApiModelProperty("scope：app端默认是app;web端默认是system")
     private String scope;
 
-    @ApiModelProperty("刷新token传入参数")
+    @ApiModelProperty("刷新token传入参数，登录的时候可以为空")
     private String refresh_token;
 }

@@ -159,4 +159,19 @@ public class Theme implements Serializable {
     @ApiModelProperty("修改时间")
     private Date updateDate; // 修改时间
 
+    @Transient
+    @ApiModelProperty("A分（汇总正分/汇总负分）")
+    private String ascore; // A分（汇总正分/汇总负分）
+
+    @Transient
+    @ApiModelProperty("B分（汇总正分/汇总负分）")
+    private String bscore; // B分（汇总正分/汇总负分）
+
+    public String getAscore() {
+        return aposScore + "/" + anegScore;
+    }
+
+    public String getBscore() {
+        return bposScore + "/" + bnegScore;
+    }
 }
