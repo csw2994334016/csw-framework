@@ -77,6 +77,8 @@ public class Test {
 //        }
 
         System.out.println(StringUtil.getStrToIdSet1("222"));
-
+        for (int i = 0; i < 10; i++) {
+            System.out.println(UUID.randomUUID().toString());
+        }
     }
 }

@@ -1,18 +1,28 @@
 package com.three.points.service;
 
+import cn.hutool.core.date.DateUtil;
+import com.netflix.discovery.converters.Auto;
 import com.three.common.enums.StatusEnum;
+import com.three.commonclient.exception.BusinessException;
 import com.three.points.entity.Event;
+import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
+import com.three.points.enums.ThemeStatusEnum;
 import com.three.points.param.ThemeEmpParam;
 import com.three.points.repository.ThemeDetailRepository;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
+import com.three.points.repository.ThemeRepository;
+import com.three.points.vo.ThemeDetailDailyVo;
 import com.three.points.vo.ThemeDetailVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +38,9 @@ import java.util.*;
 
 @Service
 public class ThemeDetailService extends BaseService<ThemeDetail, String> {
+
+    @Autowired
+    private ThemeRepository themeRepository;
 
     @Autowired
     private ThemeDetailRepository themeDetailRepository;
@@ -100,5 +113,31 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             themeDetailVoMap.get(themeDetail.getEventName()).getThemeEmpParamList().add(themeEmpParam);
         }
         return new ArrayList<>(themeDetailVoMap.values());
+    }
+
+    public PageResult<ThemeDetailDailyVo> themeDetailDaily(PageQuery pageQuery, int code, Long themeDate) {
+        String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        if (StringUtil.isNotBlank(loginUserEmpId)) {
+            Date date = new Date();
+            if (themeDate != null) {
+                date = new Date(themeDate);
+            }
+            Date stM = DateUtil.beginOfMonth(date); // 查找任务日期月份第一天
+            Date etM = DateUtil.endOfMonth(date); // 任务月份最后时间
+            if (pageQuery != null) {
+                Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
+                Page<ThemeDetailDailyVo> resultPage = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDatePageable(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, etM, pageable);
+                return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
+            } else {
+                List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, etM, new Sort(Sort.Direction.DESC, "createDate"));
+                return new PageResult<>(themeDetailDailyVoList.size(), themeDetailDailyVoList);
+            }
+        } else {
+            throw new BusinessException("用户没有登录，无法查找日常奖扣记录");
+        }
+    }
+
+    public PageResult<ThemeDetailDailyVo> themeDetailStatistics(PageQuery pageQuery, int code, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
+        return null;
     }
 }

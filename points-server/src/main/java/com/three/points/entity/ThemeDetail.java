@@ -86,6 +86,10 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("人员ID")
     private String empId; // 人员ID
 
+    @Column(name = "emp_num", columnDefinition = "varchar(100) comment '员工工号'")
+    @ApiModelProperty("员工工号")
+    private String empNum; // 员工工号
+
     @Column(name = "emp_full_name", nullable = false, columnDefinition = "varchar(255) comment '人员姓名'")
     @ApiModelProperty("人员姓名")
     private String empFullName; // 人员姓名

@@ -3,6 +3,7 @@ package com.three.points.param;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -16,6 +17,9 @@ public class ThemeEmpParam {
     @NotNull(message = "人员ID不可以为空")
     @ApiModelProperty("人员ID")
     private String empId; // 人员ID
+
+    @ApiModelProperty("员工工号/登录账号")
+    private String empNum; // 员工工号/登录账号
 
     @NotNull(message = "人员姓名不可以为空")
     @ApiModelProperty("人员姓名")

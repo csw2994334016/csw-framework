@@ -16,4 +16,6 @@ public interface ThemeRepository extends BaseRepository<Theme, String> {
     Theme findByRelationThemeIdAndThemeName(String id, String themeName);
 
     List<Theme> findAllByAttnIdAndThemeStatusAndThemeDateBetween(String empId, int code, Date taskDate, Date taskDateNext);
+
+    List<Theme> findAllByStatusAndThemeStatusAndThemeDateBetween(int code, int code1, Date stM, Date etM);
 }
