@@ -16,6 +16,7 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.repository.ThemeRepository;
 import com.three.points.vo.ThemeDetailDailyVo;
+import com.three.points.vo.ThemeDetailStatisticsVo;
 import com.three.points.vo.ThemeDetailVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -137,7 +138,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         }
     }
 
-    public PageResult<ThemeDetailDailyVo> themeDetailStatistics(PageQuery pageQuery, int code, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
+    public PageResult<ThemeDetailStatisticsVo> themeDetailStatistics(PageQuery pageQuery, int code, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
         return null;
     }
 }

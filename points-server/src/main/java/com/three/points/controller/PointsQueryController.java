@@ -4,7 +4,7 @@ import com.three.common.enums.StatusEnum;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.service.ThemeDetailService;
-import com.three.points.vo.ThemeDetailDailyVo;
+import com.three.points.vo.ThemeDetailStatisticsVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -32,7 +32,7 @@ public class PointsQueryController {
             @ApiImplicitParam(name = "searchValue", value = "搜索人员（姓名/工号/手机号）", dataType = "String")
     })
     @GetMapping("/themeDetailStatistics")
-    public PageResult<ThemeDetailDailyVo> themeDetailStatistics(Integer page, Integer limit, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
+    public PageResult<ThemeDetailStatisticsVo> themeDetailStatistics(Integer page, Integer limit, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
         if (page != null && limit != null) {
             return themeDetailService.themeDetailStatistics(new PageQuery(page, limit), StatusEnum.OK.getCode(), orgId, themeDateSt, themeDateEt, searchValue);
         } else {
