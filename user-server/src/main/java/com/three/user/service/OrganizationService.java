@@ -47,7 +47,20 @@ public class OrganizationService extends BaseService<Organization, String> {
         Organization organization = new Organization();
         organization = (Organization) BeanCopyUtil.copyBean(organizationParam, organization);
 
+        // 拼接父级组织机构层级结构
+        String parentIds = generateParentIds(organization, new StringBuilder());
+        organization.setParentIds(parentIds);
+
         organizationRepository.save(organization);
+    }
+
+    private String generateParentIds(Organization organization, StringBuilder stringBuilder) {
+        if (!"-1".equals(organization.getParentId())) {
+            Organization parentOrg = findById(organization.getParentId());
+            stringBuilder.insert(0, "," + parentOrg.getId());
+            generateParentIds(parentOrg, stringBuilder);
+        }
+        return stringBuilder.toString().substring(1);
     }
 
     @Transactional
@@ -56,6 +69,10 @@ public class OrganizationService extends BaseService<Organization, String> {
 
         Organization organization = getEntityById(organizationRepository, organizationParam.getId());
         organization = (Organization) BeanCopyUtil.copyBean(organizationParam, organization);
+
+        // 拼接父级组织机构层级结构
+        String parentIds = generateParentIds(organization, new StringBuilder());
+        organization.setParentIds(parentIds);
 
         organizationRepository.save(organization);
     }
@@ -74,14 +91,13 @@ public class OrganizationService extends BaseService<Organization, String> {
         List<String> orgNameList = new ArrayList<>();
         List<Employee> employeeList1 = new ArrayList<>();
         for (Organization organization : organizationList) {
-            List<Employee> employeeList = employeeRepository.findAllByOrganization(organization);
+            List<Employee> employeeList = employeeRepository.findAllByOrganizationId(organization.getId());
             if (employeeList.size() > 0 && organization.getParentId().equals("-1")) {
                 orgNameList.add(organization.getOrgName());
             } else { // 将员工的组织绑定到上级组织中
                 if (employeeList.size() > 0) {
-                    Organization organizationP = getEntityById(organizationRepository, organization.getParentId());
                     for (Employee employee : employeeList) {
-                        employee.setOrganization(organizationP);
+                        employee.setOrganizationId(organization.getParentId());
                     }
                     employeeList1.addAll(employeeList);
                 }
@@ -162,33 +178,12 @@ public class OrganizationService extends BaseService<Organization, String> {
         }
     }
 
-    Organization getEntityById(String organizationId) {
+    public Organization findById(String organizationId) {
         return getEntityById(organizationRepository, organizationId);
     }
 
-    List<Organization> getChildOrganizationListByOrgId(String orgId) {
-        List<Organization> childOrganizationList = new ArrayList<>();
-        List<Organization> organizationList = query(null, StatusEnum.OK.getCode(), null, null).getData();
-        Map<String, Organization> organizationMap = new HashMap<>();
-        for (Organization organization : organizationList) {
-            organizationMap.put(organization.getId(), organization);
-        }
-        for (Organization organization : organizationList) {
-            Organization parentOrg = organizationMap.get(organization.getParentId());
-            if (parentOrg != null) {
-                parentOrg.getChildren().add(organization);
-            }
-        }
-        getChildren(orgId, organizationMap, childOrganizationList);
-        childOrganizationList.add(organizationMap.get(orgId));
-        return childOrganizationList;
-    }
-
-    private void getChildren(String parentId, Map<String, Organization> organizationMap, List<Organization> organizationList) {
-        for (Organization organization : organizationMap.get(parentId).getChildren()) {
-            organizationList.add(organization);
-            getChildren(organization.getId(), organizationMap, organizationList);
-        }
+    public List<Organization> findChildOrganizationListByOrgId(String orgId) {
+        return organizationRepository.findAllByParentIdsLike("%" + orgId + "%");
     }
 
     @Transactional

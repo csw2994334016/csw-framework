@@ -1,6 +1,7 @@
 package com.three.user.repository;
 
 
+import com.three.user.entity.Employee;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
@@ -17,4 +18,6 @@ public interface UserRepository extends BaseRepository<User, String> {
     User findByUsername(String username);
 
     User findByIsAdmin(int code);
+
+    User findByEmployee(Employee employee);
 }

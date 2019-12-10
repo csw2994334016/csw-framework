@@ -7,9 +7,12 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.vo.JsonData;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Authority;
+import com.three.user.entity.Organization;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
 import com.three.user.repository.AuthorityRepository;
+import com.three.user.service.EmployeeService;
+import com.three.user.service.OrganizationService;
 import com.three.user.service.UserService;
 import com.three.user.vo.MenuVo;
 import com.three.common.vo.JsonResult;
@@ -38,6 +41,12 @@ public class SysController {
     @Autowired
     private AuthorityRepository authorityRepository;
 
+    @Autowired
+    private EmployeeService employeeService;
+
+    @Autowired
+    private OrganizationService organizationService;
+
     @ApiOperation(value = "获取个人信息")
     @GetMapping("/sys/userInfo")
     public JsonData<LoginUser> userInfo() {
@@ -49,6 +58,14 @@ public class SysController {
     public JsonData<List<MenuVo>> menuInfo() {
         return new JsonData<>(userService.getMenuInfo()).success();
     }
+
+    @ApiOperation(value = "重新加载组织机构-人员redis缓存")
+    @GetMapping("/sys/reLoadOrgEmpRedis")
+    public JsonResult reLoadOrgEmpRedis() {
+        employeeService.reLoadOrgEmpRedis();
+        return JsonResult.ok();
+    }
+
 
     @ApiOperation(value = "按用户名查找用户（内部接口）")
     @GetMapping(value = "/internal/findByUsername")
@@ -70,13 +87,14 @@ public class SysController {
         }
 
         if (user.getEmployee() != null) { // 除非admin用户，不然一般都会有员工信息
-            SysOrganization sysOrganization = new SysOrganization();
-            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(user.getEmployee().getOrganization(), sysOrganization);
-            loginUser.setSysOrganization(sysOrganization);
-
             SysEmployee sysEmployee = new SysEmployee();
             sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(user.getEmployee(), sysEmployee);
             loginUser.setSysEmployee(sysEmployee);
+
+            Organization organization = organizationService.findById(user.getEmployee().getOrganizationId());
+            SysOrganization sysOrganization = new SysOrganization();
+            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(organization, sysOrganization);
+            loginUser.setSysOrganization(sysOrganization);
         }
         return loginUser;
     }

@@ -94,6 +94,10 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("人员姓名")
     private String empFullName; // 人员姓名
 
+    @Column(name = "emp_org_id", columnDefinition = "varchar(36) comment '人员所属组织Id'")
+    @ApiModelProperty("人员所属组织Id")
+    private String empOrgId; // 人员所属组织Id
+
     @Column(name = "a_score", nullable = false, columnDefinition = "int(11) default 0 comment 'A分'")
     @ApiModelProperty("A分")
     private Integer ascore = 0; // A分

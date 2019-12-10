@@ -18,12 +18,17 @@ public class ThemeEmpParam {
     @ApiModelProperty("人员ID")
     private String empId; // 人员ID
 
+    @NotNull(message = "员工工号/登录账号不可以为空")
     @ApiModelProperty("员工工号/登录账号")
     private String empNum; // 员工工号/登录账号
 
     @NotNull(message = "人员姓名不可以为空")
     @ApiModelProperty("人员姓名")
     private String empFullName; // 人员姓名
+
+    @NotNull(message = "人员所属组织Id不可以为空")
+    @ApiModelProperty("人员所属组织Id")
+    private String empOrgId; // 人员所属组织Id
 
     @ApiModelProperty("A分")
     private Integer ascore = 0; // A分

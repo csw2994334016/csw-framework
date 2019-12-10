@@ -178,6 +178,8 @@ public class ThemeService extends BaseService<Theme, String> {
                 themeDetail.setAuditFlag(themeEventParam.getAuditFlag());
                 themeDetail.setEmpId(themeEmpParam.getEmpId());
                 themeDetail.setEmpFullName(themeEmpParam.getEmpFullName());
+                themeDetail.setEmpNum(themeEmpParam.getEmpNum());
+                themeDetail.setEmpOrgId(themeEmpParam.getEmpOrgId());
                 themeDetail.setAscore(themeEmpParam.getAscore());
                 themeDetail.setBscore(themeEmpParam.getBscore());
                 themeDetail.setRemark(themeEventParam.getRemark());

@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public interface EmployeeRepository extends BaseRepository<Employee, String> {
 
-    List<Employee> findAllByOrganization(Organization organization);
-
     List<Employee> findAllByIdIn(Set<String> empIdSet);
+
+    List<Employee> findAllByOrganizationId(String organizationId);
 }

@@ -1,9 +1,11 @@
 package com.three.user.service;
 
+import com.google.common.base.Preconditions;
 import com.three.common.auth.SysAuthority;
 import com.three.common.auth.LoginUser;
 import com.three.commonclient.exception.BusinessException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
+import com.three.user.entity.Employee;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
 import com.three.user.param.UserParam;
@@ -183,6 +185,12 @@ public class UserService extends BaseService<User, String> {
         if (user == null) {
             throw new BusinessException("不存在系统管理员");
         }
+        return user;
+    }
+
+    public User findByEmployee(Employee employee) {
+        User user = userRepository.findByEmployee(employee);
+        Preconditions.checkNotNull(user, "人员(" + employee.getUsername() + ")账户不存在");
         return user;
     }
 }

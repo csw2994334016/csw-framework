@@ -66,9 +66,9 @@ public class Organization implements Serializable {
     @ApiModelProperty("父级机构名称")
     private String parentName; // 父级机构名称
 
-    @Column(name = "parent_ids", columnDefinition = "varchar(800) comment '所有父级ID'")
-    @ApiModelProperty("所有父级ID")
-    private String parentIds; // 所有父级ID
+    @Column(name = "parent_ids", columnDefinition = "varchar(2000) comment '所有父级ID，层级结构'")
+    @ApiModelProperty("所有父级ID，层级结构")
+    private String parentIds; // 所有父级ID，层级结构
 
     @Column(name = "sort", nullable = false, columnDefinition = "int(11) default 100 comment '排序'")
     @ApiModelProperty("排序")
@@ -96,9 +96,4 @@ public class Organization implements Serializable {
 
     @LastModifiedDate
     private Date updateDate; // 修改时间
-
-    @Transient
-    private List<Organization> children = new ArrayList<>();
-
-
 }

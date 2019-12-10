@@ -12,6 +12,10 @@ public class SysEmployee implements Serializable {
 
     private String id;
 
+    private String organizationId; // 人员所属组织机构Id
+
+    private String orgName; // 组织机构名称
+
     private String username; // 账号
 
     private String fullName; // 姓名

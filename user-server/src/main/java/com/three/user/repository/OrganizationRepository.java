@@ -14,4 +14,6 @@ public interface OrganizationRepository extends BaseRepository<Organization, Str
     List<Organization> findAllByParentId(String parentId);
 
     List<Organization> findAllByFirstParentIdAndStatus(String firstParentId, int code);
+
+    List<Organization> findAllByParentIdsLike(String orgId);
 }

@@ -1,5 +1,6 @@
 package com.three.user.service;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
 import com.three.commonclient.exception.BusinessException;
@@ -57,6 +58,9 @@ public class EmployeeService extends BaseService<Employee, String> {
     @Autowired
     private PointsClient pointsClient;
 
+    @Autowired
+    private UserService userService;
+
     @Transactional
     public void create(EmployeeParam employeeParam) {
         BeanValidator.check(employeeParam);
@@ -64,8 +68,9 @@ public class EmployeeService extends BaseService<Employee, String> {
         Employee employee = new Employee();
         employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
 
-        Organization organization = organizationService.getEntityById(employeeParam.getOrganizationId());
-        employee.setOrganization(organization);
+        Organization organization = organizationService.findById(employeeParam.getOrganizationId());
+        employee.setOrganizationId(organization.getId());
+        employee.setOrgName(organization.getOrgName());
 
         employee = employeeRepository.save(employee);
 
@@ -86,12 +91,15 @@ public class EmployeeService extends BaseService<Employee, String> {
         Employee employee = getEntityById(employeeRepository, employeeParam.getId());
         employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
 
-        Organization organization = organizationService.getEntityById(employeeParam.getOrganizationId());
-        employee.setOrganization(organization);
+        Organization organization = organizationService.findById(employeeParam.getOrganizationId());
+        employee.setOrganizationId(organization.getId());
+        employee.setOrgName(organization.getOrgName());
 
-        employee.getUser().setUsername(employeeParam.getUsername());
-        employee.getUser().setFullName(employeeParam.getFullName());
-        employee.getUser().setCellNum(employeeParam.getCellNum());
+        User user = userService.findByEmployee(employee);
+
+        user.setUsername(employeeParam.getUsername());
+        user.setFullName(employeeParam.getFullName());
+        user.setCellNum(employeeParam.getCellNum());
 
         employeeRepository.save(employee);
     }
@@ -103,7 +111,8 @@ public class EmployeeService extends BaseService<Employee, String> {
         for (String id : idSet) {
             Employee employee = getEntityById(employeeRepository, String.valueOf(id));
             employee.setStatus(code);
-            employee.getUser().setStatus(code);
+            User user = userService.findByEmployee(employee);
+            user.setStatus(code);
             employeeList.add(employee);
         }
 
@@ -112,48 +121,43 @@ public class EmployeeService extends BaseService<Employee, String> {
 
     public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag, String taskFilterFlag, String awardPrivilegeFilterFlag) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        Preconditions.checkNotNull(firstOrganizationId, "当前登录账号不属于任何公司，无法查找组织机构下的人员");
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
 
             predicateList.add(criteriaBuilder.equal(root.get("status"), code));
 
             // 按组织机构查询人员信息
-            String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
             List<Organization> organizationList = new ArrayList<>();
-            if (StringUtil.isNotBlank(organizationId)) {
-                organizationList = organizationService.getChildOrganizationListByOrgId(organizationId);
-            } else {
-                if (firstParentId != null) {
-                    organizationList = organizationService.getChildOrganizationListByOrgId(firstParentId);
-                }
-            }
             if ("0".equals(containChildFlag)) { // 不包含子部门人员
-                Organization organization = null;
-                if (StringUtil.isNotBlank(organizationId)) {
-                    organization = organizationService.getEntityById(organizationId);
+                if (StringUtil.isBlank(organizationId)) {
+                    organizationList.add(organizationService.findById(firstOrganizationId));
                 } else {
-                    if (firstParentId != null) {
-                        organization = organizationService.getEntityById(firstParentId);
-                    }
+                    organizationList.add(organizationService.findById(organizationId));
                 }
-                if (organization != null) {
-                    organizationList.clear();
-                    organizationList.add(organization);
+            } else {
+                if (StringUtil.isBlank(organizationId)) {
+                    organizationList = organizationService.findChildOrganizationListByOrgId(firstOrganizationId);
+                    organizationList.add(organizationService.findById(firstOrganizationId));
+                } else {
+                    organizationList = organizationService.findChildOrganizationListByOrgId(organizationId);
+                    organizationList.add(organizationService.findById(organizationId));
                 }
             }
             if (organizationList.size() > 0) {
-                CriteriaBuilder.In<Organization> in = criteriaBuilder.in(root.get("organization"));
-                organizationList.forEach(in::value);
-                predicateList.add(in);
+                Set<String> orgIdSet = new HashSet<>();
+                organizationList.forEach(e -> orgIdSet.add(e.getId()));
+                predicateList.add(root.get("organizationId").in(orgIdSet));
             }
             Set<String> empIdSet = new HashSet<>();
             // 过滤管理任务已选择的人员
             if ("1".equals(taskFilterFlag)) {
-                empIdSet = pointsClient.findCurMonthTaskEmp(firstParentId);
+                empIdSet = pointsClient.findCurMonthTaskEmp(firstOrganizationId);
             }
             // 过滤积分奖扣权限已选择的人员
             if ("1".equals(awardPrivilegeFilterFlag)) {
-                empIdSet.addAll(pointsClient.findAwardPrivilegeEmp(firstParentId));
+                empIdSet.addAll(pointsClient.findAwardPrivilegeEmp(firstOrganizationId));
             }
             if (empIdSet.size() > 0) {
                 predicateList.add(criteriaBuilder.not(root.get("id").in(empIdSet)));
@@ -186,7 +190,8 @@ public class EmployeeService extends BaseService<Employee, String> {
         }
 
         Employee employee = getEntityById(employeeRepository, employeeParam.getId());
-        User user = employee.getUser();
+
+        User user = userService.findByEmployee(employee);
 
         // 修改角色
         Set<Role> roleSet = getRoleSet(employeeParam.getRoleIds());
@@ -202,7 +207,8 @@ public class EmployeeService extends BaseService<Employee, String> {
         List<Employee> employeeList = new ArrayList<>();
         for (String id : idSet) {
             Employee employee = getEntityById(employeeRepository, id);
-            employee.getUser().setStatus(status);
+            User user = userService.findByEmployee(employee);
+            user.setStatus(status);
             employee.setStatus(status);
         }
 
@@ -257,8 +263,8 @@ public class EmployeeService extends BaseService<Employee, String> {
     }
 
     public List<Employee> findAllByOrgId(String orgId) {
-        Organization organization = organizationService.getEntityById(orgId);
-        return employeeRepository.findAllByOrganization(organization);
+        Organization organization = organizationService.findById(orgId);
+        return employeeRepository.findAllByOrganizationId(organization.getId());
     }
 
     public Employee findById(String id) {
@@ -272,5 +278,16 @@ public class EmployeeService extends BaseService<Employee, String> {
             return employeeRepository.findAllByIdIn(empIdSet);
         }
         return new ArrayList<>();
+    }
+
+    public void reLoadOrgEmpRedis() {
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        // 查找所有有效组织机构
+//        List<Organization> organizationList = organizationService.findChildOrganizationListByOrgId(firstOrganizationId);
+        // 查找所有有效人员
+//        List<Employee> employeeList = employeeRepository.findAllByOrganization(StatusEnum.OK.getCode());
+//        for (Employee employee : employeeList) {
+//
+//        }
     }
 }

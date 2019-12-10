@@ -36,6 +36,14 @@ public class Employee implements Serializable {
     private String id;
 
 
+    @Column(name = "organization_id", nullable = false, columnDefinition = "varchar(36) comment '人员所属组织机构Id'")
+    @ApiModelProperty("人员所属组织机构Id")
+    private String organizationId; // 人员所属组织机构Id
+
+    @Column(name = "org_name", nullable = false, columnDefinition = "varchar(100) comment '组织机构名称'")
+    @ApiModelProperty("组织机构名称")
+    private String orgName; // 组织机构名称
+
     @Column(nullable = false, unique = true, columnDefinition = "varchar(36) comment '账号'")
     @ApiModelProperty("账号")
     private String username; // 账号
@@ -172,18 +180,6 @@ public class Employee implements Serializable {
     @ApiModelProperty("最后编辑用户姓名")
     private String lastEditUserName; // 最后编辑用户姓名
 
-    @OneToOne()
-    @JoinColumn(name = "organization_id", referencedColumnName = "id")
-    @ApiModelProperty("组织机构")
-    private Organization organization; // 组织机构
-
-    @OneToOne(mappedBy = "employee", cascade = CascadeType.MERGE, optional = false) // 关联关系被谁维护，非必填，只有关系维护方才能操作两者的关系，被维护方即使设置了维护方的属性进行存储也不会更新外键关联
-    @JsonIgnore
-    private User user;
-
-    @Transient
-    private Set<Role> roles;
-
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
     @ApiModelProperty("描述/备注")
@@ -200,9 +196,5 @@ public class Employee implements Serializable {
     @LastModifiedDate
     @ApiModelProperty("修改时间")
     private Date updateDate; // 修改时间
-
-    public Set<Role> getRoles() {
-        return user.getRoles();
-    }
 
 }

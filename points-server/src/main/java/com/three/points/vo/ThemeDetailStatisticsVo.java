@@ -26,15 +26,12 @@ public class ThemeDetailStatisticsVo {
     @ApiModelProperty("考勤得分")
     private Integer attendanceScore = 0; // 考勤得分
 
-    @ApiModelProperty("当月得分")
-    private Integer curMonthScore = 0; // 当月得分
-
     @ApiModelProperty("累计得分")
     private Integer cumulativeScore = 0; // 累计得分
 
     @ApiModelProperty("A分总分")
     private Integer ascoreAll = 0; // A分总分
 
-    @ApiModelProperty("B分总分")
-    private Integer bscoreAll = 0; // B分总分
+    @ApiModelProperty("B分总分/当月得分")
+    private Integer bscoreAll = 0; // B分总分/当月得分
 }
