@@ -3,8 +3,9 @@ package com.three.points.controller;
 import com.three.common.enums.StatusEnum;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
+import com.three.points.service.PointsStatisticsService;
 import com.three.points.service.ThemeDetailService;
-import com.three.points.vo.ThemeDetailStatisticsVo;
+import com.three.points.vo.PointsStatisticsVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -20,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PointsStatisticsController {
 
     @Autowired
-    private ThemeDetailService themeDetailService;
+    private PointsStatisticsService pointsStatisticsService;
 
-    @ApiOperation(value = "人员积分按月份统计（分页,page/limit不给表示不分页）", notes = "")
+    @ApiOperation(value = "按月份统计人员积分（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
@@ -32,11 +33,11 @@ public class PointsStatisticsController {
             @ApiImplicitParam(name = "searchValue", value = "搜索人员（姓名/工号/手机号）", dataType = "String")
     })
     @GetMapping("/themeDetailStatistics")
-    public PageResult<ThemeDetailStatisticsVo> themeDetailStatistics(Integer page, Integer limit, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
+    public PageResult<PointsStatisticsVo> themeDetailStatistics(Integer page, Integer limit, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
         if (page != null && limit != null) {
-            return themeDetailService.themeDetailStatistics(new PageQuery(page, limit), StatusEnum.OK.getCode(), orgId, themeDateSt, themeDateEt, searchValue);
+            return pointsStatisticsService.themeDetailStatistics(new PageQuery(page, limit), StatusEnum.OK.getCode(), orgId, themeDateSt, themeDateEt, searchValue);
         } else {
-            return themeDetailService.themeDetailStatistics(null, StatusEnum.OK.getCode(), orgId, themeDateSt, themeDateEt, searchValue);
+            return pointsStatisticsService.themeDetailStatistics(null, StatusEnum.OK.getCode(), orgId, themeDateSt, themeDateEt, searchValue);
         }
     }
 }

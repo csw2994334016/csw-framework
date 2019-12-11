@@ -9,6 +9,7 @@ import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
+import com.three.points.entity.ManagerTaskScore;
 import com.three.points.entity.Theme;
 import com.three.points.enums.ManagerTaskEnum;
 import com.three.points.enums.ThemeStatusEnum;

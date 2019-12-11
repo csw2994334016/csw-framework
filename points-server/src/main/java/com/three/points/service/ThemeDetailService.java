@@ -1,11 +1,9 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
-import com.netflix.discovery.converters.Auto;
 import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.points.entity.Event;
-import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.enums.ThemeStatusEnum;
 import com.three.points.param.ThemeEmpParam;
@@ -16,7 +14,7 @@ import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.repository.ThemeRepository;
 import com.three.points.vo.ThemeDetailDailyVo;
-import com.three.points.vo.ThemeDetailStatisticsVo;
+import com.three.points.vo.PointsStatisticsVo;
 import com.three.points.vo.ThemeDetailVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -65,12 +63,9 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     public PageResult<ThemeDetail> query(PageQuery pageQuery, int code, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<ThemeDetail> specification = (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicateList = new ArrayList<>();
-
             String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<ThemeDetail> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
-
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = new ArrayList<>();
                 Predicate p1 = criteriaBuilder.like(root.get("name"), "%" + searchValue + "%");
@@ -116,8 +111,11 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         return new ArrayList<>(themeDetailVoMap.values());
     }
 
-    public PageResult<ThemeDetailDailyVo> themeDetailDaily(PageQuery pageQuery, int code, Long themeDate) {
+    public PageResult<ThemeDetailDailyVo> themeDetailDaily(PageQuery pageQuery, int code, Long themeDate, String empId) {
         String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        if (empId != null) {
+            loginUserEmpId = empId;
+        }
         if (StringUtil.isNotBlank(loginUserEmpId)) {
             Date date = new Date();
             if (themeDate != null) {
@@ -136,9 +134,5 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         } else {
             throw new BusinessException("用户没有登录，无法查找日常奖扣记录");
         }
-    }
-
-    public PageResult<ThemeDetailStatisticsVo> themeDetailStatistics(PageQuery pageQuery, int code, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
-        return null;
     }
 }

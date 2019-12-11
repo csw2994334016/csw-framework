@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ThemeDetailStatisticsVo {
+public class PointsStatisticsVo {
 
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
