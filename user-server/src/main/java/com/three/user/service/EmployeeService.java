@@ -3,6 +3,9 @@ package com.three.user.service;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
+import com.three.common.auth.SysEmployee;
+import com.three.common.constants.RedisConstant;
+import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -21,16 +24,18 @@ import com.three.commonclient.utils.BeanValidator;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.user.repository.RoleRepository;
 import com.three.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by csw on 2019-09-27.
@@ -38,6 +43,7 @@ import java.util.*;
  */
 
 @Service
+@Slf4j
 public class EmployeeService extends BaseService<Employee, String> {
 
     @Autowired
@@ -61,6 +67,9 @@ public class EmployeeService extends BaseService<Employee, String> {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
+
     @Transactional
     public void create(EmployeeParam employeeParam) {
         BeanValidator.check(employeeParam);
@@ -82,6 +91,8 @@ public class EmployeeService extends BaseService<Employee, String> {
         user.setPassword(finalSecret);
 
         userRepository.save(user);
+
+        addEmployeeRedis(employee);
     }
 
     @Transactional
@@ -102,6 +113,8 @@ public class EmployeeService extends BaseService<Employee, String> {
         user.setCellNum(employeeParam.getCellNum());
 
         employeeRepository.save(employee);
+
+        updateEmployeeRedis(employee);
     }
 
     @Transactional
@@ -213,6 +226,10 @@ public class EmployeeService extends BaseService<Employee, String> {
         }
 
         employeeRepository.saveAll(employeeList);
+
+        for (Employee employee : employeeList) {
+            updateEmployeeRedis(employee);
+        }
     }
 
     @Transactional
@@ -262,11 +279,6 @@ public class EmployeeService extends BaseService<Employee, String> {
         return new HashSet<>(roleRepository.findAllById(roleIdSet));
     }
 
-    public List<Employee> findAllByOrgId(String orgId) {
-        Organization organization = organizationService.findById(orgId);
-        return employeeRepository.findAllByOrganizationId(organization.getId());
-    }
-
     public Employee findById(String id) {
         return getEntityById(employeeRepository, id);
     }
@@ -282,12 +294,72 @@ public class EmployeeService extends BaseService<Employee, String> {
 
     public void reLoadOrgEmpRedis() {
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        // 查找所有有效组织机构
-//        List<Organization> organizationList = organizationService.findChildOrganizationListByOrgId(firstOrganizationId);
-        // 查找所有有效人员
-//        List<Employee> employeeList = employeeRepository.findAllByOrganization(StatusEnum.OK.getCode());
-//        for (Employee employee : employeeList) {
-//
-//        }
+        // 查找所有组织机构
+        List<Organization> organizationList = organizationService.findChildOrganizationListByOrgId(firstOrganizationId);
+        organizationList.add(organizationService.findById(firstOrganizationId));
+        for (Organization organization : organizationList) {
+            organizationService.updateOrganizationRedis(organization);
+            // 查找所有人员
+            List<Employee> employeeList = employeeRepository.findAllByStatusAndOrganizationId(StatusEnum.OK.getCode(), organization.getId());
+            for (Employee employee : employeeList) {
+                updateEmployeeRedis(employee);
+            }
+        }
     }
+
+    private void updateEmployeeRedis(Employee employee) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                SysEmployee sysEmployee = new SysEmployee();
+                sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(employee, sysEmployee);
+                deleteRedis(sysEmployee);
+                addRedis(sysEmployee);
+                SysEmployee sysEmployee1 = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, employee.getId()));
+                log.info("-------------：{}", sysEmployee1.getFullName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void addEmployeeRedis(Employee employee) {
+        CompletableFuture.runAsync(() -> {
+            SysEmployee sysEmployee = new SysEmployee();
+            sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(employee, sysEmployee);
+            addRedis(sysEmployee);
+        });
+    }
+
+    private void deleteEmployeeRedis(Employee employee) {
+        CompletableFuture.runAsync(() -> {
+            SysEmployee sysEmployee = new SysEmployee();
+            sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(employee, sysEmployee);
+            deleteRedis(sysEmployee);
+        });
+    }
+
+    private void addRedis(SysEmployee sysEmployee) {
+        try {
+            String key = StringUtil.getRedisKey(RedisConstant.EMPLOYEE, sysEmployee.getId());
+            redisTemplate.opsForValue().set(key, sysEmployee);
+            log.info("从redis中新增人员：{}", sysEmployee.getFullName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteRedis(SysEmployee sysEmployee) {
+        try {
+            String key = StringUtil.getRedisKey(RedisConstant.EMPLOYEE, sysEmployee.getId());
+            // 存在缓存，则删除
+            Boolean hasKey = redisTemplate.hasKey(key);
+            if (hasKey != null && hasKey) {
+                redisTemplate.delete(key);
+                log.info("从redis中删除人员：{}", sysEmployee.getFullName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

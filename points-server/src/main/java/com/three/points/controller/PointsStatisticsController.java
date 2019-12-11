@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "积分查询", tags = "积分查询")
 @RestController
-@RequestMapping("/points/pointsQueries")
-public class PointsQueryController {
+@RequestMapping("/points/pointsStatistics")
+public class PointsStatisticsController {
 
     @Autowired
     private ThemeDetailService themeDetailService;

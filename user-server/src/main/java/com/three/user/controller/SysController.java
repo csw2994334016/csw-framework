@@ -63,7 +63,7 @@ public class SysController {
     @GetMapping("/sys/reLoadOrgEmpRedis")
     public JsonResult reLoadOrgEmpRedis() {
         employeeService.reLoadOrgEmpRedis();
-        return JsonResult.ok();
+        return JsonResult.ok("成功重新加载组织机构-人员redis缓存");
     }
 
 

@@ -2,6 +2,7 @@ package com.three.points.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.three.common.utils.DateUtils;
+import com.three.common.vo.JsonResult;
 import com.three.points.service.AwardPrivilegeService;
 import com.three.points.service.ManagerTaskService;
 import io.swagger.annotations.Api;
@@ -45,5 +46,12 @@ public class SysController {
     @GetMapping(value = "/internal/findAuditor")
     Set<String> findAuditor(String firstOrganizationId, String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
         return awardPrivilegeService.findAuditor(firstOrganizationId, attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
+    }
+
+    @ApiOperation(value = "生成管理任务下月配置（内部接口）")
+    @GetMapping(value = "/internal/generateNextManagerTask")
+    JsonResult generateNextManagerTask(String name, String method, String firstOrganizationId) {
+        managerTaskService.generateNextManagerTask(name, method, firstOrganizationId);
+        return JsonResult.ok("生成管理任务下月配置成功");
     }
 }

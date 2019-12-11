@@ -47,7 +47,8 @@ public class ExecutionJob extends QuartzJobBean {
         log.setCronExpression(quartzJob.getCronExpression());
         try {
             // 执行任务
-            logger.info("任务准备执行，任务名称：{}", quartzJob.getJobName());
+            boolean excFlag = false;
+            logger.info("任务准备执行：{}", quartzJob.getJobName());
             try {
                 QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
                 Future<?> future = executorService.submit(task);
@@ -58,17 +59,20 @@ public class ExecutionJob extends QuartzJobBean {
                 log.setMessage("定时任务[" + quartzJob.getJobName() + "]在SpringContextHolder中不存在：" + e.getMessage() + "，继续查找groovy脚本执行任务");
                 GroovyService groovyService = (GroovyService) SpringContextHolder.getBean("groovyService");
                 groovyService.exec(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
+                excFlag = true;
             }
-            QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
-            Future<?> future = executorService.submit(task);
-            future.get();
+            if (!excFlag) {
+                QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
+                Future<?> future = executorService.submit(task);
+                future.get();
+            }
             long times = System.currentTimeMillis() - startTime;
             log.setTime(times);
             // 任务状态
             log.setLogType(LogEnum.INFO.getCode());
-            logger.info("任务执行完毕，任务名称：{} 总共耗时：{} ms", quartzJob.getJobName(), times);
+            logger.info("任务执行完毕：{} 总共耗时：{} ms", quartzJob.getJobName(), times);
         } catch (Exception e) {
-            logger.error("任务执行失败，任务名称：{}，异常信息：{}", quartzJob.getJobName(), e.getMessage());
+            logger.error("任务执行失败：{}，异常信息：{}", quartzJob.getJobName(), e.getMessage());
             long times = System.currentTimeMillis() - startTime;
             log.setTime(times);
             // 任务状态 1：成功 2：失败

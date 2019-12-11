@@ -278,4 +278,8 @@ public class StringUtil {
     public static String getDateStr() {
         return sdf1.format(new Date());
     }
+
+    public static String getRedisKey(String pre, String id) {
+        return pre + id;
+    }
 }

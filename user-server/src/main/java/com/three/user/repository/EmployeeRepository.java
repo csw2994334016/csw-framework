@@ -16,4 +16,6 @@ public interface EmployeeRepository extends BaseRepository<Employee, String> {
     List<Employee> findAllByIdIn(Set<String> empIdSet);
 
     List<Employee> findAllByOrganizationId(String organizationId);
+
+    List<Employee> findAllByStatusAndOrganizationId(int code, String organizationId);
 }

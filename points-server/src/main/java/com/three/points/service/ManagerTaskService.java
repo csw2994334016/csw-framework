@@ -2,6 +2,7 @@ package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
+import com.three.common.enums.StatusEnum;
 import com.three.common.enums.YesNoEnum;
 import com.three.common.utils.DateUtils;
 import com.three.commonclient.exception.BusinessException;
@@ -74,7 +75,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         // 当前月任务
         managerTask.setTaskDate(taskDate);
         managerTaskList.add(managerTask);
-        // 依次生成未来12个月的任务
+        // 依次生成未来1个月的任务
         for (int i = 0; i < 1; i++) {
             taskDate = DateUtil.offsetMonth(taskDate, 1);
             ManagerTask managerTask1 = new ManagerTask();
@@ -324,18 +325,6 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
                 initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
             }
         } else if ("2".equals(statisticsFlag)) { // 周统计
-//            st = DateUtil.parse("2019-01-01 00:00:00");
-//            et = DateUtil.endOfYear(date);
-//            // 系统使用了几年
-//            for (int i = DateUtil.year(st); i <= DateUtil.year(et); i++) {
-//                Date date1 = DateUtil.parse(i + "-01-01 00:00:00");
-//                DateVo dateVo = new DateVo(DateUtil.beginOfYear(date1), DateUtil.endOfYear(date1));
-//                dayMap.put(i + "", dateVo);
-//                awardValueMap.put(i + "", 0);
-//                deductValueMap.put(i + "", 0);
-//                empCountValueMap.put(i + "", 0);
-//                ratioValueMap.put(i + "", 0.0);
-//            }
             st = DateUtil.beginOfMonth(date);
             et = DateUtil.endOfMonth(date);
             // 这个月有几周
@@ -352,11 +341,6 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
                 Date date1 = DateUtil.offsetDay(st, i - 1);
                 DateVo dateVo = new DateVo(DateUtil.beginOfDay(date1), DateUtil.endOfDay(date1));
                 initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
-//                dayMap.put(String.format("%02d", i), dateVo);
-//                awardValueMap.put(String.format("%02d", i), 0);
-//                deductValueMap.put(String.format("%02d", i), 0);
-//                empCountValueMap.put(String.format("%02d", i), 0);
-//                ratioValueMap.put(String.format("%02d", i), 0.0);
             }
         }
         // 统计结果
@@ -398,5 +382,41 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         deductValueMap.put(String.format("%02d", i), 0);
         empCountValueMap.put(String.format("%02d", i), 0);
         ratioValueMap.put(String.format("%02d", i), 0.0);
+    }
+
+    @Transactional
+    public void generateNextManagerTask(String name, String method, String firstOrganizationId) {
+        if (StringUtil.isBlank(firstOrganizationId)) {
+            firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        }
+        // 查看当前月的下一个月管理任务是否存在，如果不存在，则根据当前月的管理任务生成下个月的任务
+        Date curTaskDate = DateUtil.beginOfMonth(new Date());
+        List<ManagerTask> curManagerTaskList;
+        if (StringUtil.isNotBlank(firstOrganizationId)) {
+            curManagerTaskList = managerTaskRepository.findAllByStatusAndOrganizationIdAndTaskDate(StatusEnum.OK.getCode(), firstOrganizationId, curTaskDate);
+        } else {
+            curManagerTaskList = managerTaskRepository.findAllByStatusAndTaskDate(StatusEnum.OK.getCode(), curTaskDate);
+        }
+        Date nextTaskDate = DateUtil.offsetMonth(curTaskDate, 1);
+        for (ManagerTask curManagerTask : curManagerTaskList) {
+            ManagerTask nextManagerTask = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(curManagerTask.getOrganizationId(), curManagerTask.getTaskName(), nextTaskDate);
+            if (nextManagerTask == null) {
+                // 生成下个月管理任务
+                nextManagerTask = new ManagerTask();
+                nextManagerTask = (ManagerTask) BeanCopyUtil.copyBean(curManagerTask, nextManagerTask, Arrays.asList("id"));
+                nextManagerTask.setTaskDate(nextTaskDate);
+                nextManagerTask = managerTaskRepository.save(nextManagerTask);
+                // 生成下个月管理任务的人员配置
+                List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(curManagerTask.getId());
+                List<ManagerTaskEmp> nextManagerTaskEmpList = new ArrayList<>();
+                for (ManagerTaskEmp managerTaskEmp : managerTaskEmpList) {
+                    ManagerTaskEmp nextManagerTaskEmp = new ManagerTaskEmp();
+                    nextManagerTaskEmp = (ManagerTaskEmp) BeanCopyUtil.copyBean(managerTaskEmp, nextManagerTaskEmp, Arrays.asList("id"));
+                    nextManagerTaskEmp.setTaskId(nextManagerTask.getId());
+                    nextManagerTaskEmpList.add(nextManagerTaskEmp);
+                }
+                managerTaskEmpRepository.saveAll(nextManagerTaskEmpList);
+            }
+        }
     }
 }

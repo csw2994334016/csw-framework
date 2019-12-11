@@ -1,6 +1,8 @@
 package com.three.points.service;
 
 import com.three.common.auth.LoginUser;
+import com.three.common.auth.SysEmployee;
+import com.three.common.constants.RedisConstant;
 import com.three.commonclient.exception.BusinessException;
 import com.three.points.enums.EventEnum;
 import com.three.points.enums.EventFlagEnum;
@@ -23,6 +25,7 @@ import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
@@ -48,6 +51,9 @@ public class ThemeService extends BaseService<Theme, String> {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
 
     @Transactional
     public void createDraft(ThemeParam themeParam) {
@@ -495,6 +501,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getRecorderId());
                             themeDetail.setEmpFullName(theme.getRecorderName());
+                            setOrgInfo(theme.getRecorderId(), themeDetail);
                             themeDetail.setBscore(recorderBScore);
                             themeDetail.setRemark(EventEnum.EVENT_RECORDER_NEG.getMessage());
                             themeDetailList.add(themeDetail);
@@ -505,6 +512,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getAttnId());
                             themeDetail.setEmpFullName(theme.getAttnName());
+                            setOrgInfo(theme.getAttnId(), themeDetail);
                             themeDetail.setBscore(attnBScore);
                             themeDetail.setRemark(EventEnum.EVENT_ATTN_NEG.getMessage());
                             themeDetailList.add(themeDetail);
@@ -523,6 +531,15 @@ public class ThemeService extends BaseService<Theme, String> {
         }
         if (errorList.size() > 0) {
             throw new BusinessException("以下记录操作失败：" + errorList.toString());
+        }
+    }
+
+    private void setOrgInfo(String recorderId, ThemeDetail themeDetail) {
+        String key = StringUtil.getRedisKey(RedisConstant.EMPLOYEE, recorderId);
+        SysEmployee sysEmployee = (SysEmployee) redisTemplate.opsForValue().get(key);
+        if (sysEmployee != null) {
+            themeDetail.setEmpNum(sysEmployee.getEmpNum());
+            themeDetail.setEmpOrgId(sysEmployee.getOrganizationId());
         }
     }
 
@@ -570,6 +587,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getRecorderId());
                             themeDetail.setEmpFullName(theme.getRecorderName());
+                            setOrgInfo(theme.getRecorderId(), themeDetail);
                             themeDetail.setBscore(recorderBScore);
                             themeDetail.setRemark(EventEnum.EVENT_RECORDER_POS.getMessage());
                             themeDetailList.add(themeDetail);
@@ -580,6 +598,7 @@ public class ThemeService extends BaseService<Theme, String> {
                             themeDetail.setEventFlag(EventFlagEnum.TEMPORARY.getCode());
                             themeDetail.setEmpId(theme.getAttnId());
                             themeDetail.setEmpFullName(theme.getAttnName());
+                            setOrgInfo(theme.getAttnId(), themeDetail);
                             themeDetail.setBscore(attnBScore);
                             themeDetail.setRemark(EventEnum.EVENT_ATTN_POS.getMessage());
                             themeDetailList.add(themeDetail);

@@ -87,7 +87,7 @@ public class QuartzJobController {
     @PutMapping("/execute")
     public JsonResult executeJob(String ids) {
         quartzJobService.executeJob(ids);
-        return JsonResult.ok();
+        return JsonResult.ok("请查看执行日志");
     }
 
     @Autowired
