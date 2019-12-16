@@ -3,6 +3,8 @@ package com.three.points.param;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -26,6 +28,8 @@ public class PointsRuleParam {
     private Integer abScoreValue; // A/B分比例设置，1A分=?B分
 
     @NotNull(message = "管理任务结算日期设置，每月?日不可以为空")
+    @Max(value = 29, message = "管理任务结算日不能超过29")
+    @Min(value = 1, message = "管理任务结算日最小为1")
     @ApiModelProperty("管理任务结算日期设置，每月?日")
     private Integer managerTaskDay; // 管理任务结算日期设置，每月?日
 

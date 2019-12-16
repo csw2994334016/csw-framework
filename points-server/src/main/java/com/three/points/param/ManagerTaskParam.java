@@ -3,6 +3,7 @@ package com.three.points.param;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class ManagerTaskParam {
     private Integer empCountValue; // 奖扣人次值
 
     @NotNull(message = "未完成奖扣人次任务扣分不可以为空")
+    @Max(value = 0, message = "未完成奖扣人次任务扣分只能是小于0的数值")
     @ApiModelProperty("未完成奖扣人次任务扣分")
     private Integer empCountNegScore; // 未完成奖扣人次任务扣分
 

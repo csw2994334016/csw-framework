@@ -17,4 +17,7 @@ public interface PointsClient {
 
     @GetMapping(value = "/internal/generateNextManagerTask")
     JsonResult generateNextManagerTask(@RequestParam() String scriptName, @RequestParam() String method, @RequestParam() String firstOrganizationId);
+
+    @GetMapping(value = "/internal/settleManagerTask")
+    JsonResult settleManagerTask(@RequestParam() String scriptName, @RequestParam() String method, @RequestParam() String firstOrganizationId);
 }

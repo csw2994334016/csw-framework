@@ -10,7 +10,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -62,9 +64,9 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("扣分下限")
     private Integer scoreDeductMin = 0; // 扣分下限
 
-    @Column(name = "score_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣分任务扣分'")
-    @ApiModelProperty("未完成奖扣分任务扣分")
-    private Integer scoreNegScore = 0; // 未完成奖扣分任务扣分
+    @Column(name = "score_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣分任务扣分，默认0表示差额扣分'")
+    @ApiModelProperty("未完成奖扣分任务扣分，默认0表示差额扣分")
+    private Integer scoreNegScore = 0; // 未完成奖扣分任务扣分，默认0表示差额扣分
 
     @Column(name = "ratio_task_flag", nullable = false, columnDefinition = "int(1) default 2 comment '奖扣比例考核任务（1=是；2=否）'")
     @ApiModelProperty("奖扣比例考核任务（1=是；2=否）")
@@ -78,9 +80,9 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("奖扣比例值")
     private Double ratioValue = 1.0; // 奖扣比例值
 
-    @Column(name = "ratio_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣比例任务扣分'")
-    @ApiModelProperty("未完成奖扣比例任务扣分")
-    private Integer ratioNegScore = 0; // 未完成奖扣比例任务扣分
+    @Column(name = "ratio_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣比例任务扣分，默认0表示差额扣分'")
+    @ApiModelProperty("未完成奖扣比例任务扣分，默认0表示差额扣分")
+    private Integer ratioNegScore = 0; // 未完成奖扣比例任务扣分，默认0表示差额扣分
 
     @Column(name = "emp_count_task_flag", nullable = false, columnDefinition = "int(1) default 2 comment '奖扣人次考核任务（1=是；2=否）'")
     @ApiModelProperty("奖扣人次考核任务（1=是；2=否）")
@@ -94,9 +96,9 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("奖扣人次值")
     private Integer empCountValue = 0; // 奖扣人次值
 
-    @Column(name = "emp_count_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣人次任务扣分'")
-    @ApiModelProperty("未完成奖扣人次任务扣分")
-    private Integer empCountNegScore = 0; // 未完成奖扣人次任务扣分
+    @Column(name = "emp_count_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '未完成奖扣人次任务扣分，默认0表示不扣分'")
+    @ApiModelProperty("未完成奖扣人次任务扣分，默认0表示不扣分")
+    private Integer empCountNegScore = 0; // 未完成奖扣人次任务扣分，默认0表示不扣分
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")

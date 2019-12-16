@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PointsServerTask {
+public class ManagerTaskGenerator {
 
     @Autowired
     private PointsClient pointsClient;

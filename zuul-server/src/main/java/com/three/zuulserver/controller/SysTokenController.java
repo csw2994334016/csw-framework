@@ -2,6 +2,7 @@ package com.three.zuulserver.controller;
 
 import com.three.common.log.Log;
 import com.three.common.utils.LogUtil;
+import com.three.common.vo.JsonData;
 import com.three.common.vo.JsonResult;
 import com.three.zuulserver.feign.LogClient;
 import com.three.zuulserver.feign.Oauth2Client;
@@ -37,7 +38,7 @@ public class SysTokenController {
      * 采用oauth2密码模式获取access_token和refresh_token
      */
     @PostMapping("/sys/login")
-    public Map<String, Object> login(@RequestBody LoginParam loginParam) {
+    public JsonData<Map<String, Object>> login(@RequestBody LoginParam loginParam) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "password");
         parameters.put(CLIENT_ID, loginParam.getClient_id());
@@ -51,7 +52,7 @@ public class SysTokenController {
         Map<String, Object> tokenInfo = oauth2Client.postAccessToken(parameters);
         saveLoginLog(loginParam.getUsername(), "用户名密码登录");
 
-        return tokenInfo;
+        return new JsonData<>(tokenInfo);
     }
 
 //    /**
@@ -133,7 +134,7 @@ public class SysTokenController {
      * @return
      */
     @PostMapping("/sys/refresh_token")
-    public Map<String, Object> refresh_token(@RequestBody LoginParam loginParam) {
+    public JsonData<Map<String, Object>> refresh_token(@RequestBody LoginParam loginParam) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(GRANT_TYPE, "refresh_token");
         parameters.put(CLIENT_ID, loginParam.getClient_id());
@@ -146,7 +147,7 @@ public class SysTokenController {
 //        if (refreshTokenMap != null) {
 //            oauth2Client.removeToken(access_token);
 //        }
-        return refreshTokenMap;
+        return new JsonData<>(refreshTokenMap);
     }
 
     /**

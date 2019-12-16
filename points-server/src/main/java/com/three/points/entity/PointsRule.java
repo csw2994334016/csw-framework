@@ -45,9 +45,9 @@ public class PointsRule implements Serializable {
     @ApiModelProperty("A/B分比例设置，1A分=?B分")
     private Integer abScoreValue; // A/B分比例设置，1A分=?B分
 
-    @Column(name = "manager_task_day", nullable = false, columnDefinition = "int(11) comment '管理任务结算日期设置，每月?日'")
+    @Column(name = "manager_task_day", nullable = false, columnDefinition = "int(11) default 5 comment '管理任务结算日期设置，每月?日'")
     @ApiModelProperty("管理任务结算日期设置，每月?日")
-    private Integer managerTaskDay; // 管理任务结算日期设置，每月?日
+    private Integer managerTaskDay = 5; // 管理任务结算日期设置，每月?日
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")

@@ -14,7 +14,7 @@ import java.util.Date;
 
 /**
  * Created by csw on 2019-11-12.
- * Description: 积分规则设置，奖扣人次奖分设置
+ * Description: 积分规则设置，对积分奖扣主题记录人奖分设置
  */
 
 @Getter
@@ -35,9 +35,9 @@ public class PointsRuleEmpCount implements Serializable {
     @ApiModelProperty("积分规则ID")
     private String pointsRuleId; // 积分规则ID
 
-    @Column(name = "theme_emp_count", nullable = false, columnDefinition = "int(11) comment '奖扣人次（积分奖扣主题中对记录人奖分）'")
-    @ApiModelProperty("奖扣人次（积分奖扣主题中对记录人奖分）")
-    private Integer themeEmpCount; // 奖扣人次（积分奖扣主题中对记录人奖分）
+    @Column(name = "theme_emp_count", nullable = false, columnDefinition = "int(11) comment '奖扣人次（人次到？人次，奖多少分）'")
+    @ApiModelProperty("奖扣人次（人次到？人次，奖多少分）")
+    private Integer themeEmpCount; // 奖扣人次（人次到？人次，奖多少分）
 
     @Column(name = "award_score_value", nullable = false, columnDefinition = "int(11) comment '奖?分（记录人奖分） '")
     @ApiModelProperty("奖?分（对应奖分） ")

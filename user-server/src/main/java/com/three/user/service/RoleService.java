@@ -1,6 +1,7 @@
 package com.three.user.service;
 
 import com.three.common.enums.AdminEnum;
+import com.three.commonclient.exception.ParameterException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
@@ -75,6 +76,9 @@ public class RoleService extends BaseService<Role, String> {
 
     @Transactional
     public void delete(String ids, int code) {
+        if (StringUtil.isBlank(ids)) {
+            throw new  ParameterException("删除记录的ids不可以为空");
+        }
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
 
         List<Role> roleList = new ArrayList<>();

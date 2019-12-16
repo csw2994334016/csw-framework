@@ -37,6 +37,10 @@ public class ManagerTaskScore implements Serializable {
     @ApiModelProperty("组织机构（一级公司）")
     private String organizationId; // 组织机构（一级公司）
 
+    @Column(name = "task_id", nullable = false, columnDefinition = "varchar(36) comment '任务id'")
+    @ApiModelProperty("任务id")
+    private String taskId; // 任务id
+
     @Column(name = "task_name", nullable = false, columnDefinition = "varchar(255) comment '任务名称'")
     @ApiModelProperty("任务名称")
     private String taskName; // 任务名称
@@ -44,6 +48,15 @@ public class ManagerTaskScore implements Serializable {
     @Column(name = "task_date", nullable = false, columnDefinition = "datetime comment '任务日期（按月算）'")
     @ApiModelProperty("任务日期（按月算）")
     private Date taskDate; // 任务日期（按月算）
+
+    @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '人员Id'")
+    @ApiModelProperty("人员Id")
+    private String empId; // 人员Id
+
+    @Column(name = "emp_full_name", nullable = false, columnDefinition = "varchar(255) comment '人员姓名'")
+    @ApiModelProperty("人员姓名")
+    private String empFullName; // 人员姓名
+
 
     @Column(name = "task_index", nullable = false, columnDefinition = "varchar(255) comment '任务指标'")
     @ApiModelProperty("任务指标")
@@ -57,17 +70,9 @@ public class ManagerTaskScore implements Serializable {
     @ApiModelProperty("未完成扣分类型")
     private String scoreNegType; // 未完成扣分类型
 
-    @Column(name = "bscore", nullable = false, columnDefinition = "int(11) comment '实际得分（B分）'")
+    @Column(name = "bscore", nullable = false, columnDefinition = "int(11) default 1 comment '实际得分（B分）'")
     @ApiModelProperty("实际得分（B分）")
-    private Integer bscore; // 实际得分（B分）
-
-    @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '人员Id'")
-    @ApiModelProperty("人员Id")
-    private String empId; // 人员Id
-
-    @Column(name = "emp_full_name", nullable = false, columnDefinition = "varchar(255) comment '人员姓名'")
-    @ApiModelProperty("人员姓名")
-    private String empFullName; // 人员姓名
+    private Integer bscore = 0; // 实际得分（B分）
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")

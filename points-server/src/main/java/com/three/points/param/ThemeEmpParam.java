@@ -30,6 +30,9 @@ public class ThemeEmpParam {
     @ApiModelProperty("人员所属组织Id")
     private String empOrgId; // 人员所属组织Id
 
+    @ApiModelProperty("人员所属组织名称")
+    private String empOrgName; // 人员所属组织名称
+
     @ApiModelProperty("A分")
     private Integer ascore = 0; // A分
 

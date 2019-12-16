@@ -1,8 +1,8 @@
 package com.three.points.controller;
 
 import com.three.common.vo.JsonData;
-import com.three.points.entity.ManagerTaskEmp;
 import com.three.points.service.ManagerTaskService;
+import com.three.points.vo.MyManagerTaskVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,7 +31,7 @@ public class ManagerTaskMySelfController {
             @ApiImplicitParam(name = "empId", value = "人员ID，不传则表示当前登录用户", dataType = "String")
     })
     @GetMapping("/queryTaskMySelf")
-    public JsonData<ManagerTaskEmp> queryTaskMySelf(Long taskDate, String empId) {
+    public JsonData<MyManagerTaskVo> queryTaskMySelf(Long taskDate, String empId) {
         return new JsonData<>(managerTaskService.queryTaskMySelf(taskDate, empId)).success();
     }
 }

@@ -4,6 +4,7 @@ import com.three.common.auth.LoginUser;
 import com.three.common.auth.SysEmployee;
 import com.three.common.constants.RedisConstant;
 import com.three.commonclient.exception.BusinessException;
+import com.three.commonclient.exception.ParameterException;
 import com.three.points.enums.EventEnum;
 import com.three.points.enums.EventFlagEnum;
 import com.three.points.enums.ThemeStatusEnum;
@@ -461,6 +462,13 @@ public class ThemeService extends BaseService<Theme, String> {
 
     @Transactional
     public void reject(String ids, String opinion, Integer recorderBScore, Integer attnBScore) {
+        // 只有终审人驳回才能进行扣分操作
+        if (recorderBScore != null && recorderBScore > 0) {
+            throw new ParameterException("对记录人扣分数值只能是负数");
+        }
+        if (attnBScore != null && attnBScore > 0) {
+            throw new ParameterException("对初审人扣分数值只能是负数");
+        }
         String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<String> errorList = new ArrayList<>();
@@ -478,7 +486,6 @@ public class ThemeService extends BaseService<Theme, String> {
                 if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                     theme.setThemeStatus(ThemeStatusEnum.ATTN.getCode());
                     theme.setAuditOpinion(opinion);
-                    // 只有终审人驳回才能进行扣分操作
                     if ((recorderBScore != null && recorderBScore < 0) || (attnBScore != null && attnBScore < 0)) {
                         // 先生成主题
                         Theme themeNew = getThemeNew(theme);
@@ -545,6 +552,13 @@ public class ThemeService extends BaseService<Theme, String> {
 
     @Transactional
     public void approve(String ids, String opinion, Integer recorderBScore, Integer attnBScore) {
+        // 只有终审人驳回才能进行扣分操作
+        if (recorderBScore != null && recorderBScore < 0) {
+            throw new ParameterException("对记录人奖分数值只能是正数");
+        }
+        if (attnBScore != null && attnBScore < 0) {
+            throw new ParameterException("对初审人奖分数值只能是正数");
+        }
         String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<String> errorList = new ArrayList<>();
@@ -565,6 +579,7 @@ public class ThemeService extends BaseService<Theme, String> {
                     theme.setAuditOpinion(opinion);
                     theme.setAuditDate(new Date());
                     // 只有终审人通过才能进行奖分操作，通过新增一条主题详情记录实现对记录人或初审人的加分
+
                     if ((recorderBScore != null && recorderBScore > 0) || (attnBScore != null && attnBScore > 0)) {
                         // 先生成主题
                         Theme themeNew = getThemeNew(theme);
