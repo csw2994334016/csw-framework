@@ -1,7 +1,6 @@
 package com.three.points.controller;
 
 import com.three.common.vo.JsonData;
-import com.three.points.entity.ManagerTaskEmp;
 import com.three.points.service.ManagerTaskService;
 import com.three.points.vo.TaskStatisticsVo;
 import io.swagger.annotations.Api;

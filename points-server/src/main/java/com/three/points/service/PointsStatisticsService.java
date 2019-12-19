@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class PointsStatisticsService{
+public class PointsStatisticsService {
 
     @Autowired
     private ManagerTaskScoreRepository managerTaskScoreRepository;

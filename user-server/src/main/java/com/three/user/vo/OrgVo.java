@@ -22,6 +22,8 @@ public class OrgVo {
 
     private String parentId;
 
+    private String parentName;
+
     @Builder.Default
     private List<OrgVo> children = new ArrayList<>();
 

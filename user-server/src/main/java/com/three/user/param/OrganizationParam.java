@@ -23,22 +23,14 @@ public class OrganizationParam {
     @ApiModelProperty("组织机构编码")
     private String orgCode; // 组织机构编码
 
-    @ApiModelProperty("组织机构类型")
-    private String orgType; // 组织机构类型，1=部门；2=公司
-
-    @ApiModelProperty("父级编号")
-    private String parentId = "-1"; // 父级编号
-
-    @ApiModelProperty("一级父级机构ID")
-    private String firstParentId; // 一级父级机构ID
-
-    @ApiModelProperty("父级名称")
-    private String parentName; // 父级名称
+    @ApiModelProperty("父级id，不传默认为一级组织，或默认传字符串'-1'")
+    private String parentId = "-1"; // 父级id
 
     @ApiModelProperty("排序")
     private Integer sort = 100; // 排序
 
 
-    private String remark;
+    @ApiModelProperty("备注")
+    private String remark; // 备注
 
 }

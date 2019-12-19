@@ -251,6 +251,12 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         return empIdSet;
     }
 
+    /**
+     * 我的管理任务，查找（当前登录）用户作为初审人审核通过的积分奖扣主题，统计b分
+     * @param taskDateM
+     * @param empId
+     * @return
+     */
     public MyManagerTaskVo queryTaskMySelf(Long taskDateM, String empId) {
         Date date = new Date();
         if (taskDateM != null) {
@@ -323,6 +329,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         return myManagerTaskVo;
     }
 
+    /**
+     * 管理任务统计，查找（当前登录）用户作为初审人审核通过的积分奖扣主题，按日/周/月统计b分
+     * @param taskDate
+     * @param statisticsFlag
+     * @param empId
+     * @return
+     */
     public TaskStatisticsVo queryTaskStatistics(Long taskDate, String statisticsFlag, String empId) {
         TaskStatisticsVo taskStatisticsVo = new TaskStatisticsVo();
         Date date = new Date();
@@ -330,11 +343,14 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             date = new Date(taskDate);
         }
         if (StringUtil.isBlank(empId)) {
-            empId = LoginUserUtil.getLoginUserEmpId(); // 当前登录用户
+            empId = LoginUserUtil.getLoginUserEmpId(); // 当前登录用户，作为初审人审核通过了多少分
+        }
+        if (StringUtil.isBlank(empId)) {
+            throw new BusinessException("没有用户信息，无法查管理任务统计");
         }
         taskStatisticsVo.setEmpId(empId);
         Date st, et;
-        Map<String, DateVo> dayMap = new LinkedHashMap<>();
+        Map<String, DateVo> dateMap = new LinkedHashMap<>();
         Map<String, Integer> awardValueMap = new LinkedHashMap<>();
         Map<String, Integer> deductValueMap = new LinkedHashMap<>();
         Map<String, Integer> empCountValueMap = new LinkedHashMap<>();
@@ -346,7 +362,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             for (int i = DateUtil.month(st); i <= DateUtil.month(et); i++) {
                 Date date1 = DateUtil.offsetMonth(st, i);
                 DateVo dateVo = new DateVo(DateUtil.beginOfMonth(date1), DateUtil.endOfMonth(date1));
-                initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
+                initMap(dateVo, i, dateMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
             }
         } else if ("2".equals(statisticsFlag)) { // 周统计
             st = DateUtil.beginOfMonth(date);
@@ -355,13 +371,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             for (int i = DateUtil.weekOfMonth(st); i <= DateUtil.weekOfMonth(et); i++) {
                 Date date1 = DateUtil.offsetWeek(st, i - 1);
                 DateVo dateVo = new DateVo(DateUtil.beginOfWeek(date1), DateUtil.endOfWeek(date1));
-                initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
+                initMap(dateVo, i, dateMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
             }
         } else if ("4".equals(statisticsFlag)) { // 只统计这个月份
             st = DateUtil.beginOfMonth(date);
             et = DateUtil.endOfMonth(date);
             DateVo dateVo = new DateVo(st, et);
-            initMap(dateVo, DateUtil.month(st), dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
+            initMap(dateVo, DateUtil.month(st), dateMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
         } else { // 默认日统计
             st = DateUtil.beginOfMonth(date);
             et = DateUtil.endOfMonth(date);
@@ -369,7 +385,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             for (int i = DateUtil.dayOfMonth(st); i <= DateUtil.dayOfMonth(et); i++) {
                 Date date1 = DateUtil.offsetDay(st, i - 1);
                 DateVo dateVo = new DateVo(DateUtil.beginOfDay(date1), DateUtil.endOfDay(date1));
-                initMap(dateVo, i, dayMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
+                initMap(dateVo, i, dateMap, awardValueMap, deductValueMap, empCountValueMap, ratioValueMap);
             }
         }
         // 统计结果
@@ -378,7 +394,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             taskStatisticsVo.setAllAwardScore(taskStatisticsVo.getAllAwardScore() + theme.getBposScore());
             taskStatisticsVo.setAllDeductScore(taskStatisticsVo.getAllDeductScore() + theme.getBnegScore());
             taskStatisticsVo.setAllEmpCount(taskStatisticsVo.getAllEmpCount() + theme.getEmpCount());
-            for (Map.Entry<String, DateVo> entry : dayMap.entrySet()) {
+            for (Map.Entry<String, DateVo> entry : dateMap.entrySet()) {
                 if (theme.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && theme.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
                     int value1 = awardValueMap.get(entry.getKey()) + theme.getBposScore();
                     awardValueMap.put(entry.getKey(), value1);
@@ -394,7 +410,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             }
         }
         // 得到结果
-        taskStatisticsVo.setSeriesList(new ArrayList<>(dayMap.keySet()));
+        taskStatisticsVo.setSeriesList(new ArrayList<>(dateMap.keySet()));
         taskStatisticsVo.setAwardValueTrendList(new ArrayList<>(awardValueMap.values()));
         taskStatisticsVo.setDeductValueTrendList(new ArrayList<>(deductValueMap.values()));
         taskStatisticsVo.setEmpCountValueTrendList(new ArrayList<>(empCountValueMap.values()));
@@ -405,8 +421,8 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         return taskStatisticsVo;
     }
 
-    private void initMap(DateVo dateVo, int i, Map<String, DateVo> dayMap, Map<String, Integer> awardValueMap, Map<String, Integer> deductValueMap, Map<String, Integer> empCountValueMap, Map<String, Double> ratioValueMap) {
-        dayMap.put(String.format("%02d", i), dateVo);
+    private void initMap(DateVo dateVo, int i, Map<String, DateVo> dateMap, Map<String, Integer> awardValueMap, Map<String, Integer> deductValueMap, Map<String, Integer> empCountValueMap, Map<String, Double> ratioValueMap) {
+        dateMap.put(String.format("%02d", i), dateVo);
         awardValueMap.put(String.format("%02d", i), 0);
         deductValueMap.put(String.format("%02d", i), 0);
         empCountValueMap.put(String.format("%02d", i), 0);

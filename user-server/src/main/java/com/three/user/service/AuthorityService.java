@@ -1,5 +1,6 @@
 package com.three.user.service;
 
+import com.three.common.utils.StringUtil;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
 import com.three.common.enums.AuthorityEnum;
@@ -16,8 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by csw on 2019/03/31.
@@ -35,7 +35,6 @@ public class AuthorityService extends BaseService<Authority, String> {
 
         Authority authority = new Authority();
         authority = (Authority) BeanCopyUtil.copyBean(authorityParam, authority);
-//        authority.setCreateBy(LoginSysUserUtil.getLoginUser());
 
         authorityRepository.save(authority);
     }
@@ -46,7 +45,6 @@ public class AuthorityService extends BaseService<Authority, String> {
 
         Authority authority = getEntityById(authorityRepository, authorityParam.getId());
         authority = (Authority) BeanCopyUtil.copyBean(authorityParam, authority);
-//        authority.setUpdateBy(LoginUser.getLoginUser());
 
         authorityRepository.save(authority);
     }
@@ -88,7 +86,6 @@ public class AuthorityService extends BaseService<Authority, String> {
                 authorityMenu.setSort(num);
                 num = num + 3;
                 authorityMenu.setParentId("-1");
-//                authorityMenu.setCreateBy(LoginUser.getLoginUser());
                 authorityParent = authorityRepository.save(authorityMenu);
             }
             Authority authorityNew = authorityRepository.findByAuthorityNameOrAuthorityUrl(authority.getAuthorityName(), authority.getAuthorityUrl());
@@ -102,7 +99,6 @@ public class AuthorityService extends BaseService<Authority, String> {
                 authority.setSort(num);
                 num = num + 3;
                 authority.setParentId(authorityParent.getId());
-//                authority.setCreateBy(LoginUser.getLoginUser());
                 authorityRepository.save(authority);
             }
         }
@@ -115,5 +111,36 @@ public class AuthorityService extends BaseService<Authority, String> {
 
     public List<Authority> findMenuAuth() {
         return authorityRepository.findAllByStatusAndAuthorityType(StatusEnum.OK.getCode(), AuthorityEnum.MENU.getCode());
+    }
+
+    public List<Authority> findAllAuthTree(int code, String parentId) {
+        List<Authority> authTreeVoList = new ArrayList<>();
+        List<Authority> authorityList;
+        if (StringUtil.isNotBlank(parentId)) {
+            authorityList = authorityRepository.findAllByStatusAndParentId(code, parentId);
+        } else {
+            authorityList = authorityRepository.findAllByStatus(code);
+        }
+
+        Map<String, Authority> authTreeVoMap = new HashMap<>();
+        for (Authority authority : authorityList) {
+            if (!authority.getAuthorityUrl().contains(":/internal/")) {
+                authTreeVoMap.put(authority.getId(), authority);
+                if ("-1".equals(authority.getParentId())) {
+                    authTreeVoList.add(authority);
+                }
+            }
+        }
+        for (Map.Entry<String, Authority> entry : authTreeVoMap.entrySet()) {
+            if (!"-1".equals(entry.getValue().getParentId())) {
+                Authority voParent = authTreeVoMap.get(entry.getValue().getParentId());
+                voParent.getChildren().add(entry.getValue());
+            }
+        }
+        authTreeVoList.sort(Comparator.comparing(Authority::getSort));
+        for (Authority vo : authTreeVoList) {
+            vo.getChildren().sort(Comparator.comparing(Authority::getSort));
+        }
+        return authTreeVoList;
     }
 }

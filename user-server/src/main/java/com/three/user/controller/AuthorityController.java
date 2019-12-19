@@ -97,6 +97,15 @@ public class AuthorityController {
         return authorityService.findAll(StatusEnum.OK.getCode(), searchKey, searchValue);
     }
 
+    @ApiOperation(value = "查询所有权限树")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "parentId", value = "上级权限Id，为空表示查所有权限树", dataType = "String")
+    })
+    @GetMapping("/findAllAuthTree")
+    public JsonData<List<Authority>> findAllAuthTree(String parentId) {
+        return new JsonData<>(authorityService.findAllAuthTree(StatusEnum.OK.getCode(), parentId));
+    }
+
     @ApiOperation(value = "查询所有菜单权限(上级权限)")
     @GetMapping("/menuAuth")
     public JsonData<List<Authority>> menuAuth() {

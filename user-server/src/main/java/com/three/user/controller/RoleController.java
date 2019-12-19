@@ -1,6 +1,7 @@
 package com.three.user.controller;
 
 import com.three.common.log.LogAnnotation;
+import com.three.common.vo.JsonData;
 import com.three.user.entity.Role;
 import com.three.user.param.RoleParam;
 import com.three.user.service.RoleService;
@@ -9,6 +10,7 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.user.vo.AuthTreeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -79,18 +81,25 @@ public class RoleController {
         return JsonResult.ok("删除成功");
     }
 
-    @ApiOperation(value = "查找权限树（根据角色）")
+    @ApiOperation(value = "查找权限（根据角色）")
     @ApiImplicitParam(name = "roleId", value = "角色id", dataType = "String")
     @GetMapping("/findAuthTree")
     public JsonResult findAuthTree(String roleId) {
         return JsonResult.ok().put("data", roleService.findAuthTree(roleId));
     }
 
+    @ApiOperation(value = "根据角色查找权限树")
+    @ApiImplicitParam(name = "roleId", value = "角色id", dataType = "String")
+    @GetMapping("/findAuthTree1")
+    public JsonData<List<AuthTreeVo>> findAuthTree1(String roleId) {
+        return new JsonData<>(roleService.findAuthTree1(roleId));
+    }
+
     @LogAnnotation(module = "角色绑定权限")
     @ApiOperation(value = "角色绑定权限")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "authIds", value = "权限ids", dataType = "String")
+            @ApiImplicitParam(name = "authIds", value = "权限ids(用英文逗号隔开)", dataType = "String")
     })
     @PutMapping("/assignRoleAuth")
     public JsonResult assignRoleAuth(String roleId, String authIds) {

@@ -262,16 +262,20 @@ public class EmployeeService extends BaseService<Employee, String> {
                 employeeIdSet.add(user.getEmployee().getId());
             }
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
-        Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicateList = Lists.newArrayList();
-            Specification<Employee> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
-            predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
-            predicateList.add(root.<String>get("id").in(employeeIdSet));
-            Predicate[] predicates = new Predicate[predicateList.size()];
-            return criteriaBuilder.and(predicateList.toArray(predicates));
-        };
-        return query(employeeRepository, pageQuery, sort, specification);
+        if (employeeIdSet.size() > 0) {
+            Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+            Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
+                List<Predicate> predicateList = Lists.newArrayList();
+                Specification<Employee> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
+                predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
+                predicateList.add(root.<String>get("id").in(employeeIdSet));
+                Predicate[] predicates = new Predicate[predicateList.size()];
+                return criteriaBuilder.and(predicateList.toArray(predicates));
+            };
+            return query(employeeRepository, pageQuery, sort, specification);
+        } else {
+            return new PageResult<>(new ArrayList<>());
+        }
     }
 
     private Set<Role> getRoleSet(String roleIds) {
@@ -314,8 +318,6 @@ public class EmployeeService extends BaseService<Employee, String> {
                 sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(employee, sysEmployee);
                 deleteRedis(sysEmployee);
                 addRedis(sysEmployee);
-                SysEmployee sysEmployee1 = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, employee.getId()));
-                log.info("-------------：{}", sysEmployee1.getFullName());
             } catch (Exception e) {
                 e.printStackTrace();
             }

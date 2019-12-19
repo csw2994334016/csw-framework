@@ -58,7 +58,7 @@ public class Organization implements Serializable {
     @ApiModelProperty("父级机构ID")
     private String parentId = "-1"; // 父级机构ID
 
-    @Column(name = "first_parent_id", nullable = false, columnDefinition = "varchar(36) comment '一级父级机构ID'")
+    @Column(name = "first_parent_id", columnDefinition = "varchar(36) comment '一级父级机构ID'")
     @ApiModelProperty("一级父级机构ID")
     private String firstParentId; // 一级父级机构ID
 

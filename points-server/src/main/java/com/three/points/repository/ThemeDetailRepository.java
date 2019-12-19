@@ -33,11 +33,11 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
 
     int countByEventIdAndStatus(String id, int code);
 
-    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empFullName, td.ascore, td.bscore, t.attnName, t.auditName) " +
+    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
     Page<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDatePageable(int status, String empId, int themeStatus, Date stM, Date etM, Pageable pageable);
 
-    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empFullName, td.ascore, td.bscore, t.attnName, t.auditName) " +
+    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
     List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(int status, String empId, int themeStatus, Date stM, Date etM, Sort sort);
 }

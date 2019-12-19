@@ -29,6 +29,7 @@ public class Test {
         System.out.println(etM);
         System.out.println(stY);
         System.out.println(etY);
+        System.out.println(DateUtil.year(DateUtil.parse("2019-01-01")));
         System.out.println(StringUtil.getStrToIdSet1("222"));
 
 //        String statisticsFlag = "2";
@@ -76,9 +77,9 @@ public class Test {
 //            }
 //        }
 
-        System.out.println(StringUtil.getStrToIdSet1("222"));
-        for (int i = 0; i < 10; i++) {
-            System.out.println(UUID.randomUUID().toString());
-        }
+//        System.out.println(StringUtil.getStrToIdSet1("222"));
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(UUID.randomUUID().toString());
+//        }
     }
 }

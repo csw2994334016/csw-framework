@@ -18,6 +18,7 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.common.utils.StringUtil;
 import com.google.common.base.Preconditions;
+import com.three.user.vo.AuthTreeVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -77,7 +78,7 @@ public class RoleService extends BaseService<Role, String> {
     @Transactional
     public void delete(String ids, int code) {
         if (StringUtil.isBlank(ids)) {
-            throw new  ParameterException("删除记录的ids不可以为空");
+            throw new ParameterException("删除记录的ids不可以为空");
         }
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
 
@@ -121,10 +122,46 @@ public class RoleService extends BaseService<Role, String> {
     }
 
     private String getAuthorityName(Authority authority) {
-        if (LoginUserUtil.getLoginUser() != null && LoginUserUtil.getLoginUser().getIsAdmin() == AdminEnum.YES.getCode()) { // 超级管理员
-            return authority.getAuthorityName() + "(" + authority.getAuthorityUrl() + ")";
-        }
+//        if (LoginUserUtil.getLoginUser() != null && LoginUserUtil.getLoginUser().getIsAdmin() == AdminEnum.YES.getCode()) { // 超级管理员
+//            return authority.getAuthorityName() + "(" + authority.getAuthorityUrl() + ")";
+//        }
         return authority.getAuthorityName();
+    }
+
+    public List<AuthTreeVo> findAuthTree1(String roleId) {
+        List<AuthTreeVo> authTreeVoList = new ArrayList<>();
+        Role role = roleRepository.getOne(roleId);
+        Sort sort = new Sort(Sort.Direction.ASC, "sort");
+        List<Authority> authorityList = authorityRepository.findAll(sort);
+
+        Map<String, AuthTreeVo> authTreeVoMap = new HashMap<>();
+        for (Authority authority : authorityList) {
+            if (!authority.getAuthorityUrl().contains(":/internal/")) {
+                AuthTreeVo authTreeVo = new AuthTreeVo();
+                authTreeVo.setId(authority.getId());
+                authTreeVo.setParentId(authority.getParentId());
+                authTreeVo.setTitle(authority.getAuthorityName());
+                authTreeVo.setSort(authority.getSort());
+                authTreeVo.setExpand(Boolean.FALSE);
+                authTreeVo.setChecked(role.getAuthorities().contains(authority));
+                authTreeVoMap.put(authTreeVo.getId(), authTreeVo);
+                if ("-1".equals(authTreeVo.getParentId())) {
+                    authTreeVoList.add(authTreeVo);
+                }
+            }
+        }
+        for (Map.Entry<String, AuthTreeVo> entry : authTreeVoMap.entrySet()) {
+            if (!"-1".equals(entry.getValue().getParentId())) {
+                AuthTreeVo voParent = authTreeVoMap.get(entry.getValue().getParentId());
+                voParent.getChildren().add(entry.getValue());
+            }
+        }
+        authTreeVoList.sort(Comparator.comparing(AuthTreeVo::getSort));
+        for (AuthTreeVo vo : authTreeVoList) {
+            vo.setExpand(Boolean.TRUE);
+            vo.getChildren().sort(Comparator.comparing(AuthTreeVo::getSort));
+        }
+        return authTreeVoList;
     }
 
     @Transactional
@@ -144,7 +181,11 @@ public class RoleService extends BaseService<Role, String> {
     private Set<Authority> getAuthoritySet(String authIds) {
         String[] authIdArray = StringUtils.split(authIds, ",");
         Set<String> authIdSet = StringUtil.getStringArrayToIdSet1(authIdArray);
-        return new HashSet<>(authorityRepository.findAllById(authIdSet));
+        if (authIdSet.size() > 0) {
+            return new HashSet<>(authorityRepository.findAllById(authIdSet));
+        } else {
+            return new HashSet<>();
+        }
     }
 
     @Transactional
@@ -163,4 +204,5 @@ public class RoleService extends BaseService<Role, String> {
     public Role getEntityById(String roleId) {
         return getEntityById(roleRepository, roleId);
     }
+
 }

@@ -1,11 +1,13 @@
 package com.three.points.controller;
 
 import com.three.common.enums.StatusEnum;
+import com.three.common.vo.JsonData;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.entity.ManagerTaskScore;
 import com.three.points.service.ManagerTaskScoreService;
 import com.three.points.service.ThemeDetailService;
+import com.three.points.vo.MyPointsScoreTrendVo;
 import com.three.points.vo.ThemeDetailDailyVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -26,6 +28,16 @@ public class MyPointsController {
 
     @Autowired
     private ManagerTaskScoreService managerTaskScoreService;
+
+    @ApiOperation(value = "人员积分总览(包括月度、年度、累计积分趋势)", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "themeDate", value = "奖扣时间(月份，时间戳，毫秒)", dataType = "Long"),
+            @ApiImplicitParam(name = "empId", value = "人员ID，不传则表示当前登录用户", dataType = "String")
+    })
+    @GetMapping("/totalScore")
+    public JsonData<MyPointsScoreTrendVo> totalScore(Long themeDate, String empId) {
+        return new JsonData<>(themeDetailService.totalScore(themeDate, empId));
+    }
 
     @ApiOperation(value = "日常奖扣（分页,page/limit不给表示不分页）", notes = "")
     @ApiImplicitParams({

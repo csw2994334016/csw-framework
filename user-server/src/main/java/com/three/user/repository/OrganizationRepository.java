@@ -16,4 +16,12 @@ public interface OrganizationRepository extends BaseRepository<Organization, Str
     List<Organization> findAllByFirstParentIdAndStatus(String firstParentId, int code);
 
     List<Organization> findAllByParentIdsLike(String orgId);
+
+    int countByFirstParentIdAndOrgNameAndIdNot(String firstParentId, String orgName, String id);
+
+    int countByFirstParentIdAndOrgCodeAndIdNot(String firstParentId, String orgCode, String id);
+
+    int countByFirstParentIdAndOrgName(String firstParentId, String orgName);
+
+    int countByFirstParentIdAndOrgCode(String firstParentId, String orgCode);
 }
