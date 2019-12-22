@@ -6,6 +6,7 @@ import com.three.common.auth.LoginUser;
 import com.three.commonclient.exception.BusinessException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Employee;
+import com.three.user.entity.Organization;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
 import com.three.user.param.UserParam;
@@ -45,6 +46,9 @@ public class UserService extends BaseService<User, String> {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Transactional
     public void create(UserParam userParam) {
@@ -180,12 +184,15 @@ public class UserService extends BaseService<User, String> {
         return user;
     }
 
-    public User findByIsAdmin(int code) {
-        User user = userRepository.findByIsAdmin(code);
-        if (user == null) {
-            throw new BusinessException("不存在系统管理员");
+    public User findByAdmin(int code, String firstOrganizationId) {
+        List<User> userList = userRepository.findAllByIsAdmin(code);
+        for (User user : userList) {
+            Organization organization = organizationService.findById(user.getEmployee().getOrganizationId());
+            if (organization.getFirstParentId().equals(firstOrganizationId)) {
+                return user;
+            }
         }
-        return user;
+        throw new BusinessException("该公司(" + firstOrganizationId + ")不存在系统管理员");
     }
 
     public User findByEmployee(Employee employee) {

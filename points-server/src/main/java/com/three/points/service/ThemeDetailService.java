@@ -175,7 +175,6 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         Map<String, DateVo> yearDateMap = new LinkedHashMap<>();
         Map<String, Integer> yearAwardValueMap = new LinkedHashMap<>();
         Map<String, Integer> yearDeductValueMap = new LinkedHashMap<>();
-        Map<String, DateVo> totalDateMap = new LinkedHashMap<>();
         Map<String, Integer> totalAwardValueMap = new LinkedHashMap<>();
         Map<String, Integer> totalDeductValueMap = new LinkedHashMap<>();
         // 系统开始使用年份-输入事件年份
@@ -188,7 +187,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             yearAwardValueMap.put(i + "", 0);
             yearDeductValueMap.put(i + "", 0);
         }
-        // 输入时间1月-12月，12个月份，一年有多少个月
+        // 输入时间年份1月-12月，12个月份，一年有多少个月
         Date stM = DateUtil.beginOfYear(date);
         for (int i = DateUtil.month(stM); i <= DateUtil.month(et); i++) {
             Date date1 = DateUtil.offsetMonth(st, i);
@@ -199,12 +198,12 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         }
         // 日常奖扣信息
         List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(StatusEnum.OK.getCode(), loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), st, et, new Sort(Sort.Direction.DESC, "createDate"));
-        SysEmployee sysEmployee = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, empId));
+        SysEmployee sysEmployee = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, loginUserEmpId));
         if (sysEmployee == null) {
-            throw new BusinessException("无法从redis中获取用户缓存信息，请管理员重新加载缓存");
+            throw new BusinessException("无法从redis中获取用户缓存信息(" + loginUserEmpId + ")，请管理员重新加载缓存");
         }
         MyPointsScoreTrendVo myPointsScoreTrendVo = new MyPointsScoreTrendVo();
-        myPointsScoreTrendVo.setEmpId(empId);
+        myPointsScoreTrendVo.setEmpId(loginUserEmpId);
         myPointsScoreTrendVo.setEmpFullName(sysEmployee.getFullName());
         myPointsScoreTrendVo.setEmpOrgId(sysEmployee.getOrganizationId());
         myPointsScoreTrendVo.setEmpOrgName(sysEmployee.getOrgName());
@@ -212,15 +211,49 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             for (Map.Entry<String, DateVo> entry : monthDateMap.entrySet()) {
                 if (themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
                     if (themeDetailDailyVo.getBscore() > 0) { // 奖分
-
+                        myPointsScoreTrendVo.setMonthAwardScore(myPointsScoreTrendVo.getMonthAwardScore() + themeDetailDailyVo.getBscore());
+                        monthAwardValueMap.put(entry.getKey(), monthAwardValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
                     }
                     if (themeDetailDailyVo.getBscore() < 0) { // 扣分
-
+                        myPointsScoreTrendVo.setMonthDeductScore(myPointsScoreTrendVo.getMonthDeductScore() + themeDetailDailyVo.getBscore());
+                        monthDeductValueMap.put(entry.getKey(), monthDeductValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
+                    }
+                    break;
+                }
+            }
+            for (Map.Entry<String, DateVo> entry : yearDateMap.entrySet()) {
+                if (themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
+                    if (themeDetailDailyVo.getBscore() > 0) { // 奖分
+                        myPointsScoreTrendVo.setYearAwardScore(myPointsScoreTrendVo.getYearAwardScore() + themeDetailDailyVo.getBscore());
+                        yearAwardValueMap.put(entry.getKey(), yearAwardValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
+                    }
+                    if (themeDetailDailyVo.getBscore() < 0) { // 扣分
+                        myPointsScoreTrendVo.setYearDeductScore(myPointsScoreTrendVo.getYearDeductScore() + themeDetailDailyVo.getBscore());
+                        yearDeductValueMap.put(entry.getKey(), yearDeductValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
                     }
                     break;
                 }
             }
         }
+        // todo: 奖扣任务
+        myPointsScoreTrendVo.setMonthSeriesList(new ArrayList<>(monthDateMap.keySet()));
+        myPointsScoreTrendVo.setMonthAwardValueTrendList(new ArrayList<>(monthAwardValueMap.values()));
+        myPointsScoreTrendVo.setMonthDeductValueTrendList(new ArrayList<>(monthDeductValueMap.values()));
+        myPointsScoreTrendVo.setYearSeriesList(new ArrayList<>(yearDateMap.keySet()));
+        myPointsScoreTrendVo.setYearAwardValueTrendList(new ArrayList<>(yearAwardValueMap.values()));
+        myPointsScoreTrendVo.setYearDeductValueTrendList(new ArrayList<>(yearDeductValueMap.values()));
+        // 累计积分
+        for (Map.Entry<String, Integer> entry : yearAwardValueMap.entrySet()) {
+            myPointsScoreTrendVo.setTotalAwardScore(myPointsScoreTrendVo.getTotalAwardScore() + entry.getValue());
+            totalAwardValueMap.put(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Integer> entry : yearDeductValueMap.entrySet()) {
+            myPointsScoreTrendVo.setTotalDeductScore(myPointsScoreTrendVo.getTotalDeductScore() + entry.getValue());
+            totalDeductValueMap.put(entry.getKey(), entry.getValue());
+        }
+        myPointsScoreTrendVo.setTotalSeriesList(new ArrayList<>(yearDateMap.keySet()));
+        myPointsScoreTrendVo.setTotalAwardValueTrendList(new ArrayList<>(totalAwardValueMap.values()));
+        myPointsScoreTrendVo.setTotalDeductValueTrendList(new ArrayList<>(totalDeductValueMap.values()));
         return myPointsScoreTrendVo;
     }
 }

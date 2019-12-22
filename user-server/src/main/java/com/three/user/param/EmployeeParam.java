@@ -15,30 +15,33 @@ public class EmployeeParam {
 
     private String id;
 
-    @NotBlank(message = "用户名不可以为空")
     @ApiModelProperty("用户名")
     private String username; // 用户名
 
+    public String getUsername() {
+        return empNum;
+    }
+
     @NotBlank(message = "姓名不可以为空")
-    @ApiModelProperty("姓名")
+    @ApiModelProperty("姓名，必填字段")
     private String fullName; // 姓名
 
     @NotBlank(message = "手机号不可以为空")
-    @ApiModelProperty("手机号")
+    @ApiModelProperty("手机号，必填字段")
     private String cellNum; // 手机号
 
-    @ApiModelProperty("员工工号")
+    @NotBlank(message = "员工工号不可以为空")
+    @ApiModelProperty("员工工号，必填字段")
     private String empNum; // 员工工号
 
-    @ApiModelProperty("身份证号码")
-    private String idCardNum; // 身份证号码
-
     @NotBlank(message = "所在组织机构不可以为空")
-    @ApiModelProperty("所在组织")
+    @ApiModelProperty("所在组织（部门），必填字段")
     private String organizationId; // 所在组织
 
     private String roleIds;
 
+    @ApiModelProperty("身份证号码")
+    private String idCardNum; // 身份证号码
 
     @ApiModelProperty("性别")
     private String gender; // 性别
@@ -85,16 +88,16 @@ public class EmployeeParam {
     @ApiModelProperty("特长")
     private String learnSpecialty; // 特长
 
-    @ApiModelProperty("个人信息完善状态")
+    @ApiModelProperty("个人信息完善状态：1=未完善；2=完善")
     private Integer infoCompleteStatus; // 个人信息完善状态：1=未完善；2=完善
 
     @ApiModelProperty("入职日期")
     private Date joinDate; // 入职日期
 
-    @ApiModelProperty("职称")
-    private String titleLevel; // 职称
+    @ApiModelProperty("职称/职位")
+    private String titleLevel; // 职称/职位
 
-    @ApiModelProperty("职位状态")
+    @ApiModelProperty("职位状态：1=在职；2=不在职")
     private Integer empStatus; // 职位状态：1=在职；2=不在职
 
     @ApiModelProperty("工龄分")
@@ -108,18 +111,6 @@ public class EmployeeParam {
 
     @ApiModelProperty("排序")
     private Integer sort; // 排序
-
-    @ApiModelProperty("创建用户ID")
-    private String createUserID; // 创建用户ID
-
-    @ApiModelProperty("创建用户姓名")
-    private String createUserName; // 创建用户姓名
-
-    @ApiModelProperty("最后编辑用户ID")
-    private String lastEditUserID; // 最后编辑用户ID
-
-    @ApiModelProperty("最后编辑用户姓名")
-    private String lastEditUserName; // 最后编辑用户姓名
 
     @ApiModelProperty("备注")
     private String remark;

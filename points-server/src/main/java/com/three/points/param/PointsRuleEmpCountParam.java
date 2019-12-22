@@ -12,10 +12,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class PointsRuleEmpCountParam {
 
-    private String id;
-
-
-
     @NotNull(message = "奖扣人次（积分奖扣主题中对记录人奖分）")
     @ApiModelProperty("奖扣人次（积分奖扣主题中对记录人奖分）")
     private Integer themeEmpCount; // 奖扣人次（积分奖扣主题中对记录人奖分）

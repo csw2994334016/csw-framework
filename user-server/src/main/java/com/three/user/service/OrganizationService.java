@@ -198,7 +198,7 @@ public class OrganizationService extends BaseService<Organization, String> {
         Map<String, OrgVo> orgVoMap = new HashMap<>();
         for (Organization organization : organizationList) {
             OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).key(organization.getId()).
-                    parentId(organization.getParentId()).sort(organization.getSort()).parentName(organization.getParentName()).build();
+                    parentId(organization.getParentId()).sort(organization.getSort()).parentName(organization.getParentName()).orgCode(organization.getOrgCode()).build();
             orgVoMap.put(orgVo.getId(), orgVo);
         }
         List<OrgVo> parentOrgVoList = new ArrayList<>();

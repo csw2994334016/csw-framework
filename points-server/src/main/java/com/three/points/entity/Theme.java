@@ -52,7 +52,7 @@ public class Theme implements Serializable {
 
     @Column(name = "relation_theme_id", columnDefinition = "varchar(36) comment '相关联主题ID'")
     @ApiModelProperty("相关联主题ID")
-    private String relationThemeId; // 相关联主题ID
+    private String relationThemeId; // 相关联主题ID，给记录人、初审人加/减分自动生成的主题
 
     @Column(name = "a_pos_score", columnDefinition = "int(11) default 0 comment 'A分（汇总正分）'")
     @ApiModelProperty("A分（汇总正分）")

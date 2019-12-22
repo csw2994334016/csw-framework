@@ -57,7 +57,9 @@ public class PointsRuleService extends BaseService<PointsRule, String> {
             pointsRuleEmpCount.setPointsRuleId(pointsRule.getId());
             pointsRuleEmpCountList.add(pointsRuleEmpCount);
         }
-        pointsRuleEmpCountRepository.saveAll(pointsRuleEmpCountList);
+        if (pointsRuleEmpCountList.size() > 0) {
+            pointsRuleEmpCountRepository.saveAll(pointsRuleEmpCountList);
+        }
     }
 
     @Transactional

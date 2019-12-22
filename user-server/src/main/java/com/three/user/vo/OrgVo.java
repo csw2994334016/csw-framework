@@ -1,5 +1,6 @@
 package com.three.user.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,6 +24,9 @@ public class OrgVo {
     private String parentId;
 
     private String parentName;
+
+    @ApiModelProperty("组织机构编码")
+    private String orgCode; // 组织机构编码
 
     @Builder.Default
     private List<OrgVo> children = new ArrayList<>();

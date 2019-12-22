@@ -31,6 +31,7 @@ public class Test {
         System.out.println(etY);
         System.out.println(DateUtil.year(DateUtil.parse("2019-01-01")));
         System.out.println(StringUtil.getStrToIdSet1("222"));
+        System.out.println(StringUtils.split("ids", ",")[0]);
 
 //        String statisticsFlag = "2";
 //        Date date = new Date();

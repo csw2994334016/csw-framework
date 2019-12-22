@@ -547,6 +547,7 @@ public class ThemeService extends BaseService<Theme, String> {
         if (sysEmployee != null) {
             themeDetail.setEmpNum(sysEmployee.getEmpNum());
             themeDetail.setEmpOrgId(sysEmployee.getOrganizationId());
+            themeDetail.setEmpOrgName(sysEmployee.getOrgName());
         }
     }
 
@@ -636,23 +637,24 @@ public class ThemeService extends BaseService<Theme, String> {
     }
 
     private Theme getThemeNew(Theme theme) {
-        LoginUser sysUser = userClient.findByAdmin();
+//        LoginUser sysUser = userClient.findByAdmin(theme.getOrganizationId());
+        String remark = "系统机器人";
         Theme themeNew = new Theme();
         themeNew.setOrganizationId(theme.getOrganizationId());
         themeNew.setThemeDate(theme.getThemeDate());
         themeNew.setThemeStatus(ThemeStatusEnum.SUCCESS.getCode());
         themeNew.setRelationThemeId(theme.getId());
-        themeNew.setRecorderId(sysUser.getId());
-        themeNew.setRecorderName(sysUser.getFullName());
-        themeNew.setSubmitterId(sysUser.getId());
-        themeNew.setSubmitterName(sysUser.getFullName());
+//        themeNew.setRecorderId(sysUser.getId());
+        themeNew.setRecorderName(remark);
+//        themeNew.setSubmitterId(sysUser.getId());
+        themeNew.setSubmitterName(remark);
         Date date = new Date();
         themeNew.setSubmitterDate(date);
-        themeNew.setAttnId(sysUser.getId());
-        themeNew.setAttnName(sysUser.getFullName());
+//        themeNew.setAttnId(sysUser.getId());
+        themeNew.setAttnName(remark);
         themeNew.setAttnDate(date);
-        themeNew.setAuditId(sysUser.getId());
-        themeNew.setAuditName(sysUser.getFullName());
+//        themeNew.setAuditId(sysUser.getId());
+        themeNew.setAuditName(remark);
         themeNew.setAuditDate(date);
         return themeNew;
     }

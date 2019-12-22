@@ -140,9 +140,10 @@ public class EmployeeController {
             @ApiImplicitParam(name = "aNegScoreMin", value = "临时事件下,参与人员中扣A分(负分)最小值", dataType = "Integer"),
             @ApiImplicitParam(name = "bPosScoreMax", value = "临时事件下,参与人员中奖B分(正分)最大值", dataType = "Integer"),
             @ApiImplicitParam(name = "bNegScoreMin", value = "临时事件下,参与人员中扣B分(负分)最小值", dataType = "Integer"),
+            @ApiImplicitParam(name = "themeEmpIds", value = "奖扣对象，多个对象用英文逗号隔开，目的是终审人不能是奖扣对象自己", dataType = "String"),
     })
     @GetMapping("/findAuditor")
-    public JsonData<List<Employee>> findAuditor(@RequestParam(defaultValue = "0") String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
-        return new JsonData<>(employeeService.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin));
+    public JsonData<List<Employee>> findAuditor(@RequestParam(defaultValue = "0") String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin, String themeEmpIds) {
+        return new JsonData<>(employeeService.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin, themeEmpIds));
     }
 }

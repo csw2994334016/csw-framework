@@ -1,6 +1,5 @@
 package com.three.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.three.common.enums.StatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -15,7 +14,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Created by csw on 2019-09-22.

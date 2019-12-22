@@ -1,11 +1,13 @@
 package com.three.points.service;
 
 
+import com.google.common.base.Preconditions;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
+import com.three.commonclient.exception.ParameterException;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.points.entity.AwardPrivilege;
 import com.three.points.entity.AwardPrivilegeEmp;
@@ -41,10 +43,16 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
     public void create(AwardPrivilegeParam awardPrivilegeParam) {
         BeanValidator.check(awardPrivilegeParam);
 
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+
+        if (awardPrivilegeRepository.countByAwardPrivilegeNameAndOrganizationId(awardPrivilegeParam.getAwardPrivilegeName(), firstOrganizationId) > 0) {
+            throw new ParameterException("奖扣权限名称已经存在");
+        }
+
         AwardPrivilege awardPrivilege = new AwardPrivilege();
         awardPrivilege = (AwardPrivilege) BeanCopyUtil.copyBean(awardPrivilegeParam, awardPrivilege, Arrays.asList("empNum"));
 
-        awardPrivilege.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
+        awardPrivilege.setOrganizationId(firstOrganizationId);
 
         awardPrivilegeRepository.save(awardPrivilege);
     }
@@ -52,6 +60,13 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
     @Transactional
     public void update(AwardPrivilegeParam awardPrivilegeParam) {
         BeanValidator.check(awardPrivilegeParam);
+        Preconditions.checkNotNull(awardPrivilegeParam.getId(), "修改记录，id不可以为：" + awardPrivilegeParam.getId());
+
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+
+        if (awardPrivilegeRepository.countByAwardPrivilegeNameAndOrganizationIdAndIdNot(awardPrivilegeParam.getAwardPrivilegeName(), firstOrganizationId, awardPrivilegeParam.getId()) > 0) {
+            throw new ParameterException("奖扣权限名称已经存在");
+        }
 
         AwardPrivilege awardPrivilege = getEntityById(awardPrivilegeRepository, awardPrivilegeParam.getId());
         awardPrivilege = (AwardPrivilege) BeanCopyUtil.copyBean(awardPrivilegeParam, awardPrivilege, Arrays.asList("empNum"));

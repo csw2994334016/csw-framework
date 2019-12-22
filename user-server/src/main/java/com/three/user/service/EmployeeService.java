@@ -287,10 +287,14 @@ public class EmployeeService extends BaseService<Employee, String> {
         return getEntityById(employeeRepository, id);
     }
 
-    public List<Employee> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin) {
+    public List<Employee> findAuditor(String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin, String themeEmpIds) {
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Set<String> empIdSet = pointsClient.findAuditor(firstOrganizationId, attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin);
         if (empIdSet.size() > 0) {
+            if ("1".equals(attnOrAuditFlag) && StringUtil.isNotBlank(themeEmpIds)) {
+                Set<String> themeEmpIdSet = StringUtil.getStrToIdSet1(themeEmpIds);
+                themeEmpIdSet.forEach(empIdSet::remove);
+            }
             return employeeRepository.findAllByIdIn(empIdSet);
         }
         return new ArrayList<>();

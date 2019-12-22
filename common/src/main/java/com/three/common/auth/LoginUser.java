@@ -21,6 +21,7 @@ public class LoginUser {
     private String fullName; // 姓名
     private String cellNum; // 手机号
     private Integer isAdmin;
+    private String employeeId;
     /**
      * 状态
      */
@@ -36,4 +37,16 @@ public class LoginUser {
     private SysOrganization sysOrganization;
 
     private SysEmployee sysEmployee;
+
+    public LoginUser() {
+    }
+
+    public LoginUser(String id, String username, String password, String fullName, String cellNum, String employeeId) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.cellNum = cellNum;
+        this.employeeId = employeeId;
+    }
 }

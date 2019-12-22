@@ -17,5 +17,5 @@ import java.util.List;
 public interface UserClient {
 
     @GetMapping(value = "/internal/findByAdmin")
-    LoginUser findByAdmin();
+    LoginUser findByAdmin(@RequestParam() String firstOrganizationId);
 }

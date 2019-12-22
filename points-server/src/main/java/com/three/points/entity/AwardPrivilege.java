@@ -9,7 +9,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -66,5 +68,11 @@ public class AwardPrivilege implements Serializable {
     @LastModifiedDate
     private Date updateDate; // 修改时间
 
+    @ApiModelProperty("奖扣权限分数值")
+    @Transient
+    private String awardPrivilegeValue;
 
+    public String getAwardPrivilegeValue() {
+        return "+-A   " + ascore + "      +-B   " + bscore;
+    }
 }

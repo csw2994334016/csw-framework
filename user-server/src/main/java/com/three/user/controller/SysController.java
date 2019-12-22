@@ -101,32 +101,12 @@ public class SysController {
 
     @ApiOperation(value = "查找系统管理员（内部接口）")
     @GetMapping(value = "/internal/findByAdmin")
-    public LoginUser findByAdmin() {
-        User user = userService.findByIsAdmin(AdminEnum.YES.getCode());
+    public LoginUser findByAdmin(String firstOrganizationId) {
+        User user = userService.findByAdmin(AdminEnum.YES.getCode(), firstOrganizationId);
 
         LoginUser loginUser = new LoginUser();
         loginUser = (LoginUser) BeanCopyUtil.copyBean(user, loginUser);
 
-//        for (Role role : user.getRoles()) {
-//            SysRole sysRole = new SysRole();
-//            sysRole = (SysRole) BeanCopyUtil.copyBean(role, sysRole);
-//            loginUser.getSysRoles().add(sysRole);
-//            for (Authority authority : role.getAuthorities()) {
-//                SysAuthority sysAuthority = new SysAuthority();
-//                sysAuthority = (SysAuthority) BeanCopyUtil.copyBean(authority, sysAuthority);
-//                loginUser.getSysAuthorities().add(sysAuthority);
-//            }
-//        }
-//
-//        if (user.getEmployee() != null) { // 除非admin用户，不然一般都会有员工信息
-//            SysOrganization sysOrganization = new SysOrganization();
-//            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(user.getEmployee().getOrganization(), sysOrganization);
-//            loginUser.setSysOrganization(sysOrganization);
-//
-//            SysEmployee sysEmployee = new SysEmployee();
-//            sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(user.getEmployee(), sysEmployee);
-//            loginUser.setSysEmployee(sysEmployee);
-//        }
         return loginUser;
     }
 
