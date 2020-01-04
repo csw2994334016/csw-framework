@@ -53,7 +53,7 @@ public class OrganizationController {
 
     @LogAnnotation(module = "删除组织机构")
     @ApiOperation(value = "删除组织机构")
-    @ApiImplicitParam(name = "ids", value = "组织机构信息ids", required = true, dataType = "String")
+    @ApiImplicitParam(name = "ids", value = "组织机构信息ids,多个用逗号,隔开", required = true, dataType = "String")
     @DeleteMapping()
     public JsonResult delete(String ids) {
         organizationService.delete(ids, StatusEnum.DELETE.getCode());
@@ -82,18 +82,24 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "上移")
-    @ApiImplicitParam(name = "id", value = "组织机构信息id", required = true, dataType = "String")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "组织机构信息id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "upId", value = "同级上一个组织机构信息id", required = true, dataType = "String")
+    })
     @PutMapping("/moveUp")
-    public JsonResult moveUp(String id) {
-        organizationService.moveUp(id);
+    public JsonResult moveUp(@RequestParam(required = true) String id, @RequestParam(required = true) String upId) {
+        organizationService.move(id, upId);
         return JsonResult.ok("上移成功");
     }
 
     @ApiOperation(value = "下移")
-    @ApiImplicitParam(name = "id", value = "组织机构信息id", required = true, dataType = "String")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "组织机构信息id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "downId", value = "同级下一个组织机构信息id", required = true, dataType = "String")
+    })
     @GetMapping("/moveDown")
-    public JsonResult moveDown(String id) {
-        organizationService.moveDown(id);
+    public JsonResult moveDown(@RequestParam(required = true) String id, @RequestParam(required = true) String downId) {
+        organizationService.move(id, downId);
         return JsonResult.ok("下移成功");
     }
 }

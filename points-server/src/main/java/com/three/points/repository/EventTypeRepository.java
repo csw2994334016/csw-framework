@@ -16,4 +16,8 @@ public interface EventTypeRepository extends BaseRepository<EventType, String> {
     List<EventType> findAllByOrganizationIdAndStatusAndParentId(String firstOrganizationId, int code, String parentId);
 
     List<EventType> findAllByStatusAndParentId(int code, String parentId);
+
+    int countByTypeNameAndOrganizationId(String typeName, String organizationId);
+
+    int countByTypeNameAndOrganizationIdAndIdNot(String typeName, String organizationId, String id);
 }

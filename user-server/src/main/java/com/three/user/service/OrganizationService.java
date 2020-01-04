@@ -78,6 +78,11 @@ public class OrganizationService extends BaseService<Organization, String> {
         // 拼接父级组织机构层级结构
         organization.setParentIds(StringUtil.isNotBlank(parentOrg.getParentIds()) ? parentOrg.getParentIds() + "," + parentOrg.getId() : parentOrg.getId());
 
+        // 查找sort最大值，然后加10
+        Integer maxSort = organizationRepository.findMaxSortByParentId(parentOrg.getId());
+        maxSort = maxSort != null ? maxSort + 10 : 100;
+        organization.setSort(maxSort);
+
         organizationRepository.save(organization);
 
         addOrganizationRedis(organization);
@@ -233,13 +238,14 @@ public class OrganizationService extends BaseService<Organization, String> {
     }
 
     @Transactional
-    public void moveUp(String id) {
-
-    }
-
-    @Transactional
-    public void moveDown(String id) {
-
+    public void move(String id, String id1) {
+        Organization organization = findById(id);
+        Organization organization1 = findById(id1);
+        Integer sort = organization1.getSort();
+        organization1.setSort(organization.getSort());
+        organization.setSort(sort);
+        organizationRepository.save(organization);
+        organizationRepository.save(organization1);
     }
 
     public void updateOrganizationRedis(Organization organization) {

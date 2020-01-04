@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
 import com.three.commonclient.exception.BusinessException;
+import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
 import com.three.points.repository.EventRepository;
@@ -44,10 +45,14 @@ public class EventTypeService extends BaseService<EventType, String> {
     public EventType create(EventTypeParam eventTypeParam) {
         BeanValidator.check(eventTypeParam);
 
+        // 分类名称不能相同
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        if (eventTypeRepository.countByTypeNameAndOrganizationId(eventTypeParam.getTypeName(), firstOrganizationId) > 0) {
+            throw new ParameterException("已存在同名[" + eventTypeParam.getTypeName() + "]的事件分类");
+        }
+
         EventType eventType = new EventType();
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
-
-        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         eventType.setOrganizationId(firstOrganizationId);
 
         eventType = eventTypeRepository.save(eventType);
@@ -59,6 +64,10 @@ public class EventTypeService extends BaseService<EventType, String> {
         BeanValidator.check(eventTypeParam);
 
         EventType eventType = getEntityById(eventTypeRepository, eventTypeParam.getId());
+        // 分类名称不能相同
+        if (eventTypeRepository.countByTypeNameAndOrganizationIdAndIdNot(eventTypeParam.getTypeName(), eventType.getOrganizationId(), eventType.getId()) > 0) {
+            throw new ParameterException("已存在同名[" + eventTypeParam.getTypeName() + "]的事件分类");
+        }
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
 
         eventType = eventTypeRepository.save(eventType);
@@ -166,5 +175,9 @@ public class EventTypeService extends BaseService<EventType, String> {
             eventTypeList = eventTypeRepository.findAllByStatusAndParentId(code, parentId);
         }
         return eventTypeList;
+    }
+
+    public EventType findById(String id) {
+        return getEntityById(eventTypeRepository, id);
     }
 }

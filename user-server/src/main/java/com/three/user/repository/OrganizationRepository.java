@@ -2,6 +2,7 @@ package com.three.user.repository;
 
 import com.three.user.entity.Organization;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -24,4 +25,7 @@ public interface OrganizationRepository extends BaseRepository<Organization, Str
     int countByFirstParentIdAndOrgName(String firstParentId, String orgName);
 
     int countByFirstParentIdAndOrgCode(String firstParentId, String orgCode);
+
+    @Query("select max(o.sort) from Organization o where o.parentId = :parentId")
+    Integer findMaxSortByParentId(String parentId);
 }

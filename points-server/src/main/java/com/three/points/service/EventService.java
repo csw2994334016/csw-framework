@@ -3,6 +3,7 @@ package com.three.points.service;
 import com.google.common.collect.Lists;
 import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
+import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
 import com.three.points.entity.ThemeDetail;
@@ -49,10 +50,15 @@ public class EventService extends BaseService<Event, String> {
     public void create(EventParam eventParam) {
         BeanValidator.check(eventParam);
 
+        // 事件名称不能相同
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        if (eventRepository.countByEventNameAndOrganizationId(eventParam.getEventName(), firstOrganizationId) > 0) {
+            throw new ParameterException("已存在同名[" + eventParam.getEventName() + "]的事件");
+        }
+
         Event event = new Event();
         event = (Event) BeanCopyUtil.copyBean(eventParam, event);
 
-        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         event.setOrganizationId(firstOrganizationId);
 
         EventType eventType = eventTypeService.getEventTypeById(event.getTypeId());
@@ -66,6 +72,10 @@ public class EventService extends BaseService<Event, String> {
         BeanValidator.check(eventParam);
 
         Event event = getEntityById(eventRepository, eventParam.getId());
+        // 事件名称不能相同
+        if (eventRepository.countByEventNameAndOrganizationIdAndIdNot(eventParam.getEventName(), event.getOrganizationId(), event.getId()) > 0) {
+            throw new ParameterException("已存在同名[" + eventParam.getEventName() + "]的事件");
+        }
         event = (Event) BeanCopyUtil.copyBean(eventParam, event);
 
         EventType eventType = eventTypeService.getEventTypeById(event.getTypeId());
@@ -137,9 +147,16 @@ public class EventService extends BaseService<Event, String> {
     @Transactional
     public void moveEvent(MoveEventParam moveEventParam) {
         BeanValidator.check(moveEventParam);
-        Event event = getEntityById(eventRepository, moveEventParam.getId());
-        event.setTypeId(moveEventParam.getTypeId());
-        eventRepository.save(event);
+        EventType eventType = eventTypeService.findById(moveEventParam.getTypeId());
+        Set<String> ids = StringUtil.getStrToIdSet1(moveEventParam.getId());
+        List<Event> eventList = new ArrayList<>();
+        ids.forEach(id -> {
+            Event event = getEntityById(eventRepository, moveEventParam.getId());
+            event.setTypeId(eventType.getId());
+            event.setTypeName(eventType.getTypeName());
+            eventList.add(event);
+        });
+        eventRepository.saveAll(eventList);
     }
 
     public Event findById(String id) {

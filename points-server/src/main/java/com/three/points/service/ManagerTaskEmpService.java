@@ -69,7 +69,7 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
                 predicateList.add(criteriaBuilder.like(root.get("taskName"), "%" + taskName + "%"));
             }
             if (taskDate != null) {
-                Date taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date(taskDate)));
+                Date taskDate1 = DateUtil.beginOfMonth(new Date(taskDate));
                 predicateList.add(criteriaBuilder.equal(root.get("taskDate"), taskDate1));
             }
             if (StringUtil.isNotBlank(empFullName)) {

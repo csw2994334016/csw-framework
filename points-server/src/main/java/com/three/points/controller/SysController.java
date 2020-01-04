@@ -31,7 +31,7 @@ public class SysController {
     @ApiOperation(value = "查询当前月任务已分配人员（内部接口）")
     @GetMapping(value = "/internal/findCurMonthTaskEmp")
     Set<String> findCurMonthTaskEmp(String firstOrganizationId) {
-        Date date = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
+        Date date = DateUtil.beginOfMonth(new Date());
         Date taskDateNext = DateUtil.offsetMonth(date, 1);
         return managerTaskService.findCurMonthTaskEmp(firstOrganizationId, taskDateNext);
     }

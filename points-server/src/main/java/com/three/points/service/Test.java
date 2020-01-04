@@ -3,6 +3,7 @@ package com.three.points.service;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateRange;
 import cn.hutool.core.date.DateUtil;
+import com.three.common.utils.DateUtils;
 import com.three.common.utils.StringUtil;
 import com.three.points.vo.DateVo;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,7 @@ public class Test {
         System.out.println(DateUtil.year(DateUtil.parse("2019-01-01")));
         System.out.println(StringUtil.getStrToIdSet1("222"));
         System.out.println(StringUtils.split("ids", ",")[0]);
-
+//        Date taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
 //        String statisticsFlag = "2";
 //        Date date = new Date();
 //        Date st, et;

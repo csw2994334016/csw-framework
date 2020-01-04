@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 public class MoveEventParam {
 
     @NotBlank(message = "事件ID不可以为空")
-    @ApiModelProperty("事件ID")
+    @ApiModelProperty("事件ID，当多个id时，用逗号,隔开")
     private String id; // 事件ID
 
 

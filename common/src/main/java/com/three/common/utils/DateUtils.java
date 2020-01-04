@@ -12,9 +12,9 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static String getMonthFirstDay(Date date) {
-        int year = DateUtil.year(date);
-        int month = DateUtil.month(date) + 1;
-        return year + "-" + month + "-01";
-    }
+//    public static String getMonthFirstDay(Date date) {
+//        int year = DateUtil.year(date);
+//        int month = DateUtil.month(date) + 1;
+//        return year + "-" + String.format("%02d", month) + "-01";
+//    }
 }

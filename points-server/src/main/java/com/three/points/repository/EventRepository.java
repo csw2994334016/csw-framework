@@ -14,4 +14,8 @@ public interface EventRepository extends BaseRepository<Event, String> {
     int countByTypeId(String id);
 
     List<Event> findAllByTypeId(String id);
+
+    int countByEventNameAndOrganizationId(String eventName, String organizationId);
+
+    int countByEventNameAndOrganizationIdAndIdNot(String eventName, String organizationId, String id);
 }

@@ -78,7 +78,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         List<ManagerTask> managerTaskList = new ArrayList<>();
 
         // 当前月份第一天
-        Date taskDate = DateUtil.parse(DateUtils.getMonthFirstDay(DateUtil.date()));
+        Date taskDate = DateUtil.beginOfMonth(new Date());
         // 当前月任务
         managerTask.setTaskDate(taskDate);
         managerTaskList.add(managerTask);
@@ -200,9 +200,10 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             List<Predicate> predicateList = new ArrayList<>();
             Specification<ManagerTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
-            Date taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
+//            Date taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
+            Date taskDate1 = DateUtil.beginOfMonth(new Date());
             if (taskDate != null) {
-                taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date(taskDate)));
+                taskDate1 = DateUtil.beginOfMonth(new Date(taskDate));
             }
             predicateList.add(criteriaBuilder.equal(root.get("taskDate"), taskDate1));
             if (StringUtil.isNotBlank(taskName)) {
