@@ -87,3 +87,9 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 60000
+# 上传文件配置
+file:
+  local:
+    path: D:/localFile
+    prefix: /statics
+    urlPrefix: http://127.0.0.1:8084/api-file${file.local.prefix}

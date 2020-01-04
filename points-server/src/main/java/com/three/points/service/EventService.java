@@ -151,7 +151,7 @@ public class EventService extends BaseService<Event, String> {
         Set<String> ids = StringUtil.getStrToIdSet1(moveEventParam.getId());
         List<Event> eventList = new ArrayList<>();
         ids.forEach(id -> {
-            Event event = getEntityById(eventRepository, moveEventParam.getId());
+            Event event = getEntityById(eventRepository, id);
             event.setTypeId(eventType.getId());
             event.setTypeName(eventType.getTypeName());
             eventList.add(event);

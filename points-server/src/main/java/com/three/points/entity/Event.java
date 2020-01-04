@@ -95,5 +95,19 @@ public class Event implements Serializable {
     @LastModifiedDate
     private Date updateDate; // 修改时间
 
+    @Transient
+    @ApiModelProperty("A分")
+    private String ascore;
 
+    @Transient
+    @ApiModelProperty("B分")
+    private String bscore;
+
+    public String getAscore() {
+        return ascoreMin + " ~ " +ascoreMax;
+    }
+
+    public String getBscore() {
+        return bscoreMin + " ~ " +bscoreMax;
+    }
 }

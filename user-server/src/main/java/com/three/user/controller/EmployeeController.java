@@ -1,6 +1,9 @@
 package com.three.user.controller;
 
 import com.three.common.vo.JsonData;
+import com.three.commonclient.exception.BusinessException;
+import com.three.resource_jpa.jpa.file.entity.FileInfo;
+import com.three.resource_jpa.jpa.file.service.FileInfoService;
 import com.three.user.entity.Employee;
 import com.three.user.param.EmployeeParam;
 import com.three.user.service.EmployeeService;
@@ -10,10 +13,12 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.user.service.UploadFileService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,6 +34,12 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private FileInfoService fileInfoService;
+
+    @Autowired
+    private UploadFileService uploadFileService;
 
     @LogAnnotation(module = "添加员工信息")
     @ApiOperation(value = "添加员工信息")
@@ -145,5 +156,19 @@ public class EmployeeController {
     @GetMapping("/findAuditor")
     public JsonData<List<Employee>> findAuditor(@RequestParam(defaultValue = "0") String attnOrAuditFlag, String attnId, Integer aPosScoreMax, Integer aNegScoreMin, Integer bPosScoreMax, Integer bNegScoreMin, String themeEmpIds) {
         return new JsonData<>(employeeService.findAuditor(attnOrAuditFlag, attnId, aPosScoreMax, aNegScoreMin, bPosScoreMax, bNegScoreMin, themeEmpIds));
+    }
+
+    @LogAnnotation(module = "上传头像")
+    @ApiOperation(value = "上传头像", notes = "")
+    @ApiImplicitParam(name = "file", value = "图片", required = true, dataType = "MultipartFile")
+    @PostMapping("/uploadHeadPortrait")
+    public JsonData<FileInfo> uploadHeadPortrait(@RequestParam(value = "file", required = true) MultipartFile file) {
+        FileInfo fileInfo;
+        try {
+            fileInfo = uploadFileService.upload(file);
+        } catch (Exception e) {
+            throw new BusinessException("上传头像失败：" + e.getMessage());
+        }
+        return new JsonData<>(fileInfo);
     }
 }

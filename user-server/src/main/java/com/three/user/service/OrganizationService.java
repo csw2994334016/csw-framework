@@ -97,10 +97,10 @@ public class OrganizationService extends BaseService<Organization, String> {
             throw new ParameterException("修改组织机构一定要选择上级组织结构");
         }
 
-        if (organizationRepository.countByFirstParentIdAndOrgNameAndIdNot(LoginUserUtil.getLoginUserFirstOrganizationId(), organizationParam.getOrgName(), organizationParam.getId()) > 0) {
+        if (organizationRepository.countByFirstParentIdAndOrgNameAndIdNot(firstOrganizationId, organizationParam.getOrgName(), organizationParam.getId()) > 0) {
             throw new ParameterException("数据库中已存在同名称[" + organizationParam.getOrgName() + "]组织机构");
         }
-        if (organizationRepository.countByFirstParentIdAndOrgCodeAndIdNot(LoginUserUtil.getLoginUserFirstOrganizationId(), organizationParam.getOrgCode(), organizationParam.getId()) > 0) {
+        if (organizationRepository.countByFirstParentIdAndOrgCodeAndIdNot(firstOrganizationId, organizationParam.getOrgCode(), organizationParam.getId()) > 0) {
             throw new ParameterException("数据库中已存在同编号[" + organizationParam.getOrgCode() + "]组织机构");
         }
 
