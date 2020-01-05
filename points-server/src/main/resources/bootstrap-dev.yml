@@ -1,4 +1,9 @@
 spring:
+  ## 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jackson:
     serialization:
       write-dates-as-timestamps: true

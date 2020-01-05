@@ -53,7 +53,7 @@ public class ExceptionHandlerAdvice {
         log.error("服务端异常", throwable);
         Map<String, Object> data = new HashMap<>();
         data.put("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        data.put("msg", "服务端异常，请联系管理员");
+        data.put("msg", "服务端异常，请联系管理员:" + throwable);
         return data;
     }
 

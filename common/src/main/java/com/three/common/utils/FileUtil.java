@@ -29,9 +29,8 @@ public class FileUtil {
 	 * 将文件保存到本地
 	 *  @param file
 	 * @param path
-	 * @param filePath
 	 */
-	public static boolean saveFile(MultipartFile file, String path, String filePath) {
+	public static boolean saveFile(MultipartFile file, String path) {
 		try {
 			File targetFile = new File(path);
 			if (targetFile.exists()) {
@@ -40,9 +39,8 @@ public class FileUtil {
 
 			// 判断文件路径是否存在，否则创建目录
 			boolean mkdirsFlag = true;
-			File pathFile = new File(filePath);
-			if (!pathFile.exists() && !pathFile.isDirectory()) {
-				mkdirsFlag = pathFile.mkdirs();
+			if (!targetFile.getParentFile().exists()) {
+				mkdirsFlag = targetFile.getParentFile().mkdirs();
 			}
 			if (mkdirsFlag) {
 				file.transferTo(targetFile);

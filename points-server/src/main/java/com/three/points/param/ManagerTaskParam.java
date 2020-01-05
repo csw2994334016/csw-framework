@@ -56,10 +56,10 @@ public class ManagerTaskParam {
     @ApiModelProperty("奖扣人次值")
     private Integer empCountValue; // 奖扣人次值
 
-    @NotNull(message = "未完成奖扣人次任务扣分不可以为空")
-    @Max(value = 0, message = "未完成奖扣人次任务扣分只能是小于0的数值")
+//    @NotNull(message = "未完成奖扣人次任务扣分不可以为空")
+    @Max(value = 0, message = "未完成奖扣人次任务扣分只能是小于或等于0的数值")
     @ApiModelProperty("未完成奖扣人次任务扣分")
-    private Integer empCountNegScore; // 未完成奖扣人次任务扣分
+    private Integer empCountNegScore = 0; // 未完成奖扣人次任务扣分
 
 
     @ApiModelProperty("描述/备注")

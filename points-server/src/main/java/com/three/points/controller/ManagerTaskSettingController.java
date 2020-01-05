@@ -1,5 +1,6 @@
 package com.three.points.controller;
 
+import com.three.common.enums.StatusEnum;
 import com.three.common.vo.JsonData;
 import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
@@ -70,12 +71,12 @@ public class ManagerTaskSettingController {
         return new JsonData<>(managerTaskService.findNextEmp(id)).success();
     }
 
-//    @LogAnnotation(module = "删除管理任务")
-//    @ApiOperation(value = "删除管理任务")
-//    @ApiImplicitParam(name = "ids", value = "管理任务信息ids", required = true, dataType = "String")
-//    @DeleteMapping()
-//    public JsonResult delete(@RequestParam(required = true) String ids) {
-//        managerTaskService.delete(ids, StatusEnum.DELETE.getCode());
-//        return JsonResult.ok("管理任务删除成功");
-//    }
+    @LogAnnotation(module = "删除管理任务")
+    @ApiOperation(value = "删除管理任务")
+    @ApiImplicitParam(name = "ids", value = "管理任务信息ids，批量删除id用逗号,隔开", required = true, dataType = "String")
+    @DeleteMapping()
+    public JsonResult delete(@RequestParam(required = true) String ids) {
+        managerTaskService.delete(ids, StatusEnum.DELETE.getCode());
+        return JsonResult.ok("管理任务删除成功");
+    }
 }

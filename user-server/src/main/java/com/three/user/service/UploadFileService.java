@@ -48,7 +48,7 @@ public class UploadFileService extends AbstractFileService {
 
         fileInfo.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
-        return FileUtil.saveFile(file, path, localFilePath + filePath);
+        return FileUtil.saveFile(file, path);
 
     }
 
