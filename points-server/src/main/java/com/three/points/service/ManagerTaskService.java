@@ -82,17 +82,18 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         // 当前月任务
         managerTask.setTaskDate(taskDate);
         managerTaskList.add(managerTask);
-        // 依次生成未来1个月的任务
-        for (int i = 0; i < 1; i++) {
-            taskDate = DateUtil.offsetMonth(taskDate, 1);
-            ManagerTask managerTask1 = new ManagerTask();
-            managerTask1 = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTask1);
-            managerTask1.setOrganizationId(firstOrganizationId);
-            managerTask1.setTaskDate(taskDate);
-            managerTaskList.add(managerTask1);
-        }
+        // 生成下个月的任务
+        taskDate = DateUtil.offsetMonth(taskDate, 1);
+        ManagerTask managerTaskNext = new ManagerTask();
+        managerTaskNext = (ManagerTask) BeanCopyUtil.copyBean(managerTaskParam, managerTaskNext);
+        managerTaskNext.setOrganizationId(firstOrganizationId);
+        managerTaskNext.setTaskDate(taskDate);
+        managerTaskNext = managerTaskRepository.save(managerTaskNext);
+        managerTaskList.add(managerTaskNext);
 
-        managerTaskList = managerTaskRepository.saveAll(managerTaskList);
+        managerTask.setNextTaskId(managerTaskNext.getId());
+        managerTaskRepository.save(managerTask);
+
         // 添加参与人员
         if (managerTaskParam.getManagerTaskEmpParamList().size() > 0) {
             for (ManagerTask managerTask1 : managerTaskList) {
@@ -187,6 +188,11 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         for (String id : idSet) {
             ManagerTask managerTask = getEntityById(managerTaskRepository, String.valueOf(id));
             managerTask.setStatus(code);
+            if (StringUtil.isNotBlank(managerTask.getNextTaskId())) {
+                ManagerTask managerTaskNext = getEntityById(managerTaskRepository, managerTask.getNextTaskId());
+                managerTaskNext.setStatus(code);
+                managerTaskList.add(managerTaskNext);
+            }
             managerTaskList.add(managerTask);
         }
 
@@ -200,7 +206,6 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             List<Predicate> predicateList = new ArrayList<>();
             Specification<ManagerTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
-//            Date taskDate1 = DateUtil.parse(DateUtils.getMonthFirstDay(new Date()));
             Date taskDate1 = DateUtil.beginOfMonth(new Date());
             if (taskDate != null) {
                 taskDate1 = DateUtil.beginOfMonth(new Date(taskDate));
@@ -227,12 +232,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
 
     public ManagerTask findNextTask(String id) {
         ManagerTask managerTask = getEntityById(managerTaskRepository, id);
-        Date taskDateNext = DateUtil.offsetMonth(managerTask.getTaskDate(), 1);
-        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        ManagerTask managerTaskNext = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(firstOrganizationId, managerTask.getTaskName(), taskDateNext);
-        if (managerTaskNext == null) {
-            throw new BusinessException("系统中不存在该任务的下个月配置信息");
+//        Date taskDateNext = DateUtil.offsetMonth(managerTask.getTaskDate(), 1);
+//        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+//        ManagerTask managerTaskNext = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(firstOrganizationId, managerTask.getTaskName(), taskDateNext);
+        if (StringUtil.isBlank(managerTask.getNextTaskId())) {
+            throw new BusinessException("该任务的下个月配置信息不存在");
         }
+        ManagerTask managerTaskNext = managerTaskRepository.findById(managerTask.getNextTaskId()).get();
         List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(managerTaskNext.getId());
         managerTaskNext.setManagerTaskEmpList(managerTaskEmpList);
         return managerTaskNext;
@@ -444,13 +450,16 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         List<ManagerTask> curManagerTaskList = findManagerTaskListByTaskDate(curTaskDate, firstOrganizationId);
         Date nextTaskDate = DateUtil.offsetMonth(curTaskDate, 1);
         for (ManagerTask curManagerTask : curManagerTaskList) {
-            ManagerTask nextManagerTask = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(curManagerTask.getOrganizationId(), curManagerTask.getTaskName(), nextTaskDate);
-            if (nextManagerTask == null) {
+//            ManagerTask nextManagerTask = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(curManagerTask.getOrganizationId(), curManagerTask.getTaskName(), nextTaskDate);
+            if (curManagerTask.getNextTaskId() == null) {
                 // 生成下个月管理任务
-                nextManagerTask = new ManagerTask();
+                ManagerTask nextManagerTask = new ManagerTask();
                 nextManagerTask = (ManagerTask) BeanCopyUtil.copyBean(curManagerTask, nextManagerTask, Arrays.asList("id"));
                 nextManagerTask.setTaskDate(nextTaskDate);
                 nextManagerTask = managerTaskRepository.save(nextManagerTask);
+                // 当月任务记录下月任务id
+                curManagerTask.setNextTaskId(nextManagerTask.getId());
+                managerTaskRepository.save(curManagerTask);
                 // 生成下个月管理任务的人员配置
                 List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(curManagerTask.getId());
                 List<ManagerTaskEmp> nextManagerTaskEmpList = new ArrayList<>();

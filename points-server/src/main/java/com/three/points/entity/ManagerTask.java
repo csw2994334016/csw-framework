@@ -48,6 +48,10 @@ public class ManagerTask implements Serializable {
     @ApiModelProperty("任务日期（按月算）")
     private Date taskDate; // 任务日期（按月算）
 
+    @Column(name = "next_task_id", columnDefinition = "varchar(36) comment '下一个月管理任务的id'")
+    @ApiModelProperty("下一个月管理任务的id")
+    private String nextTaskId; // 下一个月管理任务的id
+
     @Column(name = "score_task_flag", nullable = false, columnDefinition = "int(1) default 2 comment '奖扣分考核任务（1=是；2=否）'")
     @ApiModelProperty("奖扣分考核任务（1=是；2=否）")
     private Integer scoreTaskFlag = 2; // 奖扣分考核任务（1=是；2=否）

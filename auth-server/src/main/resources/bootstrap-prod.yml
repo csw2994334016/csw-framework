@@ -1,12 +1,15 @@
 spring:
-  ## 文件上传配置
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-  jackson:
-    serialization:
-      write-dates-as-timestamps: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    timeout: 10s
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+        max-active: 8
+        max-wait: -1ms
   jpa: # jpa配置
     show-sql: true
     hibernate:
@@ -17,9 +20,9 @@ spring:
     database: mysql
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.0.105:3306/points_system?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+    url: jdbc:mysql://47.96.21.5:3306/points_system?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
     username: root
-    password: root
+    password: YiJiFen_123!@#
     druid:
       initial-size: 5 # 初始化连接大小
       minIdle: 5     # 最小连接池数量
@@ -41,48 +44,28 @@ spring:
     username: cloud-dev
     password: cloud-dev
     virtual-host: /
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    password:
-    timeout: 10s
-    lettuce:
-      pool:
-        min-idle: 0
-        max-idle: 8
-        max-active: 8
-        max-wait: -1ms
   mvc:
     servlet:
       load-on-startup: 1
-  aop:
-    proxy-target-class: true
   zipkin:
     base-url: http://localhost:9411
     enabled: true
     sender:
       type: web
+access_token:
+  store-jwt: false
+  jwt-signing-key: xiao@wei@jia@gou=$==+_+%0%:)(:)
+  add-user-info: false
 logging:
   level:
     root: info
     com.three: debug
     org.springframework.security: debug
   file: logs/${spring.application.name}.log
-security:
-  oauth2:
-    resource:
-      user-info-uri: http://localhost:8084/three-auth-server/user-me
-      prefer-token-info: false
-#wechat:
-#  domain: http://api.gateway.com:8080/api-u
-#  infos:
-#    app1:
-#      appid: xxx
-#      secret: xxx
-#    app2:
-#      appid: xxx
-#      secret: xxx
 ribbon:
+  eager-load:
+    enabled: true
+    clients: user-service
   ReadTimeout: 10000
   ConnectTimeout: 10000
 hystrix:
@@ -92,15 +75,3 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 60000
-# 上传文件配置
-file:
-  local:
-#    path: D:/localFile
-    prefix: /head_img
-    path: /var/www/html/userfile/head_img
-    urlPrefix: http://47.96.21.5:8011/userfile${file.local.prefix}
-  ftp:
-    hostname: 47.96.21.5
-    username:
-    password:
-

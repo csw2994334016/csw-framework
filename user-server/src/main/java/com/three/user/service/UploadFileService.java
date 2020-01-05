@@ -1,6 +1,7 @@
 package com.three.user.service;
 
 import com.three.common.utils.FileUtil;
+import com.three.common.utils.FtpOperationUtil;
 import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.jpa.file.repository.FileInfoRepository;
 import com.three.resource_jpa.jpa.file.service.AbstractFileService;
@@ -14,6 +15,15 @@ import java.time.LocalDate;
 
 @Service
 public class UploadFileService extends AbstractFileService {
+
+    @Value("${file.ftp.hostname}")
+    private String hostname;
+
+    @Value("${file.ftp.username}")
+    private String username;
+
+    @Value("${file.ftp.password}")
+    private String password;
 
     @Value("${file.local.urlPrefix}")
     private String urlPrefix;
@@ -49,7 +59,7 @@ public class UploadFileService extends AbstractFileService {
         fileInfo.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
         return FileUtil.saveFile(file, path);
-
+//        return FtpOperationUtil.upload(hostname, username, password, path, file.getInputStream());
     }
 
     public boolean deleteFile(FileInfo fileInfo) {
