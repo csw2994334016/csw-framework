@@ -74,8 +74,13 @@ public class EmployeeService extends BaseService<Employee, String> {
     public void create(EmployeeParam employeeParam) {
         BeanValidator.check(employeeParam);
 
+        if (employeeRepository.countByUsername(employeeParam.getEmpNum()) > 0) {
+            throw new ParameterException("系统中已经存在相同工号[" + employeeParam.getEmpNum() + "]人员");
+        }
+
         Employee employee = new Employee();
         employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
+        employee.setUsername(employee.getEmpNum());
 
         Organization organization = organizationService.findById(employeeParam.getOrganizationId());
         employee.setOrganizationId(organization.getId());
@@ -85,6 +90,7 @@ public class EmployeeService extends BaseService<Employee, String> {
 
         User user = new User();
         user = (User) BeanCopyUtil.copyBean(employeeParam, user);
+        user.setUsername(employee.getUsername());
         user.setEmployee(employee);
 
         String finalSecret = new BCryptPasswordEncoder().encode("123456");
@@ -100,7 +106,11 @@ public class EmployeeService extends BaseService<Employee, String> {
         BeanValidator.check(employeeParam);
 
         Employee employee = getEntityById(employeeRepository, employeeParam.getId());
+        if (employeeRepository.countByUsernameAndIdNot(employeeParam.getEmpNum(), employee.getId()) > 0) {
+            throw new ParameterException("系统中已经存在相同工号[" + employeeParam.getEmpNum() + "]人员");
+        }
         employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
+        employee.setUsername(employee.getEmpNum());
 
         Organization organization = organizationService.findById(employeeParam.getOrganizationId());
         employee.setOrganizationId(organization.getId());
@@ -108,7 +118,7 @@ public class EmployeeService extends BaseService<Employee, String> {
 
         User user = userService.findByEmployee(employee);
 
-        user.setUsername(employeeParam.getUsername());
+        user.setUsername(employee.getUsername());
         user.setFullName(employeeParam.getFullName());
         user.setCellNum(employeeParam.getCellNum());
 

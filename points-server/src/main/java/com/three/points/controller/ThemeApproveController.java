@@ -80,7 +80,7 @@ public class ThemeApproveController {
             @ApiImplicitParam(name = "attnName", value = "初审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "auditName", value = "终审人姓名", dataType = "String"),
             @ApiImplicitParam(name = "recorderName", value = "记录人姓名", dataType = "String"),
-            @ApiImplicitParam(name = "themeStatus", value = "状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定", dataType = "Integer")
+            @ApiImplicitParam(name = "themeStatus", value = "状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废", dataType = "Integer")
     })
     @GetMapping("/query")
     public PageResult<Theme> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String themeName,

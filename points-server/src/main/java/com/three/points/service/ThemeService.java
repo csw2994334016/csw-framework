@@ -1,6 +1,5 @@
 package com.three.points.service;
 
-import com.three.common.auth.LoginUser;
 import com.three.common.auth.SysEmployee;
 import com.three.common.constants.RedisConstant;
 import com.three.commonclient.exception.BusinessException;

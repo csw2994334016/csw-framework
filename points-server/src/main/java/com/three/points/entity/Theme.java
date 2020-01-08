@@ -46,9 +46,9 @@ public class Theme implements Serializable {
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
 
-    @Column(name = "theme_status", nullable = false, columnDefinition = "int(2) comment '主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定'")
-    @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定")
-    private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定
+    @Column(name = "theme_status", nullable = false, columnDefinition = "int(2) comment '主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废;7=已作废'")
+    @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废")
+    private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废
 
     @Column(name = "relation_theme_id", columnDefinition = "varchar(36) comment '相关联主题ID'")
     @ApiModelProperty("相关联主题ID")

@@ -1,11 +1,11 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import com.three.common.auth.SysEmployee;
 import com.three.common.constants.RedisConstant;
 import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
+import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.Event;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.enums.ThemeStatusEnum;
@@ -190,7 +190,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         // 输入时间年份1月-12月，12个月份，一年有多少个月
         Date stM = DateUtil.beginOfYear(date);
         for (int i = DateUtil.month(stM); i <= DateUtil.month(et); i++) {
-            Date date1 = DateUtil.offsetMonth(st, i);
+            Date date1 = DateUtil.offsetMonth(stM, i);
             DateVo dateVo = new DateVo(DateUtil.beginOfMonth(date1), DateUtil.endOfMonth(date1));
             monthDateMap.put(String.format("%02d", i + 1), dateVo);
             monthAwardValueMap.put(String.format("%02d", i + 1), 0);
@@ -211,11 +211,15 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             for (Map.Entry<String, DateVo> entry : monthDateMap.entrySet()) {
                 if (themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
                     if (themeDetailDailyVo.getBscore() > 0) { // 奖分
-                        myPointsScoreTrendVo.setMonthAwardScore(myPointsScoreTrendVo.getMonthAwardScore() + themeDetailDailyVo.getBscore());
+                        if (DateUtil.month(date) == DateUtil.month(entry.getValue().getStartD())) {
+                            myPointsScoreTrendVo.setMonthAwardScore(myPointsScoreTrendVo.getMonthAwardScore() + themeDetailDailyVo.getBscore());
+                        }
                         monthAwardValueMap.put(entry.getKey(), monthAwardValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
                     }
                     if (themeDetailDailyVo.getBscore() < 0) { // 扣分
-                        myPointsScoreTrendVo.setMonthDeductScore(myPointsScoreTrendVo.getMonthDeductScore() + themeDetailDailyVo.getBscore());
+                        if (DateUtil.month(date) == DateUtil.month(entry.getValue().getStartD())) {
+                            myPointsScoreTrendVo.setMonthDeductScore(myPointsScoreTrendVo.getMonthDeductScore() + themeDetailDailyVo.getBscore());
+                        }
                         monthDeductValueMap.put(entry.getKey(), monthDeductValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
                     }
                     break;
@@ -224,11 +228,15 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             for (Map.Entry<String, DateVo> entry : yearDateMap.entrySet()) {
                 if (themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getStartD()) >= 0 && themeDetailDailyVo.getThemeDate().compareTo(entry.getValue().getEndD()) <= 0) {
                     if (themeDetailDailyVo.getBscore() > 0) { // 奖分
-                        myPointsScoreTrendVo.setYearAwardScore(myPointsScoreTrendVo.getYearAwardScore() + themeDetailDailyVo.getBscore());
+                        if (DateUtil.year(date) == DateUtil.year(entry.getValue().getStartD())) {
+                            myPointsScoreTrendVo.setYearAwardScore(myPointsScoreTrendVo.getYearAwardScore() + themeDetailDailyVo.getBscore());
+                        }
                         yearAwardValueMap.put(entry.getKey(), yearAwardValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
                     }
                     if (themeDetailDailyVo.getBscore() < 0) { // 扣分
-                        myPointsScoreTrendVo.setYearDeductScore(myPointsScoreTrendVo.getYearDeductScore() + themeDetailDailyVo.getBscore());
+                        if (DateUtil.year(date) == DateUtil.year(entry.getValue().getStartD())) {
+                            myPointsScoreTrendVo.setYearDeductScore(myPointsScoreTrendVo.getYearDeductScore() + themeDetailDailyVo.getBscore());
+                        }
                         yearDeductValueMap.put(entry.getKey(), yearDeductValueMap.get(entry.getKey()) + themeDetailDailyVo.getBscore());
                     }
                     break;
@@ -255,5 +263,34 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         myPointsScoreTrendVo.setTotalAwardValueTrendList(new ArrayList<>(totalAwardValueMap.values()));
         myPointsScoreTrendVo.setTotalDeductValueTrendList(new ArrayList<>(totalDeductValueMap.values()));
         return myPointsScoreTrendVo;
+    }
+
+    public PageResult<ThemeDetailEventViewVo> eventView(PageQuery pageQuery, int code, Long themeDateSt, Long themeDateEt, Integer themeStatus, String themeName, String eventName, String empFullName, Integer modifyFlag) {
+        String loginUserEmpFullName = LoginUserUtil.getLoginUserEmpFullName();
+        if (StringUtil.isNotBlank(empFullName)) {
+            loginUserEmpFullName = empFullName;
+        }
+        if (StringUtil.isBlank(loginUserEmpFullName)) {
+            throw new BusinessException("没有用户信息，无法查找积分核查记录");
+        }
+        Date date = new Date();
+        Date stM = DateUtil.beginOfMonth(date); // 查找任务日期月份第一天
+        Date etM = DateUtil.endOfMonth(date); // 任务月份最后时间
+        if (themeDateSt != null && themeDateEt != null) {
+            if (themeDateEt > themeDateSt) {
+                stM = new Date(themeDateSt);
+                etM = new Date(themeDateEt);
+            } else {
+                throw new ParameterException("输入奖扣时间开始时间大于结束时间错误");
+            }
+        }
+        if (pageQuery != null) {
+            Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
+            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(code, themeStatus, stM, etM, modifyFlag, "%"+loginUserEmpFullName+"%", themeName+"%", eventName+"%", pageable);
+            return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
+        } else {
+            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(code, themeStatus, stM, etM, modifyFlag, "%"+loginUserEmpFullName+"%", themeName+"%", eventName+"%");
+            return new PageResult<>(themeDetailDailyVoList.size(), themeDetailDailyVoList);
+        }
     }
 }

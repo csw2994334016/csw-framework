@@ -15,7 +15,7 @@ public class EmployeeParam {
 
     private String id;
 
-    @ApiModelProperty("用户名")
+    @ApiModelProperty("用户名/员工工号")
     private String username; // 用户名
 
     public String getUsername() {

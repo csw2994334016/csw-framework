@@ -26,9 +26,6 @@ public class OrganizationParam {
     @ApiModelProperty("父级id，不传默认为一级组织，或默认传字符串'-1'")
     private String parentId = "-1"; // 父级id
 
-    @ApiModelProperty("排序")
-    private Integer sort = 100; // 排序
-
 
     @ApiModelProperty("备注")
     private String remark; // 备注

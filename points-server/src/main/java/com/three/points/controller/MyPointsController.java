@@ -44,13 +44,14 @@ public class MyPointsController {
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "themeDate", value = "奖扣时间(月份，时间戳，毫秒)", dataType = "Long"),
+            @ApiImplicitParam(name = "empId", value = "人员ID，不传则表示当前登录用户", dataType = "String")
     })
     @GetMapping("/themeDetailDaily")
-    public PageResult<ThemeDetailDailyVo> themeDetailDaily(Integer page, Integer limit, Long themeDate) {
+    public PageResult<ThemeDetailDailyVo> themeDetailDaily(Integer page, Integer limit, Long themeDate, String empId) {
         if (page != null && limit != null) {
-            return themeDetailService.themeDetailDaily(new PageQuery(page, limit), StatusEnum.OK.getCode(), themeDate, null);
+            return themeDetailService.themeDetailDaily(new PageQuery(page, limit), StatusEnum.OK.getCode(), themeDate, empId);
         } else {
-            return themeDetailService.themeDetailDaily(null, StatusEnum.OK.getCode(), themeDate, null);
+            return themeDetailService.themeDetailDaily(null, StatusEnum.OK.getCode(), themeDate, empId);
         }
     }
 
@@ -59,13 +60,14 @@ public class MyPointsController {
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "taskDate", value = "管理任务时间(月份，时间戳，毫秒)", dataType = "Long"),
+            @ApiImplicitParam(name = "empId", value = "人员ID，不传则表示当前登录用户", dataType = "String")
     })
     @GetMapping("/managerTaskScore")
-    public PageResult<ManagerTaskScore> managerTaskScore(Integer page, Integer limit, Long taskDate) {
+    public PageResult<ManagerTaskScore> managerTaskScore(Integer page, Integer limit, Long taskDate, String empId) {
         if (page != null && limit != null) {
-            return managerTaskScoreService.managerTaskScore(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskDate, null);
+            return managerTaskScoreService.managerTaskScore(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskDate, empId);
         } else {
-            return managerTaskScoreService.managerTaskScore(null, StatusEnum.OK.getCode(), taskDate, null);
+            return managerTaskScoreService.managerTaskScore(null, StatusEnum.OK.getCode(), taskDate, empId);
         }
     }
 }

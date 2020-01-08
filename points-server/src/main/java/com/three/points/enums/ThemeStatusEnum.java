@@ -15,7 +15,8 @@ public enum ThemeStatusEnum {
     AUDIT(3, "待终审"),
     REJECT(4, "驳回"),
     SUCCESS(5, "审核通过"),
-    LOCK(6, "锁定");
+    LOCK(6, "锁定"),
+    INVALID(7, "已作废");
 
     private int code;
 

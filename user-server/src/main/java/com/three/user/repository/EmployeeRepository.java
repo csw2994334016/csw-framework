@@ -18,4 +18,8 @@ public interface EmployeeRepository extends BaseRepository<Employee, String> {
     List<Employee> findAllByOrganizationId(String organizationId);
 
     List<Employee> findAllByStatusAndOrganizationId(int code, String organizationId);
+
+    int countByUsername(String empNum);
+
+    int countByUsernameAndIdNot(String empNum, String id);
 }

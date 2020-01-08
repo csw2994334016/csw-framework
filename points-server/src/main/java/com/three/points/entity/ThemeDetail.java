@@ -110,6 +110,10 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("B分")
     private Integer bscore = 0; // B分
 
+    @Column(name = "modify_flag", nullable = false, columnDefinition = "int(1) default 0 comment '修改（是否修改过分值）：0=否（默认）；1=是'")
+    @ApiModelProperty("修改（是否修改过分值）：0=否（默认）；1=是")
+    private Integer modifyFlag = 0; // 修改（是否修改过分值）：0=否（默认）；1=是
+
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
     @ApiModelProperty("描述/备注")

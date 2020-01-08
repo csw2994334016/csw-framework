@@ -280,6 +280,9 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         }
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         ManagerTaskEmp managerTaskEmp = managerTaskEmpRepository.findAllByOrganizationIdAndTaskDateAndEmpId(firstOrganizationId, stM, empId);
+        if (managerTaskEmp == null) {
+            throw new BusinessException("用户没有管理任务配置信息");
+        }
         ManagerTask managerTask = getEntityById(managerTaskRepository, managerTaskEmp.getTaskId());
 
         MyManagerTaskVo myManagerTaskVo = new MyManagerTaskVo();
