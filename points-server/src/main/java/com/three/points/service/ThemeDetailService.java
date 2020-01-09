@@ -4,9 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import com.three.common.auth.SysEmployee;
 import com.three.common.constants.RedisConstant;
 import com.three.common.enums.StatusEnum;
+import com.three.common.enums.YesNoEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.Event;
+import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.enums.ThemeStatusEnum;
 import com.three.points.param.ThemeEmpParam;
@@ -51,6 +53,9 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
 
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+
+    @Autowired
+    private ThemeService themeService;
 
     @Transactional
     public void delete(String ids, int code) {
@@ -286,11 +291,69 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         }
         if (pageQuery != null) {
             Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
-            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(code, themeStatus, stM, etM, modifyFlag, "%"+loginUserEmpFullName+"%", themeName+"%", eventName+"%", pageable);
+            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%", pageable);
             return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
         } else {
-            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(code, themeStatus, stM, etM, modifyFlag, "%"+loginUserEmpFullName+"%", themeName+"%", eventName+"%");
+            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%");
             return new PageResult<>(themeDetailDailyVoList.size(), themeDetailDailyVoList);
         }
+    }
+
+    @Transactional
+    public void changePriceFlag(String ids, String flag) {
+        Set<String> idSet = StringUtil.getStrToIdSet1(ids);
+        List<String> errorList = new ArrayList<>();
+        List<ThemeDetail> themeDetailList = new ArrayList<>();
+        for (String id : idSet) {
+            ThemeDetail themeDetail = getEntityById(themeDetailRepository, id);
+            if ("cancel".equals(flag)) {
+                if (themeDetail.getPrizeFlag() == YesNoEnum.YES.getCode()) { // 只有奖票事件才能取消奖票
+                    themeDetail.setPrizeFlag(YesNoEnum.NO.getCode());
+                    themeDetailList.add(themeDetail);
+                } else {
+                    errorList.add(themeDetail.getEventName());
+                }
+            } else if ("recovery".equals(flag)) {
+                if (themeDetail.getPrizeFlag() == YesNoEnum.NO.getCode()) { // 只有作废状态的事件才能恢复奖票
+                    themeDetail.setPrizeFlag(YesNoEnum.YES.getCode());
+                    themeDetailList.add(themeDetail);
+                } else {
+                    errorList.add(themeDetail.getEventName());
+                }
+            }
+        }
+        if (errorList.size() > 0) {
+            throw new BusinessException("事件奖票状态不合法，不能执行该操作，事件名称如下：" + errorList.toString());
+        }
+        themeDetailRepository.saveAll(themeDetailList);
+    }
+
+    @Transactional
+    public void changeThemeStatus(String themeIds, String flag) {
+        Set<String> themeIdSet = StringUtil.getStrToIdSet1(themeIds);
+        List<String> errorList = new ArrayList<>();
+        List<Theme> themeList = new ArrayList<>();
+        for (String themeId : themeIdSet) {
+            Theme theme = themeService.findById(themeId);
+            if ("cancel".equals(flag)) {
+                if (theme.getThemeStatus() == ThemeStatusEnum.SUCCESS.getCode()) { // 只有审核通过的积分奖扣主题才能作废
+                    theme.setThemeStatus(ThemeStatusEnum.INVALID.getCode());
+                    themeList.add(theme);
+                } else {
+                    errorList.add(theme.getThemeName());
+                }
+            } else if ("recovery".equals(flag)) {
+                if (theme.getThemeStatus() == ThemeStatusEnum.INVALID.getCode()) { // 只有作废状态的积分奖扣主题才能恢复
+                    theme.setThemeStatus(ThemeStatusEnum.SUCCESS.getCode());
+                    themeList.add(theme);
+                } else {
+                    errorList.add(theme.getThemeName());
+                }
+            }
+        }
+        if (errorList.size() > 0) {
+            throw new BusinessException("积分奖扣主题状态不合法，不能执行该操作，主题名称如下：" + errorList.toString());
+        }
+        themeRepository.saveAll(themeList);
     }
 }

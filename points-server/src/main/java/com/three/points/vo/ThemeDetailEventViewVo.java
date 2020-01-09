@@ -47,9 +47,11 @@ public class ThemeDetailEventViewVo {
     @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废")
     private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废
 
+    @ApiModelProperty("主题ID")
+    private String themeId; // 主题ID
+
     public ThemeDetailEventViewVo(String empId, String empFullName, Date themeDate, String themeName, String eventName,
-                                  Integer modifyFlag, Integer ascore, Integer bscore, Integer prizeFlag,
-                                  String recorderName, String attnName, String auditName, Integer themeStatus) {
+                                  Integer modifyFlag, Integer ascore, Integer bscore, Integer prizeFlag, String recorderName, String attnName, String auditName, Integer themeStatus, String themeId) {
         this.empId = empId;
         this.empFullName = empFullName;
         this.themeDate = themeDate;
@@ -63,5 +65,6 @@ public class ThemeDetailEventViewVo {
         this.attnName = attnName;
         this.auditName = auditName;
         this.themeStatus = themeStatus;
+        this.themeId = themeId;
     }
 }

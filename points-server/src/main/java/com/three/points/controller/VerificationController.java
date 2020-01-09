@@ -1,6 +1,8 @@
 package com.three.points.controller;
 
 import com.three.common.enums.StatusEnum;
+import com.three.common.log.LogAnnotation;
+import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.service.ThemeDetailService;
@@ -43,5 +45,41 @@ public class VerificationController {
         } else {
             return themeDetailService.eventView(null, StatusEnum.OK.getCode(), themeDateSt, themeDateEt, themeStatus, themeName, eventName, empFullName, modifyFlag);
         }
+    }
+
+    @LogAnnotation(module = "奖票撤销")
+    @ApiOperation(value = "奖票撤销", notes = "")
+    @ApiImplicitParam(name = "ids", value = "积分奖扣主题详情id(多条记录用英文逗号隔开)", required = true, dataType = "String")
+    @GetMapping("/cancelPrice")
+    public JsonResult cancelPrice(@RequestParam(required = true) String ids) {
+        themeDetailService.changePriceFlag(ids, "cancel");
+        return JsonResult.ok("奖票撤销成功");
+    }
+
+    @LogAnnotation(module = "奖票恢复")
+    @ApiOperation(value = "奖票恢复", notes = "")
+    @ApiImplicitParam(name = "ids", value = "积分奖扣主题详情id(多条记录用英文逗号隔开)", required = true, dataType = "String")
+    @GetMapping("/recoveryPrice")
+    public JsonResult recoveryPrice(@RequestParam(required = true) String ids) {
+        themeDetailService.changePriceFlag(ids, "recovery");
+        return JsonResult.ok("奖票恢复成功");
+    }
+
+    @LogAnnotation(module = "积分主题作废")
+    @ApiOperation(value = "积分主题作废", notes = "")
+    @ApiImplicitParam(name = "themeIds", value = "积分奖扣主题themeId(多条记录用英文逗号隔开)", required = true, dataType = "String")
+    @GetMapping("/cancelTheme")
+    public JsonResult cancelTheme(@RequestParam(required = true) String themeIds) {
+        themeDetailService.changeThemeStatus(themeIds, "cancel");
+        return JsonResult.ok("积分主题作废成功");
+    }
+
+    @LogAnnotation(module = "积分主题恢复")
+    @ApiOperation(value = "积分主题恢复", notes = "")
+    @ApiImplicitParam(name = "themeIds", value = "积分奖扣主题themeId(多条记录用英文逗号隔开)", required = true, dataType = "String")
+    @GetMapping("/recoveryTheme")
+    public JsonResult recoveryTheme(@RequestParam(required = true) String themeIds) {
+        themeDetailService.changeThemeStatus(themeIds, "recovery");
+        return JsonResult.ok("积分主题恢复成功");
     }
 }

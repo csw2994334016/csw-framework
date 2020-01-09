@@ -47,13 +47,13 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
 //            "and if(:themeName is not null and :themeName != '', td.themeName like contact('%',:themeName,'%'), 1=1) and if(:eventName is not null and :eventName != '', td.eventName like contact('%',:eventName,'%'), 1=1)")
 //    Page<ThemeDetailEventViewVo> findAllByEventView(int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName, Pageable pageable);
 
-    @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus) " +
+    @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id) " +
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
             " (:modifyFlag is null or td.modifyFlag = :modifyFlag) and (:empFullName is null or td.empFullName like :empFullName) and" +
             " (:themeName is null or td.themeName like :themeName) and (:eventName is null or td.eventName like :eventName)")
     Page<ThemeDetailEventViewVo> findAllByEventView(int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName, Pageable pageable);
 
-    @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus) " +
+    @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id) " +
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
             " (:modifyFlag is null or td.modifyFlag = :modifyFlag) and (:empFullName is null or td.modifyFlag = :empFullName) and" +
             "(:themeName is null or td.themeName = :themeName) and (:eventName is null or td.eventName = :eventName) order by td.themeDate")
