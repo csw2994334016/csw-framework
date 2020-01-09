@@ -23,9 +23,6 @@ public class EventTypeParam {
     @ApiModelProperty("分类名称")
     private String typeName; // 分类名称
 
-    @ApiModelProperty("排序，默认100")
-    private Integer sort = 100; // 排序，默认100
-
 
     private String remark;
 

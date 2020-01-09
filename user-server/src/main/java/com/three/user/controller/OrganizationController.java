@@ -55,7 +55,7 @@ public class OrganizationController {
     @ApiOperation(value = "删除组织机构")
     @ApiImplicitParam(name = "ids", value = "组织机构信息ids,多个用逗号,隔开", required = true, dataType = "String")
     @DeleteMapping()
-    public JsonResult delete(String ids) {
+    public JsonResult delete(@RequestParam(required = true) String ids) {
         organizationService.delete(ids, StatusEnum.DELETE.getCode());
         return JsonResult.ok("组织机构删除成功");
     }

@@ -63,7 +63,7 @@ public class EmployeeController {
     @ApiOperation(value = "删除员工信息")
     @ApiImplicitParam(name = "ids", value = "员工信息ids", required = true, dataType = "String")
     @DeleteMapping()
-    public JsonResult delete(String ids) {
+    public JsonResult delete(@RequestParam(required = true) String ids) {
         employeeService.delete(ids, StatusEnum.DELETE.getCode());
         return JsonResult.ok("员工信息删除成功");
     }

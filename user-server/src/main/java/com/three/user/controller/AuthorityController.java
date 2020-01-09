@@ -52,7 +52,7 @@ public class AuthorityController {
     @ApiOperation(value = "删除权限")
     @ApiImplicitParam(name = "id", value = "权限id", required = true, dataType = "String")
     @DeleteMapping()
-    public JsonResult delete(String id) {
+    public JsonResult delete(@RequestParam(required = true) String id) {
         authorityService.delete(id, StatusEnum.DELETE.getCode());
         return JsonResult.ok("删除成功");
     }

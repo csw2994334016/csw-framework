@@ -134,9 +134,9 @@ public class EmployeeService extends BaseService<Employee, String> {
         for (String id : idSet) {
             Employee employee = getEntityById(employeeRepository, String.valueOf(id));
             employee.setStatus(code);
+            employeeList.add(employee);
             User user = userService.findByEmployee(employee);
             user.setStatus(code);
-            employeeList.add(employee);
         }
 
         employeeRepository.saveAll(employeeList);

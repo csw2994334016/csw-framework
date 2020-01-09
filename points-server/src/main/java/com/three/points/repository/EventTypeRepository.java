@@ -2,6 +2,7 @@ package com.three.points.repository;
 
 import com.three.points.entity.EventType;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -20,4 +21,7 @@ public interface EventTypeRepository extends BaseRepository<EventType, String> {
     int countByTypeNameAndOrganizationId(String typeName, String organizationId);
 
     int countByTypeNameAndOrganizationIdAndIdNot(String typeName, String organizationId, String id);
+
+    @Query("select max(e.sort) from EventType e where e.parentId = :parentId")
+    Integer findMaxSortByParentId(String parentId);
 }

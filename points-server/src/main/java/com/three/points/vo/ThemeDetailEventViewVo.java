@@ -11,8 +11,8 @@ public class ThemeDetailEventViewVo {
     @ApiModelProperty("人员Id")
     private String empId; // 人员Id
 
-    @ApiModelProperty("人员姓名")
-    private String empFullName; // 人员姓名
+    @ApiModelProperty("奖扣对象/参与人")
+    private String empFullName; // 奖扣对象/参与人
 
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
@@ -50,8 +50,28 @@ public class ThemeDetailEventViewVo {
     @ApiModelProperty("主题ID")
     private String themeId; // 主题ID
 
+    @ApiModelProperty("描述")
+    private String remark; // 描述
+
+    @ApiModelProperty("事件分类名称")
+    private String eventTypeName; // 事件分类名称
+
+    @ApiModelProperty("A分（汇总正分）")
+    private Integer aposScore = 0; // A分（汇总正分）
+
+    @ApiModelProperty("A分（汇总负分）")
+    private Integer anegScore = 0; // A分（汇总负分）
+
+    @ApiModelProperty("B分（汇总正分）")
+    private Integer bposScore = 0; // B分（汇总正分）
+
+    @ApiModelProperty("B分（汇总负分）")
+    private Integer bnegScore = 0; // B分（汇总负分）
+
     public ThemeDetailEventViewVo(String empId, String empFullName, Date themeDate, String themeName, String eventName,
-                                  Integer modifyFlag, Integer ascore, Integer bscore, Integer prizeFlag, String recorderName, String attnName, String auditName, Integer themeStatus, String themeId) {
+                                  Integer modifyFlag, Integer ascore, Integer bscore, Integer prizeFlag, String recorderName,
+                                  String attnName, String auditName, Integer themeStatus, String themeId, String remark,
+                                  String eventTypeName, Integer aposScore, Integer anegScore, Integer bposScore, Integer bnegScore) {
         this.empId = empId;
         this.empFullName = empFullName;
         this.themeDate = themeDate;
@@ -66,5 +86,11 @@ public class ThemeDetailEventViewVo {
         this.auditName = auditName;
         this.themeStatus = themeStatus;
         this.themeId = themeId;
+        this.remark = remark;
+        this.eventTypeName = eventTypeName;
+        this.aposScore = aposScore;
+        this.anegScore = anegScore;
+        this.bposScore = bposScore;
+        this.bnegScore = bnegScore;
     }
 }

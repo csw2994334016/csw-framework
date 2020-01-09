@@ -55,6 +55,9 @@ public class EventTypeService extends BaseService<EventType, String> {
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
         eventType.setOrganizationId(firstOrganizationId);
 
+        Integer maxSort = eventTypeRepository.findMaxSortByParentId(eventType.getParentId());
+        maxSort = maxSort != null ? maxSort + 10 : 100;
+        eventType.setSort(maxSort);
         eventType = eventTypeRepository.save(eventType);
         return eventType;
     }
@@ -71,6 +74,8 @@ public class EventTypeService extends BaseService<EventType, String> {
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
 
         eventType = eventTypeRepository.save(eventType);
+        // 修改事件分类下面的事件
+        eventRepository.updateTypeNameByTypeId(eventType.getTypeName(), eventType.getId());
         return eventType;
     }
 

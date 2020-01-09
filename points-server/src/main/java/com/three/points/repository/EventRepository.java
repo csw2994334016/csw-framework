@@ -2,6 +2,8 @@ package com.three.points.repository;
 
 import com.three.points.entity.Event;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -18,4 +20,8 @@ public interface EventRepository extends BaseRepository<Event, String> {
     int countByEventNameAndOrganizationId(String eventName, String organizationId);
 
     int countByEventNameAndOrganizationIdAndIdNot(String eventName, String organizationId, String id);
+
+    @Modifying
+    @Query("update Event e set e.typeName = :typeName  where e.typeId = :typeId")
+    void updateTypeNameByTypeId(String typeName, String typeId);
 }

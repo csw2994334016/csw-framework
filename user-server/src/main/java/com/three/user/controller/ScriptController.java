@@ -47,7 +47,7 @@ public class ScriptController {
 	@ApiOperation(value = "user-server删除脚本")
 	@ApiImplicitParam(name = "ids", value = "groovy脚本ids", required = true, dataType = "String")
 	@DeleteMapping()
-	public JsonResult delete(String ids) {
+	public JsonResult delete(@RequestParam(required = true) String ids) {
 		scriptService.delete(ids, StatusEnum.DELETE.getCode());
 		return JsonResult.ok("删除成功");
 	}
