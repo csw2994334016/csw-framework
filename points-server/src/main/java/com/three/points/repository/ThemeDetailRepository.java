@@ -1,6 +1,7 @@
 package com.three.points.repository;
 
 import com.three.points.entity.ThemeDetail;
+import com.three.points.vo.ManagerTaskScoreVo;
 import com.three.points.vo.ThemeDetailDailyVo;
 import com.three.points.vo.ThemeDetailEventViewVo;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
@@ -34,24 +35,36 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
     int countByEventIdAndStatus(String id, int code);
 
     @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
-            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
-    Page<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDatePageable(int status, String empId, int themeStatus, Date stM, Date etM, Pageable pageable);
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +
+            "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and td.themeType = :themeType")
+    Page<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypePageable(int status, String empId, int themeStatus, Date stM, Date etM, int themeType, Pageable pageable);
 
     @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
-            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
-    List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(int status, String empId, int themeStatus, Date stM, Date etM, Sort sort);
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +
+            "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and td.themeType = :themeType")
+    List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypeSort(int status, String empId, int themeStatus, Date stM, Date etM, int themeType, Sort sort);
 
     @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, " +
             "td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id, td.remark, td.eventTypeName, t.aposScore, t.anegScore, t.bposScore, t.bnegScore) " +
-            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
+            "from ThemeDetail td, Theme t where td.themeType = :themeType and td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
             " (:modifyFlag is null or td.modifyFlag = :modifyFlag) and (:empFullName is null or td.empFullName like :empFullName) and" +
             " (:themeName is null or td.themeName like :themeName) and (:eventName is null or td.eventName like :eventName)")
-    Page<ThemeDetailEventViewVo> findAllByEventView(int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName, Pageable pageable);
+    Page<ThemeDetailEventViewVo> findAllByEventView(int themeType, int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName, Pageable pageable);
 
     @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, " +
             "td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id, td.remark, td.eventTypeName, t.aposScore, t.anegScore, t.bposScore, t.bnegScore) " +
-            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
+            "from ThemeDetail td, Theme t where td.themeType = :themeType and td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
             " (:modifyFlag is null or td.modifyFlag = :modifyFlag) and (:empFullName is null or td.modifyFlag = :empFullName) and" +
             "(:themeName is null or td.themeName = :themeName) and (:eventName is null or td.eventName = :eventName) order by td.themeDate")
-    List<ThemeDetailEventViewVo> findAllByEventViewOrderByThemeDate(int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName);
+    List<ThemeDetailEventViewVo> findAllByEventViewOrderByThemeDate(int themeType, int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName);
+
+    @Query("select new com.three.points.vo.ManagerTaskScoreVo(td.managerTaskName, td.managerTaskDate, td.managerTaskIndex, td.managerTaskType, td.scoreNegType, td.bscore) " +
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +
+            "t.themeStatus = :themeStatus and td.managerTaskDate = :stM and td.themeType = :themeType")
+    Page<ManagerTaskScoreVo> findAllByManagerTaskScorePageable(int status, String empId, int themeStatus, Date stM, int themeType, Pageable pageable);
+
+    @Query("select new com.three.points.vo.ManagerTaskScoreVo(td.managerTaskName, td.managerTaskDate, td.managerTaskIndex, td.managerTaskType, td.scoreNegType, td.bscore) " +
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +
+            "t.themeStatus = :themeStatus and td.managerTaskDate = :stM and td.themeType = :themeType")
+    List<ManagerTaskScoreVo> findAllByManagerTaskScoreSort(int status, String empId, int themeStatus, Date stM, int themeType, Sort sort);
 }

@@ -11,6 +11,7 @@ import com.three.points.entity.Event;
 import com.three.points.entity.Theme;
 import com.three.points.entity.ThemeDetail;
 import com.three.points.enums.ThemeStatusEnum;
+import com.three.points.enums.ThemeTypeEnum;
 import com.three.points.param.ThemeEmpParam;
 import com.three.points.repository.ThemeDetailRepository;
 import com.three.common.utils.BeanCopyUtil;
@@ -144,13 +145,47 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         }
         Date stM = DateUtil.beginOfMonth(date); // 查找任务日期月份第一天
         Date etM = DateUtil.endOfMonth(date); // 任务月份最后时间
+        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         if (pageQuery != null) {
-            Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
-            Page<ThemeDetailDailyVo> resultPage = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDatePageable(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, etM, pageable);
+            Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), sort);
+            Page<ThemeDetailDailyVo> resultPage = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypePageable(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, etM, ThemeTypeEnum.DAILY_POINTS.getCode(), pageable);
             return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
         } else {
-            List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, etM, new Sort(Sort.Direction.DESC, "createDate"));
+            List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypeSort(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, etM, ThemeTypeEnum.DAILY_POINTS.getCode(), sort);
             return new PageResult<>(themeDetailDailyVoList.size(), themeDetailDailyVoList);
+        }
+    }
+
+    /**
+     * 我的积分，管理任务得分信息，查找（当前登录）用户管理任务完成得分详情
+     * @param pageQuery
+     * @param code
+     * @param taskDate
+     * @param empId
+     * @return
+     */
+    public PageResult<ManagerTaskScoreVo> managerTaskScore(PageQuery pageQuery, int code, Long taskDate, String empId) {
+        String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        if (empId != null) {
+            loginUserEmpId = empId;
+        }
+        if (StringUtil.isNotBlank(loginUserEmpId)) {
+            Date date = new Date();
+            if (taskDate != null) {
+                date = new Date(taskDate);
+            }
+            Date stM = DateUtil.beginOfMonth(date); // 查找任务日期月份第一天
+            Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+            if (pageQuery != null) {
+                Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
+                Page<ManagerTaskScoreVo> resultPage = themeDetailRepository.findAllByManagerTaskScorePageable(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, ThemeTypeEnum.MANAGER_TASK.getCode(), pageable);
+                return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
+            } else {
+                List<ManagerTaskScoreVo> managerTaskScoreVoList = themeDetailRepository.findAllByManagerTaskScoreSort(code, loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), stM, ThemeTypeEnum.MANAGER_TASK.getCode(), sort);
+                return new PageResult<>(managerTaskScoreVoList.size(), managerTaskScoreVoList);
+            }
+        } else {
+            throw new BusinessException("用户没有登录，无法查找奖扣任务记录");
         }
     }
 
@@ -202,7 +237,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             monthDeductValueMap.put(String.format("%02d", i + 1), 0);
         }
         // 日常奖扣信息
-        List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(StatusEnum.OK.getCode(), loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), st, et, new Sort(Sort.Direction.DESC, "createDate"));
+        List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypeSort(StatusEnum.OK.getCode(), loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), st, et, ThemeTypeEnum.DAILY_POINTS.getCode(), new Sort(Sort.Direction.DESC, "createDate"));
         SysEmployee sysEmployee = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, loginUserEmpId));
         if (sysEmployee == null) {
             throw new BusinessException("无法从redis中获取用户缓存信息(" + loginUserEmpId + ")，请管理员重新加载缓存");
@@ -291,10 +326,10 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         }
         if (pageQuery != null) {
             Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
-            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%", pageable);
+            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(ThemeTypeEnum.DAILY_POINTS.getCode(), code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%", pageable);
             return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
         } else {
-            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%");
+            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(ThemeTypeEnum.DAILY_POINTS.getCode(), code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%");
             return new PageResult<>(themeDetailDailyVoList.size(), themeDetailDailyVoList);
         }
     }

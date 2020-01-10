@@ -1,6 +1,7 @@
 package com.three.points.entity;
 
 import com.three.common.enums.StatusEnum;
+import com.three.points.enums.ThemeTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,6 +51,38 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
 
+    @Column(name = "theme_type", nullable = false, columnDefinition = "int(2) default 1 comment '积分类型：1=日常奖扣；2=管理任务；3=固定积分；4=其他得分'")
+    @ApiModelProperty("积分类型：1=日常奖扣；2=管理任务；3=固定积分；4=其他得分")
+    private Integer themeType = ThemeTypeEnum.DAILY_POINTS.getCode(); // 积分类型：1=日常奖扣；2=管理任务；3=固定积分；4=其他得分
+
+
+    // 管理任务特有字段
+    @Column(name = "manager_task_id", columnDefinition = "varchar(36) comment '管理任务id'")
+    @ApiModelProperty("管理任务id")
+    private String managerTaskId; // 管理任务id
+
+    @Column(name = "manager_task_name", columnDefinition = "varchar(255) comment '任务名称'")
+    @ApiModelProperty("任务名称")
+    private String managerTaskName; // 任务名称
+
+    @Column(name = "manager_task_date", columnDefinition = "datetime comment '任务日期（按月算）'")
+    @ApiModelProperty("任务日期（按月算）")
+    private Date managerTaskDate; // 任务日期（按月算）
+
+    @Column(name = "manager_task_index", columnDefinition = "varchar(255) comment '任务指标'")
+    @ApiModelProperty("任务指标")
+    private String managerTaskIndex; // 任务指标
+
+    @Column(name = "manager_task_type", columnDefinition = "varchar(255) comment '任务类型'")
+    @ApiModelProperty("任务类型")
+    private String managerTaskType; // 任务类型
+
+    @Column(name = "score_neg_type", nullable = false, columnDefinition = "varchar(255) comment '未完成扣分类型'")
+    @ApiModelProperty("未完成扣分类型")
+    private String scoreNegType; // 未完成扣分类型
+
+
+    // 日常奖扣（包括考勤）
     @Column(name = "event_type_id", columnDefinition = "varchar(36) comment '事件分类ID'")
     @ApiModelProperty("事件分类ID")
     private String eventTypeId; // 事件分类ID
@@ -82,6 +115,7 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("专人审核：1=是；0=否")
     private Integer auditFlag = 0; // 专人审核：1=是；0=否
 
+    // 奖扣对象字段
     @Column(name = "emp_id", nullable = false, columnDefinition = "varchar(36) comment '人员ID'")
     @ApiModelProperty("人员ID")
     private String empId; // 人员ID
@@ -106,9 +140,9 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("A分")
     private Integer ascore = 0; // A分
 
-    @Column(name = "b_score", nullable = false, columnDefinition = "int(11) default 0 comment 'B分'")
+    @Column(name = "b_score", nullable = false, columnDefinition = "int(11) default 0 comment '日常奖扣B分/管理任务实际得分/固定积分B分'")
     @ApiModelProperty("B分")
-    private Integer bscore = 0; // B分
+    private Integer bscore = 0; // B分：日常奖扣/管理任务（完成情况实际得分）/固定积分
 
     @Column(name = "modify_flag", nullable = false, columnDefinition = "int(1) default 0 comment '修改（是否修改过分值）：0=否（默认）；1=是'")
     @ApiModelProperty("修改（是否修改过分值）：0=否（默认）；1=是")
@@ -134,11 +168,13 @@ public class ThemeDetail implements Serializable {
     public ThemeDetail() {
     }
 
-    public ThemeDetail(String organizationId, String themeId, String themeName, Date themeDate, String eventTypeName) {
+    public ThemeDetail(String organizationId, String themeId, String themeName, Date themeDate, Integer themeType, String eventTypeName, Integer eventFlag) {
         this.organizationId = organizationId;
         this.themeId = themeId;
         this.themeName = themeName;
         this.themeDate = themeDate;
+        this.themeType = themeType;
         this.eventTypeName = eventTypeName;
+        this.eventFlag = eventFlag;
     }
 }

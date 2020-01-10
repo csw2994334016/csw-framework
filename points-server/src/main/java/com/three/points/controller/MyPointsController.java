@@ -4,9 +4,8 @@ import com.three.common.enums.StatusEnum;
 import com.three.common.vo.JsonData;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.points.entity.ManagerTaskScore;
-import com.three.points.service.ManagerTaskScoreService;
 import com.three.points.service.ThemeDetailService;
+import com.three.points.vo.ManagerTaskScoreVo;
 import com.three.points.vo.MyPointsScoreTrendVo;
 import com.three.points.vo.ThemeDetailDailyVo;
 import io.swagger.annotations.Api;
@@ -25,9 +24,6 @@ public class MyPointsController {
 
     @Autowired
     private ThemeDetailService themeDetailService;
-
-    @Autowired
-    private ManagerTaskScoreService managerTaskScoreService;
 
     @ApiOperation(value = "人员积分总览(包括月度、年度、累计积分趋势)", notes = "")
     @ApiImplicitParams({
@@ -63,11 +59,11 @@ public class MyPointsController {
             @ApiImplicitParam(name = "empId", value = "人员ID，不传则表示当前登录用户", dataType = "String")
     })
     @GetMapping("/managerTaskScore")
-    public PageResult<ManagerTaskScore> managerTaskScore(Integer page, Integer limit, Long taskDate, String empId) {
+    public PageResult<ManagerTaskScoreVo> managerTaskScore(Integer page, Integer limit, Long taskDate, String empId) {
         if (page != null && limit != null) {
-            return managerTaskScoreService.managerTaskScore(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskDate, empId);
+            return themeDetailService.managerTaskScore(new PageQuery(page, limit), StatusEnum.OK.getCode(), taskDate, empId);
         } else {
-            return managerTaskScoreService.managerTaskScore(null, StatusEnum.OK.getCode(), taskDate, empId);
+            return themeDetailService.managerTaskScore(null, StatusEnum.OK.getCode(), taskDate, empId);
         }
     }
 }

@@ -2,7 +2,6 @@ package com.three.points.entity;
 
 import com.three.common.enums.StatusEnum;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.models.auth.In;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;

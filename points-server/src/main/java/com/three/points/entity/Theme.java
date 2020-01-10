@@ -1,6 +1,7 @@
 package com.three.points.entity;
 
 import com.three.common.enums.StatusEnum;
+import com.three.points.enums.ThemeTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,6 +51,10 @@ public class Theme implements Serializable {
     @ApiModelProperty("主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废")
     private Integer themeStatus; // 主题状态：0=草稿;1=保存;2=待初审;3=待终审;4=驳回;5=审核通过;6=锁定;7=已作废
 
+    @Column(name = "theme_type", nullable = false, columnDefinition = "int(2) default 1 comment '积分类型：1=日常奖扣；2=管理任务；3=固定积分；4=其他得分'")
+    @ApiModelProperty("积分类型：1=日常奖扣；2=管理任务；3=固定积分；4=其他得分")
+    private Integer themeType = ThemeTypeEnum.DAILY_POINTS.getCode(); // 积分类型：1=日常奖扣；2=管理任务；3=固定积分；4=其他得分
+
     @Column(name = "relation_theme_id", columnDefinition = "varchar(36) comment '相关联主题ID'")
     @ApiModelProperty("相关联主题ID")
     private String relationThemeId; // 相关联主题ID，给记录人、初审人加/减分自动生成的主题
@@ -74,6 +79,7 @@ public class Theme implements Serializable {
     @ApiModelProperty("人次")
     private Integer empCount = 0; // 人次
 
+
     @Column(name = "recorder_id", columnDefinition = "varchar(36) comment '记录人ID'")
     @ApiModelProperty("记录人ID")
     private String recorderId; // 记录人ID
@@ -81,14 +87,6 @@ public class Theme implements Serializable {
     @Column(name = "recorder_name", columnDefinition = "varchar(255) comment '记录人姓名'")
     @ApiModelProperty("记录人姓名")
     private String recorderName; // 记录人姓名
-
-    @Column(name = "submitter_id", columnDefinition = "varchar(36) comment '提交人ID'")
-    @ApiModelProperty("提交人ID")
-    private String submitterId; // 提交人ID
-
-    @Column(name = "submitter_name", columnDefinition = "varchar(255) comment '提交人姓名'")
-    @ApiModelProperty("提交人姓名")
-    private String submitterName; // 提交人姓名
 
     @Column(name = "submitter_date", columnDefinition = "datetime comment '提交时间'")
     @ApiModelProperty("提交时间")
@@ -173,5 +171,16 @@ public class Theme implements Serializable {
 
     public String getBscore() {
         return bposScore + "/" + bnegScore;
+    }
+
+    public void setSysAdminInfo() {
+        Date date = new Date();
+        String name = "系统机器人";
+        this.setRecorderName(name);
+        this.setSubmitterDate(date);
+        this.setAttnName(name);
+        this.setAttnDate(date);
+        this.setAuditName(name);
+        this.setAuditDate(date);
     }
 }
