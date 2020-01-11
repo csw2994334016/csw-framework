@@ -236,8 +236,8 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             monthAwardValueMap.put(String.format("%02d", i + 1), 0);
             monthDeductValueMap.put(String.format("%02d", i + 1), 0);
         }
-        // 日常奖扣信息
-        List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypeSort(StatusEnum.OK.getCode(), loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), st, et, ThemeTypeEnum.DAILY_POINTS.getCode(), new Sort(Sort.Direction.DESC, "createDate"));
+        // 日常奖扣和管理任务得分信息
+        List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(StatusEnum.OK.getCode(), loginUserEmpId, ThemeStatusEnum.SUCCESS.getCode(), st, et, new Sort(Sort.Direction.DESC, "createDate"));
         SysEmployee sysEmployee = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, loginUserEmpId));
         if (sysEmployee == null) {
             throw new BusinessException("无法从redis中获取用户缓存信息(" + loginUserEmpId + ")，请管理员重新加载缓存");
@@ -283,7 +283,6 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
                 }
             }
         }
-        // todo: 奖扣任务
         myPointsScoreTrendVo.setMonthSeriesList(new ArrayList<>(monthDateMap.keySet()));
         myPointsScoreTrendVo.setMonthAwardValueTrendList(new ArrayList<>(monthAwardValueMap.values()));
         myPointsScoreTrendVo.setMonthDeductValueTrendList(new ArrayList<>(monthDeductValueMap.values()));

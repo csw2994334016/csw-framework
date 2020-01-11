@@ -44,6 +44,11 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
             "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and td.themeType = :themeType")
     List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateAndThemeTypeSort(int status, String empId, int themeStatus, Date stM, Date etM, int themeType, Sort sort);
 
+    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +
+            "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
+    List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(int status, String empId, int themeStatus, Date stM, Date etM, Sort sort);
+
     @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, " +
             "td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id, td.remark, td.eventTypeName, t.aposScore, t.anegScore, t.bposScore, t.bnegScore) " +
             "from ThemeDetail td, Theme t where td.themeType = :themeType and td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
@@ -67,4 +72,5 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +
             "t.themeStatus = :themeStatus and td.managerTaskDate = :stM and td.themeType = :themeType")
     List<ManagerTaskScoreVo> findAllByManagerTaskScoreSort(int status, String empId, int themeStatus, Date stM, int themeType, Sort sort);
+
 }
