@@ -61,14 +61,15 @@ public class PointsTaskController {
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
             @ApiImplicitParam(name = "sortKey", value = "排序方式（createDate=最新发布；deadline=截止时间）", dataType = "String"),
-            @ApiImplicitParam(name = "chargePersonId", value = "责任人", dataType = "String")
+            @ApiImplicitParam(name = "chargePersonId", value = "责任人", dataType = "String"),
+            @ApiImplicitParam(name = "chargePersonName", value = "责任人姓名", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<PointsTask> query(Integer page, Integer limit, String sortKey, String chargePersonId) {
+    public PageResult<PointsTask> query(Integer page, Integer limit, String sortKey, String chargePersonId, String chargePersonName) {
         if (page != null && limit != null) {
-            return pointsTaskService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), "4", sortKey, chargePersonId);
+            return pointsTaskService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), "4", sortKey, chargePersonId, chargePersonName);
         } else {
-            return pointsTaskService.query(null, StatusEnum.OK.getCode(), "4", sortKey, chargePersonId);
+            return pointsTaskService.query(null, StatusEnum.OK.getCode(), "4", sortKey, chargePersonId, chargePersonName);
         }
     }
 

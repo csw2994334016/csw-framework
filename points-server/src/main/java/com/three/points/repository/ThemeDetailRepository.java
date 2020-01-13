@@ -51,17 +51,17 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
 
     @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, " +
             "td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id, td.remark, td.eventTypeName, t.aposScore, t.anegScore, t.bposScore, t.bnegScore) " +
-            "from ThemeDetail td, Theme t where td.themeType = :themeType and td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
-            " (:modifyFlag is null or td.modifyFlag = :modifyFlag) and (:empFullName is null or td.empFullName like :empFullName) and" +
-            " (:themeName is null or td.themeName like :themeName) and (:eventName is null or td.eventName like :eventName)")
-    Page<ThemeDetailEventViewVo> findAllByEventView(int themeType, int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName, Pageable pageable);
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.themeType = :themeType and  td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
+            " (td.modifyFlag = :modifyFlag) and (:empFullName is null or td.empFullName like concat('%', :empFullName, '%')) and" +
+            " (:themeName is null or td.themeName like concat('%', :themeName, '%')) and (:eventName is null or td.eventName like concat('%', :eventName, '%'))")
+    Page<ThemeDetailEventViewVo> findAllByEventView(int themeType, int status, int themeStatus, Date stM, Date etM, int modifyFlag, String empFullName, String themeName, String eventName, Pageable pageable);
 
     @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, " +
             "td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id, td.remark, td.eventTypeName, t.aposScore, t.anegScore, t.bposScore, t.bnegScore) " +
-            "from ThemeDetail td, Theme t where td.themeType = :themeType and td.themeId = t.id and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
-            " (:modifyFlag is null or td.modifyFlag = :modifyFlag) and (:empFullName is null or td.modifyFlag = :empFullName) and" +
-            "(:themeName is null or td.themeName = :themeName) and (:eventName is null or td.eventName = :eventName) order by td.themeDate")
-    List<ThemeDetailEventViewVo> findAllByEventViewOrderByThemeDate(int themeType, int status, Integer themeStatus, Date stM, Date etM, Integer modifyFlag, String empFullName, String themeName, String eventName);
+            "from ThemeDetail td, Theme t where td.themeId = t.id and td.themeType = :themeType and td.status = :status and t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM and" +
+            " (td.modifyFlag = :modifyFlag) and (:empFullName is null or td.empFullName like concat('%', :empFullName, '%')) and" +
+            "(:themeName is null or td.themeName like concat('%', :themeName, '%')) and (:eventName is null or td.eventName like concat('%', :eventName, '%')) order by td.themeDate")
+    List<ThemeDetailEventViewVo> findAllByEventViewOrderByThemeDate(int themeType, int status, int themeStatus, Date stM, Date etM, int modifyFlag, String empFullName, String themeName, String eventName);
 
     @Query("select new com.three.points.vo.ManagerTaskScoreVo(td.managerTaskName, td.managerTaskDate, td.managerTaskIndex, td.managerTaskType, td.scoreNegType, td.bscore) " +
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.status = :status and td.empId = :empId and " +

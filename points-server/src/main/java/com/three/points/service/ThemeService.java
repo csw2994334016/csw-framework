@@ -430,10 +430,12 @@ public class ThemeService extends BaseService<Theme, String> {
                 } else if (theme.getThemeStatus() == ThemeStatusEnum.SUCCESS.getCode()) { // 记录是审核通过状态,只有当前用户是终审人才能撤回
                     if (StringUtil.isNotBlank(theme.getAuditId()) && theme.getAuditId().equals(loginUserEmpId)) {
                         theme.setThemeStatus(ThemeStatusEnum.LOCK.getCode());
-                        // 撤回之前，要删除相应的奖分记录
+                        // 撤回之前，如果有，相应的奖分记录要删除
                         Theme theme1 = themeRepository.findByRelationThemeIdAndThemeName(theme.getId(), EventEnum.THEME_NAME_AUDIT_POS.getMessage());
-                        themeRepository.delete(theme1);
-                        themeDetailRepository.deleteByThemeId(theme1.getId());
+                        if (theme1 != null) {
+                            themeRepository.delete(theme1);
+                            themeDetailRepository.deleteByThemeId(theme1.getId());
+                        }
                         themeRepository.save(theme);
                     } else {
                         errorList.add("主题(" + theme.getThemeName() + ")是审核通过状态,只有终审人才能撤回");

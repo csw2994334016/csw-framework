@@ -71,7 +71,6 @@ public class ${className}Service extends BaseService<${className},  ${pkColumnTy
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<${className}> specification = (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicateList = new ArrayList<>();
 
             Specification<${className}> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);

@@ -305,13 +305,13 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     }
 
     public PageResult<ThemeDetailEventViewVo> eventView(PageQuery pageQuery, int code, Long themeDateSt, Long themeDateEt, Integer themeStatus, String themeName, String eventName, String empFullName, Integer modifyFlag) {
-        String loginUserEmpFullName = LoginUserUtil.getLoginUserEmpFullName();
-        if (StringUtil.isNotBlank(empFullName)) {
-            loginUserEmpFullName = empFullName;
-        }
-        if (StringUtil.isBlank(loginUserEmpFullName)) {
-            throw new BusinessException("没有用户信息，无法查找积分核查记录");
-        }
+//        String loginUserEmpFullName = LoginUserUtil.getLoginUserEmpFullName();
+//        if (StringUtil.isNotBlank(empFullName)) {
+//            loginUserEmpFullName = empFullName;
+//        }
+//        if (StringUtil.isBlank(loginUserEmpFullName)) {
+//            throw new BusinessException("没有用户信息，无法查找积分核查记录");
+//        }
         Date date = new Date();
         Date stM = DateUtil.beginOfMonth(date); // 查找任务日期月份第一天
         Date etM = DateUtil.endOfMonth(date); // 任务月份最后时间
@@ -325,10 +325,10 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
         }
         if (pageQuery != null) {
             Pageable pageable = PageRequest.of(pageQuery.getPageNo(), pageQuery.getPageSize(), new Sort(Sort.Direction.DESC, "createDate"));
-            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(ThemeTypeEnum.DAILY_POINTS.getCode(), code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%", pageable);
+            Page<ThemeDetailEventViewVo> resultPage = themeDetailRepository.findAllByEventView(ThemeTypeEnum.DAILY_POINTS.getCode(), code, themeStatus, stM, etM, modifyFlag, empFullName, themeName, eventName, pageable);
             return new PageResult<>(resultPage.getTotalElements(), resultPage.getContent());
         } else {
-            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(ThemeTypeEnum.DAILY_POINTS.getCode(), code, themeStatus, stM, etM, modifyFlag, "%" + loginUserEmpFullName + "%", themeName + "%", eventName + "%");
+            List<ThemeDetailEventViewVo> themeDetailDailyVoList = themeDetailRepository.findAllByEventViewOrderByThemeDate(ThemeTypeEnum.DAILY_POINTS.getCode(), code, themeStatus, stM, etM, modifyFlag, empFullName, themeName, eventName);
             return new PageResult<>(themeDetailDailyVoList.size(), themeDetailDailyVoList);
         }
     }

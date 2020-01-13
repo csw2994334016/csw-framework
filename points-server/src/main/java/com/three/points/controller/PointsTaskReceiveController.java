@@ -33,14 +33,15 @@ public class PointsTaskReceiveController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "Integer"),
             @ApiImplicitParam(name = "limit", value = "每页多少条", dataType = "Integer"),
-            @ApiImplicitParam(name = "whoFlag", value = "我参与的/我负责的,1=我参与的;2=我负责的(默认1)", dataType = "String")
+            @ApiImplicitParam(name = "whoFlag", value = "我参与的/我负责的,1=我参与的;2=我负责的(默认1)", dataType = "String"),
+            @ApiImplicitParam(name = "chargePersonName", value = "责任人姓名", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<PointsTask> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag) {
+    public PageResult<PointsTask> query(Integer page, Integer limit, @RequestParam(defaultValue = "1") String whoFlag, String chargePersonName) {
         if (page != null && limit != null) {
-            return pointsTaskService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), whoFlag, null, null);
+            return pointsTaskService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), whoFlag, null, null, chargePersonName);
         } else {
-            return pointsTaskService.query(null, StatusEnum.OK.getCode(), whoFlag, null, null);
+            return pointsTaskService.query(null, StatusEnum.OK.getCode(), whoFlag, null, null, chargePersonName);
         }
     }
 

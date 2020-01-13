@@ -77,7 +77,7 @@ public class ThemeDetail implements Serializable {
     @ApiModelProperty("任务类型")
     private String managerTaskType; // 任务类型
 
-    @Column(name = "score_neg_type", nullable = false, columnDefinition = "varchar(255) comment '未完成扣分类型'")
+    @Column(name = "score_neg_type", columnDefinition = "varchar(255) comment '未完成扣分类型'")
     @ApiModelProperty("未完成扣分类型")
     private String scoreNegType; // 未完成扣分类型
 

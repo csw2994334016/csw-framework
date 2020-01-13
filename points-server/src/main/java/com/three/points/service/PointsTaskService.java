@@ -76,7 +76,7 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
         pointsTaskRepository.saveAll(pointsTaskList);
     }
 
-    public PageResult<PointsTask> query(PageQuery pageQuery, int code, String whoFlag, String sortKey, String chargePersonId) {
+    public PageResult<PointsTask> query(PageQuery pageQuery, int code, String whoFlag, String sortKey, String chargePersonId, String chargePersonName) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         if ("deadline".equals(sortKey)) {
             sort = new Sort(Sort.Direction.DESC, "deadline");
@@ -84,8 +84,7 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
         Specification<PointsTask> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-            Specification<PointsTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
+            Specification<PointsTask> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, LoginUserUtil.getLoginUserFirstOrganizationId());
             predicateList.add(codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder));
 
             String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
@@ -103,6 +102,9 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
 
             if (StringUtil.isNotBlank(chargePersonId)) {
                 predicateList.add(criteriaBuilder.equal(root.get("chargePersonId"), chargePersonId));
+            }
+            if (StringUtil.isNotBlank(chargePersonName)) {
+                predicateList.add(criteriaBuilder.like(root.get("chargePersonName"), "%" + chargePersonName + "%"));
             }
             return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         };
