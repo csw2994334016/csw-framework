@@ -67,7 +67,7 @@ public class Employee implements Serializable {
     private String picture; // 头像
 
     @Column(name = "gender", columnDefinition = "varchar(2) comment '性别'")
-    @ApiModelProperty("性别")
+    @ApiModelProperty("性别：1=男；2=女")
     private String gender; // 性别
 
     @Column(name = "birthday", columnDefinition = "datetime comment '出生日期'")
