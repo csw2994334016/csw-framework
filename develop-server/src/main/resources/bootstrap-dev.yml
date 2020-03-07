@@ -9,9 +9,12 @@ spring:
     database: mysql
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.0.105:3306/points_develop?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+#    url: jdbc:mysql://192.168.0.105:3306/points_develop?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+#    username: root
+#    password: root
+    url: jdbc:mysql://47.96.21.5:3306/points_develop?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
     username: root
-    password: root
+    password: YiJiFen_123!@#
     druid:
       initial-size: 5 # 初始化连接大小
       minIdle: 5     # 最小连接池数量
@@ -58,3 +61,23 @@ security:
     resource:
       user-info-uri: http://localhost:8084/three-auth-server/user-me
       prefer-token-info: false
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 5
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

@@ -58,7 +58,7 @@ spring:
   aop:
     proxy-target-class: true
   zipkin:
-    base-url: http://localhost:9411
+    base-url: http://47.96.21.5:9411
     enabled: true
     sender:
       type: web
@@ -71,7 +71,7 @@ logging:
 security:
   oauth2:
     resource:
-      user-info-uri: http://localhost:8084/three-auth-server/user-me
+      user-info-uri: http://47.96.21.5:8084/three-auth-server/user-me
       prefer-token-info: false
 #wechat:
 #  domain: http://api.gateway.com:8080/api-u
@@ -104,3 +104,23 @@ file:
     username:
     password:
 
+#eureka配置
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://47.96.21.5:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 5
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
