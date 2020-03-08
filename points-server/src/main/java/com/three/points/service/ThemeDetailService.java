@@ -158,6 +158,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
 
     /**
      * 我的积分，管理任务得分信息，查找（当前登录）用户管理任务完成得分详情
+     *
      * @param pageQuery
      * @param code
      * @param taskDate
@@ -330,6 +331,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     public void changePriceFlag(String ids, String flag) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<String> errorList = new ArrayList<>();
+        String errorTip = "只有奖票事件才能取消奖票";
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         for (String id : idSet) {
             ThemeDetail themeDetail = getEntityById(themeDetailRepository, id);
@@ -341,6 +343,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
                     errorList.add(themeDetail.getEventName());
                 }
             } else if ("recovery".equals(flag)) {
+                errorTip = "只有奖票时间取消状态才能恢复奖票";
                 if (themeDetail.getPrizeFlag() == YesNoEnum.NO.getCode()) { // 只有作废状态的事件才能恢复奖票
                     themeDetail.setPrizeFlag(YesNoEnum.YES.getCode());
                     themeDetailList.add(themeDetail);
@@ -350,7 +353,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             }
         }
         if (errorList.size() > 0) {
-            throw new BusinessException("事件奖票状态不合法，不能执行该操作，事件名称如下：" + errorList.toString());
+            throw new BusinessException("主题事件奖票状态不合法，" + errorTip + "，事件名称如下：" + errorList.toString());
         }
         themeDetailRepository.saveAll(themeDetailList);
     }
@@ -359,6 +362,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     public void changeThemeStatus(String themeIds, String flag) {
         Set<String> themeIdSet = StringUtil.getStrToIdSet1(themeIds);
         List<String> errorList = new ArrayList<>();
+        String errorTip = "只有审核通过的主题才能作废";
         List<Theme> themeList = new ArrayList<>();
         for (String themeId : themeIdSet) {
             Theme theme = themeService.findById(themeId);
@@ -370,6 +374,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
                     errorList.add(theme.getThemeName());
                 }
             } else if ("recovery".equals(flag)) {
+                errorTip = "只有作废状态的主题才能恢复";
                 if (theme.getThemeStatus() == ThemeStatusEnum.INVALID.getCode()) { // 只有作废状态的积分奖扣主题才能恢复
                     theme.setThemeStatus(ThemeStatusEnum.SUCCESS.getCode());
                     themeList.add(theme);
@@ -379,7 +384,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             }
         }
         if (errorList.size() > 0) {
-            throw new BusinessException("积分奖扣主题状态不合法，不能执行该操作，主题名称如下：" + errorList.toString());
+            throw new BusinessException("积分奖扣主题状态不合法，" + errorTip + "，主题名称如下：" + errorList.toString());
         }
         themeRepository.saveAll(themeList);
     }

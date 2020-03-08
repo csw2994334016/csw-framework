@@ -5,6 +5,7 @@ import com.three.commonclient.exception.BusinessException;
 import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.jpa.file.service.FileInfoService;
 import com.three.user.entity.Employee;
+import com.three.user.entity.Role;
 import com.three.user.param.EmployeeParam;
 import com.three.user.service.EmployeeService;
 import com.three.common.enums.StatusEnum;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by csw on 2019-09-27.
@@ -141,6 +143,13 @@ public class EmployeeController {
     @GetMapping("/findById")
     public JsonData<Employee> findById(String id) {
         return new JsonData<>(employeeService.findById(id)).success();
+    }
+
+    @ApiOperation(value = "查找员工已绑定的角色信息（根据Id）", notes = "")
+    @ApiImplicitParam(name = "id", value = "员工ID", required = true, dataType = "String")
+    @GetMapping("/findRolesById")
+    public JsonData<Set<Role>> findRolesById(@RequestParam(required = true) String id) {
+        return new JsonData<>(employeeService.findRolesById(id)).success();
     }
 
     @ApiOperation(value = "查找积分奖扣审核人员列表", notes = "")

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(value = "我发布的任务", tags = "我发布的任务")
 @RestController
 @RequestMapping("/points/pointsTasks")
-public class PointsTaskController {
+public class PointsTaskReleasedController {
 
     @Autowired
     private PointsTaskService pointsTaskService;

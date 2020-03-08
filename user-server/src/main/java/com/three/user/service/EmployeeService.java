@@ -378,4 +378,12 @@ public class EmployeeService extends BaseService<Employee, String> {
         }
     }
 
+    public Set<Role> findRolesById(String id) {
+        Employee employee = findById(id);
+        User user = userRepository.findByEmployee(employee);
+        if (user == null) {
+            throw new BusinessException("该员工没有user账号，请联系管理员");
+        }
+        return user.getRoles();
+    }
 }

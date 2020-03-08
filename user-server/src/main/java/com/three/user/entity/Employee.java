@@ -42,9 +42,13 @@ public class Employee implements Serializable {
     @ApiModelProperty("组织机构名称")
     private String orgName; // 组织机构名称
 
-    @Column(nullable = false, unique = true, columnDefinition = "varchar(36) comment '账号'")
+    @Column(name = "username", nullable = false, unique = true, columnDefinition = "varchar(36) comment '账号'")
     @ApiModelProperty("账号")
     private String username; // 账号
+
+    @Column(name = "emp_num", nullable = false, unique = true, columnDefinition = "varchar(100) comment '员工工号'")
+    @ApiModelProperty("员工工号")
+    private String empNum; // 员工工号
 
     @Column(name = "full_name", nullable = false, columnDefinition = "varchar(50) comment '姓名'")
     @ApiModelProperty("姓名")
@@ -53,10 +57,6 @@ public class Employee implements Serializable {
     @Column(name = "cell_num", nullable = false, columnDefinition = "varchar(30) comment '手机号'")
     @ApiModelProperty("手机号")
     private String cellNum; // 手机号
-
-    @Column(name = "emp_num", columnDefinition = "varchar(100) comment '员工工号'")
-    @ApiModelProperty("员工工号")
-    private String empNum; // 员工工号
 
     @Column(name = "id_card_num", unique = true, columnDefinition = "varchar(255) comment '身份证号码'")
     @ApiModelProperty("身份证号码")
