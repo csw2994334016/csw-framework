@@ -331,7 +331,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
     public void changePriceFlag(String ids, String flag) {
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<String> errorList = new ArrayList<>();
-        String errorTip = "只有奖票事件才能取消奖票";
+        String errorTip = "事件为奖票事件才能取消";
         List<ThemeDetail> themeDetailList = new ArrayList<>();
         for (String id : idSet) {
             ThemeDetail themeDetail = getEntityById(themeDetailRepository, id);
@@ -343,7 +343,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
                     errorList.add(themeDetail.getEventName());
                 }
             } else if ("recovery".equals(flag)) {
-                errorTip = "只有奖票时间取消状态才能恢复奖票";
+                errorTip = "非奖票事件才能恢复为奖票";
                 if (themeDetail.getPrizeFlag() == YesNoEnum.NO.getCode()) { // 只有作废状态的事件才能恢复奖票
                     themeDetail.setPrizeFlag(YesNoEnum.YES.getCode());
                     themeDetailList.add(themeDetail);
@@ -353,7 +353,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             }
         }
         if (errorList.size() > 0) {
-            throw new BusinessException("主题事件奖票状态不合法，" + errorTip + "，事件名称如下：" + errorList.toString());
+            throw new BusinessException("事件奖票状态不合法，" + errorTip + "，事件名称如下：" + errorList.toString());
         }
         themeDetailRepository.saveAll(themeDetailList);
     }
@@ -384,7 +384,7 @@ public class ThemeDetailService extends BaseService<ThemeDetail, String> {
             }
         }
         if (errorList.size() > 0) {
-            throw new BusinessException("积分奖扣主题状态不合法，" + errorTip + "，主题名称如下：" + errorList.toString());
+            throw new BusinessException("主题状态不合法，" + errorTip + "，主题名称如下：" + errorList.toString());
         }
         themeRepository.saveAll(themeList);
     }

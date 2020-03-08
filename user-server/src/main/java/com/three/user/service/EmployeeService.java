@@ -207,17 +207,17 @@ public class EmployeeService extends BaseService<Employee, String> {
     }
 
     @Transactional
-    public void assignRole(EmployeeParam employeeParam) {
-        if (StringUtil.isBlank(employeeParam.getRoleIds())) {
+    public void assignRole(String id, String roleIds) {
+        if (StringUtil.isBlank(roleIds)) {
             throw new ParameterException("角色不可以为空，至少选择一个默认角色");
         }
 
-        Employee employee = getEntityById(employeeRepository, employeeParam.getId());
+        Employee employee = getEntityById(employeeRepository, id);
 
         User user = userService.findByEmployee(employee);
 
         // 修改角色
-        Set<Role> roleSet = getRoleSet(employeeParam.getRoleIds());
+        Set<Role> roleSet = getRoleSet(roleIds);
         user.setRoles(roleSet);
 
         userRepository.save(user);

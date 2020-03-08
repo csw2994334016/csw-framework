@@ -93,11 +93,14 @@ public class EmployeeController {
 
     @LogAnnotation(module = "分配角色")
     @ApiOperation(value = "分配角色", notes = "")
-    @ApiImplicitParam(name = "EmployeeParam", value = "员工信息", required = true, dataType = "employeeParam")
-    @PutMapping("/assignRole")
-    public JsonResult assignRole(@RequestBody EmployeeParam employeeParam) {
-        employeeService.assignRole(employeeParam);
-        return JsonResult.ok("修改成功");
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "成员id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "roleIds", value = "角色ids(多个用英文逗号隔开)", required = true, dataType = "String")
+    })
+    @GetMapping("/assignRole")
+    public JsonResult assignRole(@RequestParam(required = true) String id, @RequestParam(required = true) String roleIds) {
+        employeeService.assignRole(id, roleIds);
+        return JsonResult.ok("分配角色成功");
     }
 
     @LogAnnotation(module = "修改员工状态")
@@ -106,7 +109,7 @@ public class EmployeeController {
             @ApiImplicitParam(name = "ids", value = "员工信息ids", required = true, dataType = "String"),
             @ApiImplicitParam(name = "status", value = "状态：1正常，2冻结，3删除", required = true, dataType = "Integer")
     })
-    @PutMapping("/status")
+    @GetMapping("/status")
     public JsonResult updateState(String ids, Integer status) {
         employeeService.updateState(ids, status);
         return JsonResult.ok();
