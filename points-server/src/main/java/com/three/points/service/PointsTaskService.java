@@ -1,6 +1,7 @@
 package com.three.points.service;
 
 import com.three.commonclient.exception.BusinessException;
+import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.PointsTask;
 import com.three.points.enums.PointsTaskEnum;
 import com.three.points.repository.PointsTaskRepository;
@@ -39,6 +40,13 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
     public void create(PointsTaskParam pointsTaskParam) {
         BeanValidator.check(pointsTaskParam);
 
+        if (pointsTaskParam.getDelayNegScore() > 0) {
+            throw new ParameterException("延期扣分只能是负数");
+        }
+        if (pointsTaskParam.getNegScoreMax() > 0) {
+            throw new ParameterException("扣分上限只能是负数");
+        }
+
         PointsTask pointsTask = new PointsTask();
         pointsTask = (PointsTask) BeanCopyUtil.copyBean(pointsTaskParam, pointsTask);
         pointsTask.setDeadline(new Date(pointsTaskParam.getDeadline()));
@@ -55,6 +63,13 @@ public class PointsTaskService extends BaseService<PointsTask, String> {
     @Transactional
     public void update(PointsTaskParam pointsTaskParam) {
         BeanValidator.check(pointsTaskParam);
+
+        if (pointsTaskParam.getDelayNegScore() > 0) {
+            throw new ParameterException("延期扣分只能是负数");
+        }
+        if (pointsTaskParam.getNegScoreMax() > 0) {
+            throw new ParameterException("扣分上限只能是负数");
+        }
 
         PointsTask pointsTask = getEntityById(pointsTaskRepository, pointsTaskParam.getId());
         pointsTask = (PointsTask) BeanCopyUtil.copyBean(pointsTaskParam, pointsTask);

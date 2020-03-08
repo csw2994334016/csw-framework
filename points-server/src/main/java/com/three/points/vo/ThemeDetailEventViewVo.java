@@ -8,6 +8,9 @@ import java.util.Date;
 @Data
 public class ThemeDetailEventViewVo {
 
+    @ApiModelProperty("主题详情Id")
+    private String id; // 主题详情Id
+
     @ApiModelProperty("人员Id")
     private String empId; // 人员Id
 
@@ -68,10 +71,11 @@ public class ThemeDetailEventViewVo {
     @ApiModelProperty("B分（汇总负分）")
     private Integer bnegScore = 0; // B分（汇总负分）
 
-    public ThemeDetailEventViewVo(String empId, String empFullName, Date themeDate, String themeName, String eventName,
+    public ThemeDetailEventViewVo(String id, String empId, String empFullName, Date themeDate, String themeName, String eventName,
                                   Integer modifyFlag, Integer ascore, Integer bscore, Integer prizeFlag, String recorderName,
                                   String attnName, String auditName, Integer themeStatus, String themeId, String remark,
                                   String eventTypeName, Integer aposScore, Integer anegScore, Integer bposScore, Integer bnegScore) {
+        this.id = id;
         this.empId = empId;
         this.empFullName = empFullName;
         this.themeDate = themeDate;

@@ -21,11 +21,11 @@ public class PointsTaskParam {
     @ApiModelProperty("任务内容")
     private String taskContent; // 任务内容
 
-    @NotNull(message = "延期扣分不可以为空")
+    @NotNull(message = "延期扣分不可以为空，负数")
     @ApiModelProperty("延期扣分")
     private Integer delayNegScore; // 延期扣分
 
-    @NotNull(message = "扣分上限不可以为空")
+    @NotNull(message = "扣分上限不可以为空，负数")
     @ApiModelProperty("扣分上限")
     private Integer negScoreMax; // 扣分上限
 

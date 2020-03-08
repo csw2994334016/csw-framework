@@ -47,17 +47,17 @@ public class PointsTask implements Serializable {
     @ApiModelProperty("任务状态（1=未完成；2=完成）")
     private Integer taskStatus = PointsTaskEnum.UNFINISHED.getCode(); // 任务状态（1=未完成；2=完成）
 
-    @Column(name = "delay_neg_score", nullable = false, columnDefinition = "int(11) comment '延期扣分'")
-    @ApiModelProperty("延期扣分")
-    private Integer delayNegScore; // 延期扣分
+    @Column(name = "delay_neg_score", nullable = false, columnDefinition = "int(11) default 0 comment '延期扣分'")
+    @ApiModelProperty("延期扣分，负数")
+    private Integer delayNegScore = 0; // 延期扣分
 
-    @Column(name = "neg_score_max", nullable = false, columnDefinition = "int(11) comment '扣分上限'")
-    @ApiModelProperty("扣分上限")
-    private Integer negScoreMax; // 扣分上限
+    @Column(name = "neg_score_max", nullable = false, columnDefinition = "int(11) default 0 comment '扣分上限'")
+    @ApiModelProperty("扣分上限，负数")
+    private Integer negScoreMax = 0; // 扣分上限
 
-    @Column(name = "times_num", nullable = false, columnDefinition = "int(11) comment '积分翻倍（1=不翻倍；2=翻倍）'")
+    @Column(name = "times_num", nullable = false, columnDefinition = "int(11) default 1 comment '积分翻倍（1=不翻倍；2=翻倍）'")
     @ApiModelProperty("积分翻倍（1=不翻倍；2=翻倍）")
-    private Integer timesNum; // 积分翻倍（1=不翻倍；2=翻倍）
+    private Integer timesNum = 1; // 积分翻倍（1=不翻倍；2=翻倍）
 
     @Column(name = "deadline", nullable = false, columnDefinition = "datetime comment '截止时间'")
     @ApiModelProperty("截止时间")
