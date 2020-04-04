@@ -17,4 +17,6 @@ public interface AwardPrivilegeEmpRepository extends JpaRepository<AwardPrivileg
     List<AwardPrivilegeEmp> findAllByAwardPrivilegeIdInAndEmpIdNot(Set<String> awardPrivilegeIdSet, String attnId);
 
     List<AwardPrivilegeEmp> findAllByAwardPrivilegeIdIn(Set<String> awardPrivilegeIdSet);
+
+    List<AwardPrivilegeEmp> findAllByAwardPrivilegeId(String awardPrivilegeId);
 }

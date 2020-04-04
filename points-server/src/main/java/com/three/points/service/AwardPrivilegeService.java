@@ -45,7 +45,7 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
 
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
 
-        if (awardPrivilegeRepository.countByAwardPrivilegeNameAndOrganizationId(awardPrivilegeParam.getAwardPrivilegeName(), firstOrganizationId) > 0) {
+        if (awardPrivilegeRepository.countByAwardPrivilegeNameAndOrganizationIdAndStatus(awardPrivilegeParam.getAwardPrivilegeName(), firstOrganizationId, StatusEnum.OK.getCode()) > 0) {
             throw new ParameterException("奖扣权限名称已经存在");
         }
 
@@ -64,7 +64,7 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
 
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
 
-        if (awardPrivilegeRepository.countByAwardPrivilegeNameAndOrganizationIdAndIdNot(awardPrivilegeParam.getAwardPrivilegeName(), firstOrganizationId, awardPrivilegeParam.getId()) > 0) {
+        if (awardPrivilegeRepository.countByAwardPrivilegeNameAndOrganizationIdAndStatusAndIdNot(awardPrivilegeParam.getAwardPrivilegeName(), firstOrganizationId, StatusEnum.OK.getCode(), awardPrivilegeParam.getId()) > 0) {
             throw new ParameterException("奖扣权限名称已经存在");
         }
 
@@ -164,4 +164,10 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         return getEntityById(awardPrivilegeRepository, id);
     }
 
+    public List<AwardPrivilegeEmp> findAwardPrivilegeEmpList(String awardPrivilegeId) {
+        if (StringUtil.isNotBlank(awardPrivilegeId)) {
+            return awardPrivilegeEmpRepository.findAllByAwardPrivilegeId(awardPrivilegeId);
+        }
+        return new ArrayList<>();
+    }
 }

@@ -113,11 +113,11 @@ public class AuthorityService extends BaseService<Authority, String> {
         return authorityRepository.findAllByStatusAndAuthorityType(StatusEnum.OK.getCode(), AuthorityEnum.MENU.getCode());
     }
 
-    public List<Authority> findAllAuthTree(int code, String parentId) {
+    public List<Authority> findAllAuthTree(int code, String authorityName) {
         List<Authority> authTreeVoList = new ArrayList<>();
         List<Authority> authorityList;
-        if (StringUtil.isNotBlank(parentId)) {
-            authorityList = authorityRepository.findAllByStatusAndParentId(code, parentId);
+        if (StringUtil.isNotBlank(authorityName)) {
+            authorityList = authorityRepository.findAllByStatusAndAuthorityNameLike(code, authorityName);
         } else {
             authorityList = authorityRepository.findAllByStatus(code);
         }

@@ -20,5 +20,5 @@ public interface AuthorityRepository extends BaseRepository<Authority, String>, 
 
     List<Authority> findAllByParentId(String id);
 
-    List<Authority> findAllByStatusAndParentId(int code, String parentId);
+    List<Authority> findAllByStatusAndAuthorityNameLike(int code, String authorityName);
 }

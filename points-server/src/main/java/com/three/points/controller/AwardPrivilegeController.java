@@ -7,6 +7,7 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.points.entity.AwardPrivilege;
+import com.three.points.entity.AwardPrivilegeEmp;
 import com.three.points.param.AwardPrivilegeEmpParam;
 import com.three.points.param.AwardPrivilegeParam;
 import com.three.points.service.AwardPrivilegeService;
@@ -16,6 +17,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by csw on 2019-09-29.
@@ -86,5 +89,12 @@ public class AwardPrivilegeController {
     @GetMapping("/findById")
     public JsonData<AwardPrivilege> findById(@RequestParam(required = true) String id) {
         return new JsonData<>(awardPrivilegeService.findById(id));
+    }
+
+    @ApiOperation(value = "查找奖扣权限设置的人员", notes = "")
+    @ApiImplicitParam(name = "awardPrivilegeId", value = "奖扣权限id", required = true, dataType = "String")
+    @GetMapping("/findAwardPrivilegeEmpList")
+    public JsonData<List<AwardPrivilegeEmp>> findAwardPrivilegeEmpList(@RequestParam(required = true) String awardPrivilegeId) {
+        return new JsonData<>(awardPrivilegeService.findAwardPrivilegeEmpList(awardPrivilegeId));
     }
 }
