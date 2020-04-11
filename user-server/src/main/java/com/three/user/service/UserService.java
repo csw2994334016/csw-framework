@@ -188,7 +188,7 @@ public class UserService extends BaseService<User, String> {
         List<User> userList = userRepository.findAllByIsAdmin(code);
         for (User user : userList) {
             Organization organization = organizationService.findById(user.getEmployee().getOrganizationId());
-            if (organization.getFirstParentId().equals(firstOrganizationId)) {
+            if (organization.getOrganizationId().equals(firstOrganizationId)) {
                 return user;
             }
         }

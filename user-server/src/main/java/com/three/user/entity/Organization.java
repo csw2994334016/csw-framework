@@ -34,11 +34,15 @@ public class Organization implements Serializable {
     private String id;
 
 
+    @Column(name = "organization_id", columnDefinition = "varchar(36) comment '组织机构（一级公司）'")
+    @ApiModelProperty("组织机构（一级公司）")
+    private String organizationId; // 组织机构（一级公司）
+
     @Column(name = "org_name", nullable = false, columnDefinition = "varchar(100) comment '组织机构名称'")
     @ApiModelProperty("组织机构名称")
     private String orgName; // 组织机构名称
 
-    @Column(name = "org_code", nullable = false, unique = true, columnDefinition = "varchar(100) comment '组织机构编码'")
+    @Column(name = "org_code", nullable = false, columnDefinition = "varchar(100) comment '组织机构编码'")
     @ApiModelProperty("组织机构编码")
     private String orgCode; // 组织机构编码
 
@@ -57,10 +61,6 @@ public class Organization implements Serializable {
     @Column(name = "parent_id", nullable = false, columnDefinition = "varchar(36) default '-1' comment '父级机构ID'")
     @ApiModelProperty("父级机构ID")
     private String parentId = "-1"; // 父级机构ID
-
-    @Column(name = "first_parent_id", columnDefinition = "varchar(36) comment '一级父级机构ID'")
-    @ApiModelProperty("一级父级机构ID")
-    private String firstParentId; // 一级父级机构ID
 
     @Column(name = "parent_name", columnDefinition = "varchar(100) comment '父级机构名称'")
     @ApiModelProperty("父级机构名称")

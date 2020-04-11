@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
 import com.three.common.auth.SysEmployee;
 import com.three.common.constants.RedisConstant;
+import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
@@ -75,16 +76,11 @@ public class EmployeeService extends BaseService<Employee, String> {
         BeanValidator.check(employeeParam);
 
         if (employeeRepository.countByUsername(employeeParam.getEmpNum()) > 0) {
-            throw new ParameterException("系统中已经存在相同工号[" + employeeParam.getEmpNum() + "]人员");
+            throw new ParameterException("已经存在相同工号[" + employeeParam.getEmpNum() + "]人员");
         }
 
         Employee employee = new Employee();
-        employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
-        employee.setUsername(employee.getEmpNum());
-
-        Organization organization = organizationService.findById(employeeParam.getOrganizationId());
-        employee.setOrganizationId(organization.getId());
-        employee.setOrgName(organization.getOrgName());
+        employee = setEmployeeByParam(employeeParam, employee);
 
         employee = employeeRepository.save(employee);
 
@@ -107,14 +103,9 @@ public class EmployeeService extends BaseService<Employee, String> {
 
         Employee employee = getEntityById(employeeRepository, employeeParam.getId());
         if (employeeRepository.countByUsernameAndIdNot(employeeParam.getEmpNum(), employee.getId()) > 0) {
-            throw new ParameterException("系统中已经存在相同工号[" + employeeParam.getEmpNum() + "]人员");
+            throw new ParameterException("已经存在相同工号[" + employeeParam.getEmpNum() + "]人员");
         }
-        employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
-        employee.setUsername(employee.getEmpNum());
-
-        Organization organization = organizationService.findById(employeeParam.getOrganizationId());
-        employee.setOrganizationId(organization.getId());
-        employee.setOrgName(organization.getOrgName());
+        employee = setEmployeeByParam(employeeParam, employee);
 
         User user = userService.findByEmployee(employee);
 
@@ -125,6 +116,15 @@ public class EmployeeService extends BaseService<Employee, String> {
         employeeRepository.save(employee);
 
         updateEmployeeRedis(employee);
+    }
+
+    private Employee setEmployeeByParam(EmployeeParam employeeParam, Employee employee) {
+        employee = (Employee) BeanCopyUtil.copyBean(employeeParam, employee);
+        employee.setUsername(employee.getEmpNum());
+
+        Organization organization = organizationService.findById(employeeParam.getOrganizationId());
+        employee.setOrgName(organization.getOrgName());
+        return employee;
     }
 
     @Transactional
@@ -140,12 +140,24 @@ public class EmployeeService extends BaseService<Employee, String> {
         }
 
         employeeRepository.saveAll(employeeList);
+
+        employeeList.forEach(this::deleteEmployeeRedis);
     }
 
     public PageResult<Employee> query(PageQuery pageQuery, int code, String organizationId, String searchValue, String containChildFlag, String taskFilterFlag, String awardPrivilegeFilterFlag) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        Preconditions.checkNotNull(firstOrganizationId, "当前登录账号不属于任何公司，无法查找组织机构下的人员");
+        String orgId = StringUtil.isBlank(organizationId) ? firstOrganizationId : organizationId;
+        if (StringUtil.isBlank(firstOrganizationId) && AdminEnum.YES.getCode() == Objects.requireNonNull(LoginUserUtil.getLoginUser()).getIsAdmin()) { // 超级管理员
+            // 超级管理员查找用户，需要选择相应的部门，否则不返回数据
+            if (StringUtil.isBlank(orgId)) {
+                return new PageResult<>(new ArrayList<>());
+            }
+        } else {
+            if (StringUtil.isBlank(firstOrganizationId)) {
+                throw new ParameterException("用户不属于组织机构，不允许操作");
+            }
+        }
         Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = Lists.newArrayList();
 
@@ -154,19 +166,10 @@ public class EmployeeService extends BaseService<Employee, String> {
             // 按组织机构查询人员信息
             List<Organization> organizationList = new ArrayList<>();
             if ("0".equals(containChildFlag)) { // 不包含子部门人员
-                if (StringUtil.isBlank(organizationId)) {
-                    organizationList.add(organizationService.findById(firstOrganizationId));
-                } else {
-                    organizationList.add(organizationService.findById(organizationId));
-                }
+                organizationList.add(organizationService.findById(orgId));
             } else {
-                if (StringUtil.isBlank(organizationId)) {
-                    organizationList = organizationService.findChildOrganizationListByOrgId(firstOrganizationId);
-                    organizationList.add(organizationService.findById(firstOrganizationId));
-                } else {
-                    organizationList = organizationService.findChildOrganizationListByOrgId(organizationId);
-                    organizationList.add(organizationService.findById(organizationId));
-                }
+                organizationList = organizationService.findChildOrganizationListByOrgId(orgId);
+                organizationList.add(organizationService.findById(orgId));
             }
             if (organizationList.size() > 0) {
                 Set<String> orgIdSet = new HashSet<>();

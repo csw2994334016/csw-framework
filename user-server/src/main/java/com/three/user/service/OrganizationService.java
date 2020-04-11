@@ -54,38 +54,50 @@ public class OrganizationService extends BaseService<Organization, String> {
     public void create(OrganizationParam organizationParam) {
         BeanValidator.check(organizationParam);
 
-        if (organizationRepository.countByFirstParentIdAndOrgName(LoginUserUtil.getLoginUserFirstOrganizationId(), organizationParam.getOrgName()) > 0) {
-            throw new ParameterException("数据库中已存在同名称[" + organizationParam.getOrgName() + "]组织机构");
-        }
-        if (organizationRepository.countByFirstParentIdAndOrgCode(LoginUserUtil.getLoginUserFirstOrganizationId(), organizationParam.getOrgCode()) > 0) {
-            throw new ParameterException("数据库中已存在同编号[" + organizationParam.getOrgCode() + "]组织机构");
-        }
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
 
         Organization organization = new Organization();
         organization = (Organization) BeanCopyUtil.copyBean(organizationParam, organization);
 
-        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        organization.setFirstParentId(firstOrganizationId);
-
-        // 如果当前登录用户存在一级组织机构、且传参parentId="-1"，则默认该组织机构在一级组织结构下
-        if (StringUtil.isNotBlank(firstOrganizationId) && "-1".equals(organization.getParentId())) {
-            organization.setParentId(firstOrganizationId);
+        if (StringUtil.isBlank(firstOrganizationId) && AdminEnum.YES.getCode() == Objects.requireNonNull(LoginUserUtil.getLoginUser()).getIsAdmin()) { // 超级管理员
+            // 只允许创建一级公司
+            organization.setParentId("-1");
+            organization.setSort(100);
+            organization = organizationRepository.save(organization);
+            organization.setOrganizationId(organization.getId());
+            organizationRepository.save(organization);
+        } else { // 用户
+            if (StringUtil.isBlank(firstOrganizationId)) {
+                throw new ParameterException("用户不属于组织机构，不允许操作");
+            }
+            if (organizationRepository.countByOrganizationIdAndOrgNameAndStatus(firstOrganizationId, organizationParam.getOrgName(), StatusEnum.OK.getCode()) > 0) {
+                throw new ParameterException("已存在同名称[" + organizationParam.getOrgName() + "]组织机构");
+            }
+            if (organizationRepository.countByOrganizationIdAndOrgCodeAndStatus(firstOrganizationId, organizationParam.getOrgCode(), StatusEnum.OK.getCode()) > 0) {
+                throw new ParameterException("中已存在同编号[" + organizationParam.getOrgCode() + "]组织机构");
+            }
+            organization.setOrganizationId(firstOrganizationId);
+            // 如果当前登录用户存在一级组织机构、且传参parentId="-1"，则默认该组织机构在一级组织结构下，即不允许创建一级公司
+            if ("-1".equals(organization.getParentId())) {
+                organization.setParentId(firstOrganizationId);
+            }
+            // 拼接父级组织机构层级结构
+            Organization parentOrg = setParentOrg(organization);
+            // 查找sort最大值，然后加10
+            Integer maxSort = organizationRepository.findMaxSortByParentId(parentOrg.getId());
+            maxSort = maxSort != null ? maxSort + 10 : 100;
+            organization.setSort(maxSort);
+            organizationRepository.save(organization);
         }
 
+        addOrganizationRedis(organization);
+    }
+
+    private Organization setParentOrg(Organization organization) {
         Organization parentOrg = findById(organization.getParentId());
         organization.setParentName(parentOrg.getOrgName());
-
-        // 拼接父级组织机构层级结构
         organization.setParentIds(StringUtil.isNotBlank(parentOrg.getParentIds()) ? parentOrg.getParentIds() + "," + parentOrg.getId() : parentOrg.getId());
-
-        // 查找sort最大值，然后加10
-        Integer maxSort = organizationRepository.findMaxSortByParentId(parentOrg.getId());
-        maxSort = maxSort != null ? maxSort + 10 : 100;
-        organization.setSort(maxSort);
-
-        organizationRepository.save(organization);
-
-        addOrganizationRedis(organization);
+        return parentOrg;
     }
 
     @Transactional
@@ -93,32 +105,30 @@ public class OrganizationService extends BaseService<Organization, String> {
         BeanValidator.check(organizationParam);
 
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        if (StringUtil.isNotBlank(firstOrganizationId) && "-1".equals(organizationParam.getParentId())) {
-            throw new ParameterException("修改组织机构一定要选择上级组织结构");
-        }
-
-        if (organizationRepository.countByFirstParentIdAndOrgNameAndIdNot(firstOrganizationId, organizationParam.getOrgName(), organizationParam.getId()) > 0) {
-            throw new ParameterException("数据库中已存在同名称[" + organizationParam.getOrgName() + "]组织机构");
-        }
-        if (organizationRepository.countByFirstParentIdAndOrgCodeAndIdNot(firstOrganizationId, organizationParam.getOrgCode(), organizationParam.getId()) > 0) {
-            throw new ParameterException("数据库中已存在同编号[" + organizationParam.getOrgCode() + "]组织机构");
-        }
 
         Organization organization = getEntityById(organizationRepository, organizationParam.getId());
-        if ("-1".equals(organization.getParentId()) && AdminEnum.YES.getCode() != Objects.requireNonNull(LoginUserUtil.getLoginUser()).getIsAdmin()) {
-            throw new BusinessException("非管理员没有修改顶级组织结构的权限");
-        }
         organization = (Organization) BeanCopyUtil.copyBean(organizationParam, organization);
 
-        if (StringUtil.isNotBlank(organization.getParentId()) && !"-1".equals(organization.getParentId())) {
-            Organization parentOrg = findById(organization.getParentId());
-            organization.setParentName(parentOrg.getOrgName());
-
+        if (StringUtil.isBlank(firstOrganizationId) && AdminEnum.YES.getCode() == Objects.requireNonNull(LoginUserUtil.getLoginUser()).getIsAdmin()) { // 超级管理员
+            // 只允许修改代码和名称等
+            organizationRepository.save(organization);
+        } else { // 用户
+            if (StringUtil.isBlank(firstOrganizationId)) {
+                throw new ParameterException("用户不属于组织机构，不允许操作");
+            }
+            if (organizationRepository.countByOrganizationIdAndOrgNameAndStatusAndIdNot(firstOrganizationId, organizationParam.getOrgName(), StatusEnum.OK.getCode(), organizationParam.getId()) > 0) {
+                throw new ParameterException("已存在同名称[" + organizationParam.getOrgName() + "]组织机构");
+            }
+            if (organizationRepository.countByOrganizationIdAndOrgCodeAndStatusAndIdNot(firstOrganizationId, organizationParam.getOrgCode(), StatusEnum.OK.getCode(), organizationParam.getId()) > 0) {
+                throw new ParameterException("已存在同编号[" + organizationParam.getOrgCode() + "]组织机构");
+            }
+            if ("-1".equals(organization.getParentId())) {
+                throw new BusinessException("父级组织机构不能是一级公司，数据不合法");
+            }
             // 拼接父级组织机构层级结构
-            organization.setParentIds(StringUtil.isNotBlank(parentOrg.getParentIds()) ? parentOrg.getParentIds() + "," + parentOrg.getId() : parentOrg.getId());
+            setParentOrg(organization);
+            organizationRepository.save(organization);
         }
-
-        organizationRepository.save(organization);
 
         updateOrganizationRedis(organization);
     }
@@ -151,7 +161,7 @@ public class OrganizationService extends BaseService<Organization, String> {
         }
 
         if (orgNameList.size() > 0) {
-            throw new BusinessException("一级组织" + orgNameList.toString() + "有员工信息，无法删除！");
+            throw new BusinessException("一级组织[" + orgNameList.toString() + "]有员工信息，无法删除！");
         }
 
         if (employeeList1.size() > 0) {
@@ -167,14 +177,13 @@ public class OrganizationService extends BaseService<Organization, String> {
 
     public PageResult<Organization> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
-        String firstParentId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Specification<Organization> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
             Specification<Organization> codeAndSearchKeySpec = getCodeAndSearchKeySpec(code, searchKey, searchValue);
-            if (firstParentId != null) { // 根据当前登录用户，查找该公司的所有组织机构
-                predicateList.add(criteriaBuilder.equal(root.get("firstParentId"), firstParentId));
-            }
+            Specification<Organization> codeAndSearchKeySpec1 = getCodeAndOrganizationSpec(code, firstOrganizationId);
             predicateList.add(codeAndSearchKeySpec.toPredicate(root, criteriaQuery, criteriaBuilder));
+            predicateList.add(codeAndSearchKeySpec1.toPredicate(root, criteriaQuery, criteriaBuilder));
             Predicate[] predicates = new Predicate[predicateList.size()];
             return criteriaBuilder.and(predicateList.toArray(predicates));
         };
@@ -187,26 +196,25 @@ public class OrganizationService extends BaseService<Organization, String> {
     }
 
     public List<OrgVo> findAllWithTree(int code) {
-        List<Organization> organizationList = new ArrayList<>();
+        List<OrgVo> parentOrgVoList = new ArrayList<>();
 
-        LoginUser loginUser = LoginUserUtil.getLoginUser();
-        if (loginUser != null) {
-            if (loginUser.getSysOrganization() != null) {
-                organizationList = organizationRepository.findAllByFirstParentIdAndStatus(loginUser.getSysOrganization().getFirstParentId(), code);
-            } else {
-                if (loginUser.getIsAdmin().equals(AdminEnum.YES.getCode())) {
-                    organizationList = organizationRepository.findAllByStatus(code); // 默认admin账号可以查看全库所有组织机构
-                }
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+
+        List<Organization> organizationList;
+        if (StringUtil.isBlank(firstOrganizationId) && AdminEnum.YES.getCode() == Objects.requireNonNull(LoginUserUtil.getLoginUser()).getIsAdmin()) { // 超级管理员
+            organizationList = organizationRepository.findAllByStatus(code);
+        } else {
+            if (StringUtil.isBlank(firstOrganizationId)) {
+                throw new ParameterException("用户不属于组织机构，不允许操作");
             }
+            organizationList = organizationRepository.findAllByOrganizationIdAndStatus(firstOrganizationId, code);
         }
-
         Map<String, OrgVo> orgVoMap = new HashMap<>();
         for (Organization organization : organizationList) {
             OrgVo orgVo = OrgVo.builder().title(organization.getOrgName()).id(organization.getId()).key(organization.getId()).
                     parentId(organization.getParentId()).sort(organization.getSort()).parentName(organization.getParentName()).orgCode(organization.getOrgCode()).build();
             orgVoMap.put(orgVo.getId(), orgVo);
         }
-        List<OrgVo> parentOrgVoList = new ArrayList<>();
         for (OrgVo orgVo : orgVoMap.values()) {
             OrgVo parentOrg = orgVoMap.get(orgVo.getParentId());
             if (parentOrg != null) {
@@ -214,6 +222,10 @@ public class OrganizationService extends BaseService<Organization, String> {
             } else {
                 parentOrgVoList.add(orgVo);
             }
+        }
+        if (StringUtil.isBlank(firstOrganizationId) && AdminEnum.YES.getCode() == Objects.requireNonNull(LoginUserUtil.getLoginUser()).getIsAdmin()) { // 超级管理员
+            OrgVo orgVo = OrgVo.builder().title("一级公司").id("-1").key("-1").sort(0).orgCode("FIRST_COMPANY").build();
+            parentOrgVoList.add(orgVo);
         }
         // 排序
         sortBySort(parentOrgVoList);

@@ -18,9 +18,9 @@ public interface EventTypeRepository extends BaseRepository<EventType, String> {
 
     List<EventType> findAllByStatusAndParentId(int code, String parentId);
 
-    int countByTypeNameAndOrganizationId(String typeName, String organizationId);
+    int countByTypeNameAndOrganizationIdAndStatus(String typeName, String organizationId, int code);
 
-    int countByTypeNameAndOrganizationIdAndIdNot(String typeName, String organizationId, String id);
+    int countByTypeNameAndOrganizationIdAndStatusAndIdNot(String typeName, String organizationId, int code, String id);
 
     @Query("select max(e.sort) from EventType e where e.parentId = :parentId")
     Integer findMaxSortByParentId(String parentId);

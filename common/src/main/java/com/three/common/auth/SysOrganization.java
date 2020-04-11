@@ -29,7 +29,7 @@ public class SysOrganization implements Serializable {
 
     private String parentIds; // 所有父级ID
 
-    private String firstParentId;
+    private String organizationId; // 一级组织机构（一级公司）
 
     private Integer sort = 100; // 排序
 

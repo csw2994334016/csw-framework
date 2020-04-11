@@ -66,7 +66,7 @@ public class LoginUserUtil {
     public static String getLoginUserFirstOrganizationId() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null && loginUser.getSysOrganization() != null) {
-            return loginUser.getSysOrganization().getFirstParentId();
+            return loginUser.getSysOrganization().getOrganizationId();
         }
         return null;
     }

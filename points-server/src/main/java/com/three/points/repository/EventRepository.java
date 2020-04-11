@@ -13,13 +13,11 @@ import java.util.List;
  */
 public interface EventRepository extends BaseRepository<Event, String> {
 
-    int countByTypeId(String id);
-
     List<Event> findAllByTypeId(String id);
 
-    int countByEventNameAndOrganizationId(String eventName, String organizationId);
+    int countByEventNameAndOrganizationIdAndStatus(String eventName, String organizationId, int code);
 
-    int countByEventNameAndOrganizationIdAndIdNot(String eventName, String organizationId, String id);
+    int countByEventNameAndOrganizationIdAndStatusAndIdNot(String eventName, String organizationId, int code, String id);
 
     @Modifying
     @Query("update Event e set e.typeName = :typeName  where e.typeId = :typeId")

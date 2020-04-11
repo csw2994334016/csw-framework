@@ -3,7 +3,7 @@ package com.three.points.service;
 import com.google.common.collect.Lists;
 import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
@@ -47,7 +47,7 @@ public class EventTypeService extends BaseService<EventType, String> {
 
         // 分类名称不能相同
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        if (eventTypeRepository.countByTypeNameAndOrganizationId(eventTypeParam.getTypeName(), firstOrganizationId) > 0) {
+        if (eventTypeRepository.countByTypeNameAndOrganizationIdAndStatus(eventTypeParam.getTypeName(), firstOrganizationId, StatusEnum.OK.getCode()) > 0) {
             throw new ParameterException("已存在同名[" + eventTypeParam.getTypeName() + "]的事件分类");
         }
 
@@ -68,7 +68,7 @@ public class EventTypeService extends BaseService<EventType, String> {
 
         EventType eventType = getEntityById(eventTypeRepository, eventTypeParam.getId());
         // 分类名称不能相同
-        if (eventTypeRepository.countByTypeNameAndOrganizationIdAndIdNot(eventTypeParam.getTypeName(), eventType.getOrganizationId(), eventType.getId()) > 0) {
+        if (eventTypeRepository.countByTypeNameAndOrganizationIdAndStatusAndIdNot(eventTypeParam.getTypeName(), eventType.getOrganizationId(), StatusEnum.OK.getCode(), eventType.getId()) > 0) {
             throw new ParameterException("已存在同名[" + eventTypeParam.getTypeName() + "]的事件分类");
         }
         eventType = (EventType) BeanCopyUtil.copyBean(eventTypeParam, eventType);
@@ -100,8 +100,6 @@ public class EventTypeService extends BaseService<EventType, String> {
     public PageResult<EventType> query(PageQuery pageQuery, int code, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<EventType> specification = (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicateList = Lists.newArrayList();
-
             String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
             Specification<EventType> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
@@ -126,15 +124,9 @@ public class EventTypeService extends BaseService<EventType, String> {
     public List<EventTypeVo> findAllWithTree(int code) {
         List<EventType> eventTypeList = new ArrayList<>();
 
-        LoginUser loginUser = LoginUserUtil.getLoginUser();
-        if (loginUser != null) {
-            if (loginUser.getSysOrganization() != null) {
-                eventTypeList = eventTypeRepository.findAllByOrganizationIdAndStatus(loginUser.getSysOrganization().getFirstParentId(), code);
-            } else {
-                if (loginUser.getIsAdmin().equals(AdminEnum.YES.getCode())) {
-                    eventTypeList = eventTypeRepository.findAllByStatus(code); // 默认admin账号可以查看全库所有组织机构
-                }
-            }
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        if (StringUtil.isNotBlank(firstOrganizationId)) {
+            eventTypeList = eventTypeRepository.findAllByOrganizationIdAndStatus(firstOrganizationId, code);
         }
 
         Map<String, EventTypeVo> voMap = new HashMap<>();

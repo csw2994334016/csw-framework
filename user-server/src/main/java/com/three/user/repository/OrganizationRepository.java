@@ -12,19 +12,18 @@ import java.util.List;
  */
 public interface OrganizationRepository extends BaseRepository<Organization, String> {
 
-    List<Organization> findAllByParentId(String parentId);
 
-    List<Organization> findAllByFirstParentIdAndStatus(String firstParentId, int code);
+    List<Organization> findAllByOrganizationIdAndStatus(String firstParentId, int code);
 
     List<Organization> findAllByParentIdsLike(String orgId);
 
-    int countByFirstParentIdAndOrgNameAndIdNot(String firstParentId, String orgName, String id);
+    int countByOrganizationIdAndOrgNameAndStatusAndIdNot(String firstParentId, String orgName, int code, String id);
 
-    int countByFirstParentIdAndOrgCodeAndIdNot(String firstParentId, String orgCode, String id);
+    int countByOrganizationIdAndOrgCodeAndStatusAndIdNot(String firstParentId, String orgCode, int code, String id);
 
-    int countByFirstParentIdAndOrgName(String firstParentId, String orgName);
+    int countByOrganizationIdAndOrgNameAndStatus(String firstParentId, String orgName, int code);
 
-    int countByFirstParentIdAndOrgCode(String firstParentId, String orgCode);
+    int countByOrganizationIdAndOrgCodeAndStatus(String firstParentId, String orgCode, int code);
 
     @Query("select max(o.sort) from Organization o where o.parentId = :parentId")
     Integer findMaxSortByParentId(String parentId);

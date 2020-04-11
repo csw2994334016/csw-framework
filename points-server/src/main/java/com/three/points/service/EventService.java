@@ -6,7 +6,6 @@ import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
-import com.three.points.entity.ThemeDetail;
 import com.three.points.param.MoveEventParam;
 import com.three.points.repository.EventRepository;
 import com.three.points.param.EventParam;
@@ -52,7 +51,7 @@ public class EventService extends BaseService<Event, String> {
 
         // 事件名称不能相同
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
-        if (eventRepository.countByEventNameAndOrganizationId(eventParam.getEventName(), firstOrganizationId) > 0) {
+        if (eventRepository.countByEventNameAndOrganizationIdAndStatus(eventParam.getEventName(), firstOrganizationId, StatusEnum.OK.getCode()) > 0) {
             throw new ParameterException("已存在同名[" + eventParam.getEventName() + "]的事件");
         }
 
@@ -73,7 +72,7 @@ public class EventService extends BaseService<Event, String> {
 
         Event event = getEntityById(eventRepository, eventParam.getId());
         // 事件名称不能相同
-        if (eventRepository.countByEventNameAndOrganizationIdAndIdNot(eventParam.getEventName(), event.getOrganizationId(), event.getId()) > 0) {
+        if (eventRepository.countByEventNameAndOrganizationIdAndStatusAndIdNot(eventParam.getEventName(), event.getOrganizationId(), StatusEnum.OK.getCode(), event.getId()) > 0) {
             throw new ParameterException("已存在同名[" + eventParam.getEventName() + "]的事件");
         }
         event = (Event) BeanCopyUtil.copyBean(eventParam, event);
