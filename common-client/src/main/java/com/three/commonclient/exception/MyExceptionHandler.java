@@ -26,10 +26,11 @@ public class MyExceptionHandler {
         if (ex instanceof IException) {
             map.put("code", ((IException) ex).getCode());
             map.put("msg", ex.getMessage());
+            logger.error(ex.getMessage(), ex);
         } else if (ex instanceof NullPointerException) {
             map.put("code", 500);
             map.put("msg", ex.getMessage());
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
         } else {
             String message = ex.getMessage();
             map.put("code", 500);
