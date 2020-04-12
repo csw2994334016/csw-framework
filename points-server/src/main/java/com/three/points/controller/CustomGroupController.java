@@ -1,6 +1,8 @@
 package com.three.points.controller;
 
 import com.three.points.entity.CustomGroup;
+import com.three.points.entity.CustomGroupEmp;
+import com.three.points.param.CustomGroupEmpParam;
 import com.three.points.param.CustomGroupParam;
 import com.three.points.service.CustomGroupService;
 import com.three.common.enums.StatusEnum;
@@ -15,6 +17,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by csw on 2020-04-06.
@@ -76,5 +80,21 @@ public class CustomGroupController {
     @GetMapping("/findById")
     public JsonData<CustomGroup> findById(@RequestParam(required = true) String id) {
         return new JsonData<>(customGroupService.findById(id)).success();
+    }
+
+    @LogAnnotation(module = "配置分组人员")
+    @ApiOperation(value = "配置分组人员")
+    @ApiImplicitParam(name = "customGroupEmpParam", value = "配置人员信息", required = true, dataType = "CustomGroupEmpParam")
+    @PostMapping("/bindEmployee")
+    public JsonResult bindEmployee(@RequestBody CustomGroupEmpParam customGroupEmpParam) {
+        customGroupService.bindEmployee(customGroupEmpParam);
+        return JsonResult.ok("配置分组人员");
+    }
+
+    @ApiOperation(value = "查找分组已配置的人员", notes = "")
+    @ApiImplicitParam(name = "customGroupId", value = "分组id", required = true, dataType = "String")
+    @GetMapping("/findCustomGroupEmpList")
+    public JsonData<List<CustomGroupEmp>> findCustomGroupEmpList(@RequestParam(required = true) String customGroupId) {
+        return new JsonData<>(customGroupService.findCustomGroupEmpList(customGroupId));
     }
 }

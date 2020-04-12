@@ -99,4 +99,11 @@ public class BaseService<T, ID> {
         Preconditions.checkNotNull(entity, "记录（id：" + id + ")不存在");
         return entity;
     }
+
+    protected String getLoginUserFirstOrganizationId() {
+        String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        Preconditions.checkArgument(StringUtil.isNotBlank(firstOrganizationId), "用户不属于任何公司，不允许操作");
+        return firstOrganizationId;
+    }
+
 }

@@ -9,5 +9,7 @@ import com.three.resource_jpa.jpa.base.repository.BaseRepository;
  */
 public interface CustomGroupRepository extends BaseRepository<CustomGroup, String> {
 
+    int countByOrganizationIdAndGroupNameAndStatusAndIdNot(String firstOrganizationId, String groupName, int code, String id);
+
     int countByOrganizationIdAndGroupNameAndStatus(String firstOrganizationId, String groupName, int code);
 }

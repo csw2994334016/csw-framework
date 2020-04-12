@@ -91,12 +91,12 @@ public class AwardPrivilegeService extends BaseService<AwardPrivilege, String> {
         }
     }
 
-    public PageResult<AwardPrivilege> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
+    public PageResult<AwardPrivilege> query(PageQuery pageQuery, int code, String searchValue) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         if (pageQuery != null) {
-            return query(awardPrivilegeRepository, pageQuery, sort, code, searchKey, searchValue);
+            return query(awardPrivilegeRepository, pageQuery, sort, code, "awardPrivilegeName", searchValue);
         } else {
-            return query(awardPrivilegeRepository, sort, code, searchKey, searchValue);
+            return query(awardPrivilegeRepository, sort, code, "awardPrivilegeName", searchValue);
         }
     }
 

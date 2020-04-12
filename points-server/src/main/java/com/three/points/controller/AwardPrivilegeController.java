@@ -68,20 +68,20 @@ public class AwardPrivilegeController {
             @ApiImplicitParam(name = "searchValue", value = "筛选值", dataType = "String")
     })
     @GetMapping("/query")
-    public PageResult<AwardPrivilege> query(Integer page, Integer limit, String searchKey, String searchValue) {
+    public PageResult<AwardPrivilege> query(Integer page, Integer limit, String searchValue) {
         if (page != null && limit != null) {
-            return awardPrivilegeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchKey, searchValue);
+            return awardPrivilegeService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
         }
-        return awardPrivilegeService.query(null, StatusEnum.OK.getCode(), searchKey, searchValue);
+        return awardPrivilegeService.query(null, StatusEnum.OK.getCode(), searchValue);
     }
 
-    @LogAnnotation(module = "添加人员")
-    @ApiOperation(value = "添加人员")
-    @ApiImplicitParam(name = "awardPrivilegeParam", value = "添加人员信息", required = true, dataType = "AwardPrivilegeEmployeeParam")
+    @LogAnnotation(module = "配置奖扣权限人员")
+    @ApiOperation(value = "配置奖扣权限人员")
+    @ApiImplicitParam(name = "awardPrivilegeEmpParam", value = "配置人员信息", required = true, dataType = "AwardPrivilegeEmpParam")
     @PostMapping("/bindEmployee")
     public JsonResult bindEmployee(@RequestBody AwardPrivilegeEmpParam awardPrivilegeEmpParam) {
         awardPrivilegeService.bindEmployee(awardPrivilegeEmpParam);
-        return JsonResult.ok("添加人员成功");
+        return JsonResult.ok("配置奖扣权限人员");
     }
 
     @ApiOperation(value = "查询奖扣权限设置（根据ID查找）", notes = "")

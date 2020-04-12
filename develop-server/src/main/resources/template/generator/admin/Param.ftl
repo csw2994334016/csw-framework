@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 <#if hasDate>
 import java.util.Date;
 </#if>
@@ -37,7 +38,8 @@ public class ${className}Param {
     </#list>
 </#if>
 
-    @ApiModelProperty("描述/备注")
+    @Size(max = 500, message = "描述/备注不超过500个字")
+    @ApiModelProperty("描述/备注(不超过500个字)")
     private String remark; // 描述/备注
 
 }

@@ -59,7 +59,7 @@ public class ${className}Service extends BaseService<${className},  ${pkColumnTy
         Set<String> idSet = StringUtil.getStrToIdSet1(ids);
         List<${className}> ${changeClassName}List = new ArrayList<>();
         for (String id : idSet) {
-            ${className} ${changeClassName} = getEntityById(${changeClassName}Repository, ${pkColumnType}.valueOf(id));
+            ${className} ${changeClassName} = getEntityById(${changeClassName}Repository, id);
             ${changeClassName}.setStatus(code);
             ${changeClassName}List.add(${changeClassName});
         }
@@ -67,27 +67,23 @@ public class ${className}Service extends BaseService<${className},  ${pkColumnTy
         ${changeClassName}Repository.saveAll(${changeClassName}List);
     }
 
-    public PageResult<${className}> query(PageQuery pageQuery, int code, String searchValue) {
+    public PageResult<${className}> query(Integer page, Integer limit, int code, String searchValue) {
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<${className}> specification = (root, criteriaQuery, criteriaBuilder) -> {
-
             Specification<${className}> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
-
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = new ArrayList<>();
                 Predicate p1 = criteriaBuilder.like(root.get("name"), "%" + searchValue + "%");
                 predicateList1.add(criteriaBuilder.or(p1));
-                Predicate[] predicates1 = new Predicate[predicateList1.size()];
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(predicates1));
-
+                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
             return predicate;
         };
-        if (pageQuery != null) {
-            return query(${changeClassName}Repository, pageQuery, sort, specification);
+        if (page != null && limit != null) {
+            return query(${changeClassName}Repository, new PageQuery(page, limit), sort, specification);
         } else {
             return query(${changeClassName}Repository, sort, specification);
         }

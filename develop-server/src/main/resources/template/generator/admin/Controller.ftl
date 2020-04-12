@@ -7,7 +7,6 @@ import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.JsonData;
-import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -64,11 +63,7 @@ public class ${className}Controller {
     })
     @GetMapping("/query")
     public PageResult<${className}> query(Integer page, Integer limit, String searchValue) {
-        if (page != null && limit != null) {
-            return ${changeClassName}Service.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
-        } else {
-            return ${changeClassName}Service.query(null, StatusEnum.OK.getCode(), searchValue);
-        }
+        return ${changeClassName}Service.query(page, limit, StatusEnum.OK.getCode(), searchValue);
     }
 
     @ApiOperation(value = "查询${menuName}（根据ID查找）", notes = "")
