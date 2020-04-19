@@ -332,6 +332,13 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
             myManagerTaskVo.setRatioTaskAwardScore(myManagerTaskVo.getRatioTaskAwardScore() + theme.getBposScore());
             myManagerTaskVo.setRatioTaskDeductScore(myManagerTaskVo.getRatioTaskDeductScore() + theme.getBnegScore());
         }
+        if (myManagerTaskVo.getRatioTaskDeductScore() > 0) {
+            myManagerTaskVo.setRatioValueCompleted(NumberUtil.div(myManagerTaskVo.getRatioTaskAwardScore(), myManagerTaskVo.getRatioTaskDeductScore(), 2).doubleValue());
+        }
+        myManagerTaskVo.setScoreAwardNeeded(managerTask.getScoreAwardMin());
+        myManagerTaskVo.setScoreDeductNeeded(managerTask.getScoreDeductMin());
+        myManagerTaskVo.setEmpCountValueNeeded(managerTask.getEmpCountValue());
+        myManagerTaskVo.setRatioValueNeeded(managerTask.getRatioValue());
         return myManagerTaskVo;
     }
 
@@ -450,8 +457,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         List<ManagerTask> curManagerTaskList = findManagerTaskListByTaskDate(curTaskDate, firstOrganizationId);
         Date nextTaskDate = DateUtil.offsetMonth(curTaskDate, 1);
         for (ManagerTask curManagerTask : curManagerTaskList) {
-//            ManagerTask nextManagerTask = managerTaskRepository.findByOrganizationIdAndTaskNameAndTaskDate(curManagerTask.getOrganizationId(), curManagerTask.getTaskName(), nextTaskDate);
-            if (curManagerTask.getNextTaskId() == null) {
+            if (StringUtil.isBlank(curManagerTask.getNextTaskId())) {
                 // 生成下个月管理任务
                 ManagerTask nextManagerTask = new ManagerTask();
                 nextManagerTask = (ManagerTask) BeanCopyUtil.copyBean(curManagerTask, nextManagerTask, Arrays.asList("id"));
@@ -467,6 +473,7 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
                     ManagerTaskEmp nextManagerTaskEmp = new ManagerTaskEmp();
                     nextManagerTaskEmp = (ManagerTaskEmp) BeanCopyUtil.copyBean(managerTaskEmp, nextManagerTaskEmp, Arrays.asList("id"));
                     nextManagerTaskEmp.setTaskId(nextManagerTask.getId());
+                    nextManagerTaskEmp.setTaskDate(nextManagerTask.getTaskDate());
                     nextManagerTaskEmpList.add(nextManagerTaskEmp);
                 }
                 managerTaskEmpRepository.saveAll(nextManagerTaskEmpList);
@@ -502,134 +509,137 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         List<ManagerTask> managerTaskList = findManagerTaskListByTaskDate(frontTaskDate, firstOrganizationId);
         for (ManagerTask managerTask : managerTaskList) {
             List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(managerTask.getId());
-            Theme themeNew = getNewTheme(managerTask);
-            themeNew = themeRepository.save(themeNew);
-            List<ThemeDetail> themeDetailList = new ArrayList<>();
-            for (ManagerTaskEmp managerTaskEmp : managerTaskEmpList) {
-                ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), themeNew.getThemeType(), EventEnum.EVENT_TYPE_MANAGER_TASK.getMessage(), EventFlagEnum.TEMPORARY.getCode());
-                themeDetail.setEventName(EventEnum.EVENT_NAME_MANAGER_TASK.getMessage());
-                // 管理任务属性设置
-                themeDetail.setManagerTaskId(managerTask.getId());
-                themeDetail.setManagerTaskName(managerTask.getTaskName());
-                themeDetail.setManagerTaskDate(managerTask.getTaskDate());
-                // 积分对象
-                themeDetail.setEmpId(managerTaskEmp.getEmpId());
-                themeDetail.setEmpFullName(managerTaskEmp.getEmpFullName());
-                themeService.setOrgInfo(managerTaskEmp.getEmpId(), themeDetail);
-                if (YesNoEnum.YES.getCode() == managerTask.getScoreTaskFlag()) {
-                    ThemeDetail themeDetail1 = new ThemeDetail();
-                    themeDetail1 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, themeDetail1);
-                    themeDetail1.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_AWARD.getMessage());
-                    themeDetail1.setManagerTaskIndex(getTaskIndex(managerTask.getScoreAwardMin(), managerTask.getScoreCycle()));
-                    TaskStatisticsVo taskStatisticsVo;
-                    if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getScoreCycle()) { // 这个月有多少天，按天统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "1", managerTaskEmp.getEmpId());
-                    } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getScoreCycle()) { // 这个月有多少周，按周统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "2", managerTaskEmp.getEmpId());
-                    } else { // 按整个月统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "4", managerTaskEmp.getEmpId());
-                    }
-                    for (Integer awardValue : taskStatisticsVo.getAwardValueTrendList()) {
-                        if (managerTask.getScoreNegScore() == 0) {
-                            themeDetail1.setScoreNegType("差额扣分");
-                            if (awardValue < managerTask.getScoreAwardMin()) {
-                                themeDetail1.setBscore(themeDetail1.getBscore() + awardValue - managerTask.getScoreAwardMin());
-                            }
-                        } else {
-                            themeDetail1.setScoreNegType("未完成扣分：" + managerTask.getScoreNegScore()); // 扣分是负分
-                            if (awardValue < managerTask.getScoreAwardMin()) {
-                                themeDetail1.setBscore(themeDetail1.getBscore() + managerTask.getScoreNegScore());
+            if (managerTaskEmpList.size() > 0) {
+                // 新增管理任务主题
+                Theme themeNew = getNewTheme(managerTask);
+                themeNew = themeRepository.save(themeNew);
+                List<ThemeDetail> themeDetailList = new ArrayList<>();
+                for (ManagerTaskEmp managerTaskEmp : managerTaskEmpList) {
+                    ThemeDetail themeDetail = new ThemeDetail(themeNew.getOrganizationId(), themeNew.getId(), themeNew.getThemeName(), themeNew.getThemeDate(), themeNew.getThemeType(), EventEnum.EVENT_TYPE_MANAGER_TASK.getMessage(), EventFlagEnum.TEMPORARY.getCode());
+                    themeDetail.setEventName(EventEnum.EVENT_NAME_MANAGER_TASK.getMessage());
+                    // 管理任务属性设置
+                    themeDetail.setManagerTaskId(managerTask.getId());
+                    themeDetail.setManagerTaskName(managerTask.getTaskName());
+                    themeDetail.setManagerTaskDate(managerTask.getTaskDate());
+                    // 积分对象
+                    themeDetail.setEmpId(managerTaskEmp.getEmpId());
+                    themeDetail.setEmpFullName(managerTaskEmp.getEmpFullName());
+                    themeService.setOrgInfo(managerTaskEmp.getEmpId(), themeDetail);
+                    if (YesNoEnum.YES.getCode() == managerTask.getScoreTaskFlag()) {
+                        ThemeDetail themeDetail1 = new ThemeDetail();
+                        themeDetail1 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, themeDetail1);
+                        themeDetail1.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_AWARD.getMessage());
+                        themeDetail1.setManagerTaskIndex(getTaskIndex(managerTask.getScoreAwardMin(), managerTask.getScoreCycle()));
+                        TaskStatisticsVo taskStatisticsVo;
+                        if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getScoreCycle()) { // 这个月有多少天，按天统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "1", managerTaskEmp.getEmpId());
+                        } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getScoreCycle()) { // 这个月有多少周，按周统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "2", managerTaskEmp.getEmpId());
+                        } else { // 按整个月统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "4", managerTaskEmp.getEmpId());
+                        }
+                        for (Integer awardValue : taskStatisticsVo.getAwardValueTrendList()) {
+                            if (managerTask.getScoreNegScore() == 0) {
+                                themeDetail1.setScoreNegType("差额扣分");
+                                if (awardValue < managerTask.getScoreAwardMin()) {
+                                    themeDetail1.setBscore(themeDetail1.getBscore() + awardValue - managerTask.getScoreAwardMin());
+                                }
+                            } else {
+                                themeDetail1.setScoreNegType("未完成扣分：" + managerTask.getScoreNegScore()); // 扣分是负分
+                                if (awardValue < managerTask.getScoreAwardMin()) {
+                                    themeDetail1.setBscore(themeDetail1.getBscore() + managerTask.getScoreNegScore());
+                                }
                             }
                         }
-                    }
-                    themeDetailList.add(themeDetail1);
-                    ThemeDetail themeDetail2 = new ThemeDetail();
-                    themeDetail2 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, themeDetail2);
-                    themeDetail2.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_NEG.getMessage());
-                    themeDetail2.setManagerTaskIndex(getTaskIndex(managerTask.getScoreDeductMin(), managerTask.getScoreCycle()));
-                    for (Integer deductValue : taskStatisticsVo.getDeductValueTrendList()) {
-                        if (managerTask.getScoreNegScore() == 0) {
-                            themeDetail2.setScoreNegType("差额扣分");
-                            if (deductValue > managerTask.getScoreDeductMin()) {
-                                themeDetail2.setBscore(themeDetail2.getBscore() + managerTask.getScoreDeductMin() - deductValue);
-                            }
-                        } else {
-                            themeDetail2.setScoreNegType("未完成扣分：" + managerTask.getScoreNegScore());
-                            if (deductValue > managerTask.getScoreAwardMin()) {
-                                themeDetail2.setBscore(themeDetail2.getBscore() + managerTask.getScoreNegScore());
+                        themeDetailList.add(themeDetail1);
+                        ThemeDetail themeDetail2 = new ThemeDetail();
+                        themeDetail2 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, themeDetail2);
+                        themeDetail2.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_NEG.getMessage());
+                        themeDetail2.setManagerTaskIndex(getTaskIndex(managerTask.getScoreDeductMin(), managerTask.getScoreCycle()));
+                        for (Integer deductValue : taskStatisticsVo.getDeductValueTrendList()) {
+                            if (managerTask.getScoreNegScore() == 0) {
+                                themeDetail2.setScoreNegType("差额扣分");
+                                if (deductValue > managerTask.getScoreDeductMin()) {
+                                    themeDetail2.setBscore(themeDetail2.getBscore() + managerTask.getScoreDeductMin() - deductValue);
+                                }
+                            } else {
+                                themeDetail2.setScoreNegType("未完成扣分：" + managerTask.getScoreNegScore());
+                                if (deductValue > managerTask.getScoreAwardMin()) {
+                                    themeDetail2.setBscore(themeDetail2.getBscore() + managerTask.getScoreNegScore());
+                                }
                             }
                         }
+                        themeDetailList.add(themeDetail2);
                     }
-                    themeDetailList.add(themeDetail2);
+                    if (YesNoEnum.YES.getCode() == managerTask.getEmpCountTaskFlag()) {
+                        ThemeDetail managerTaskScore1 = new ThemeDetail();
+                        managerTaskScore1 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, managerTaskScore1);
+                        managerTaskScore1.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_EMP_COUNT.getMessage());
+                        managerTaskScore1.setManagerTaskIndex(getTaskIndex(managerTask.getEmpCountValue(), managerTask.getEmpCountCycle()));
+                        managerTaskScore1.setScoreNegType("未完成扣分：" + managerTask.getEmpCountNegScore());
+                        TaskStatisticsVo taskStatisticsVo;
+                        if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getEmpCountCycle()) { // 这个月有多少天，按天统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "1", managerTaskEmp.getEmpId());
+                        } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getEmpCountCycle()) { // 这个月有多少周，按周统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "2", managerTaskEmp.getEmpId());
+                        } else { // 按整个月统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "4", managerTaskEmp.getEmpId());
+                        }
+                        for (Integer empCountValue : taskStatisticsVo.getEmpCountValueTrendList())
+                            if (empCountValue < managerTask.getEmpCountValue()) {
+                                managerTaskScore1.setBscore(managerTaskScore1.getBscore() + managerTask.getEmpCountNegScore());
+                            }
+                        themeDetailList.add(managerTaskScore1);
+                    }
+                    if (YesNoEnum.YES.getCode() == managerTask.getRatioTaskFlag()) {
+                        ThemeDetail managerTaskScore1 = new ThemeDetail();
+                        managerTaskScore1 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, managerTaskScore1);
+                        managerTaskScore1.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_RATIO.getMessage());
+                        managerTaskScore1.setManagerTaskIndex(managerTask.getRatioValue() + "%/" + ManagerTaskEnum.getMessageByCode(managerTask.getRatioCycle()));
+                        TaskStatisticsVo taskStatisticsVo;
+                        if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getRatioCycle()) { // 这个月有多少天，按天统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "1", managerTaskEmp.getEmpId());
+                        } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getRatioCycle()) { // 这个月有多少周，按周统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "2", managerTaskEmp.getEmpId());
+                        } else { // 按整个月统计
+                            taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "4", managerTaskEmp.getEmpId());
+                        }
+                        for (int i = 0; i < taskStatisticsVo.getRatioValueTrendList().size(); i++) {
+                            double ratioValue = taskStatisticsVo.getRatioValueTrendList().get(i);
+                            if (managerTask.getRatioNegScore() == 0) {
+                                managerTaskScore1.setScoreNegType("差额扣分");
+                                if (ratioValue > 0 && ratioValue < managerTask.getRatioValue() / 100) { // （扣分/奖分）< 目标比例值  表示比例任务未完成，需扣分
+                                    // 扣分规则：已奖分 * 目标比例 – 已扣分值
+                                    double deduct = taskStatisticsVo.getAwardValueTrendList().get(i) * managerTask.getRatioValue() / 100;
+                                    int d = (int) (taskStatisticsVo.getDeductValueTrendList().get(i) - deduct);
+                                    managerTaskScore1.setBscore(managerTaskScore1.getBscore() + d);
+                                }
+                            } else {
+                                managerTaskScore1.setScoreNegType("未完成扣分：" + managerTask.getRatioNegScore());
+                                if (ratioValue > 0 && ratioValue < managerTask.getRatioValue()) {
+                                    managerTaskScore1.setBscore(managerTaskScore1.getBscore() + managerTask.getRatioNegScore());
+                                }
+                            }
+                        }
+                        themeDetailList.add(managerTaskScore1);
+                    }
                 }
-                if (YesNoEnum.YES.getCode() == managerTask.getEmpCountTaskFlag()) {
-                    ThemeDetail managerTaskScore1 = new ThemeDetail();
-                    managerTaskScore1 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, managerTaskScore1);
-                    managerTaskScore1.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_EMP_COUNT.getMessage());
-                    managerTaskScore1.setManagerTaskIndex(getTaskIndex(managerTask.getEmpCountValue(), managerTask.getEmpCountCycle()));
-                    managerTaskScore1.setScoreNegType("未完成扣分：" + managerTask.getEmpCountNegScore());
-                    TaskStatisticsVo taskStatisticsVo;
-                    if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getEmpCountCycle()) { // 这个月有多少天，按天统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "1", managerTaskEmp.getEmpId());
-                    } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getEmpCountCycle()) { // 这个月有多少周，按周统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "2", managerTaskEmp.getEmpId());
-                    } else { // 按整个月统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "4", managerTaskEmp.getEmpId());
+                themeDetailListA.addAll(themeDetailList);
+                themeNew.setEmpCount(themeDetailList.size());
+                for (ThemeDetail themeDetail : themeDetailList) {
+                    if (themeDetail.getAscore() > 0) {
+                        themeNew.setAposScore(themeNew.getAposScore() + themeDetail.getAscore());
+                    } else {
+                        themeNew.setAnegScore(themeNew.getAnegScore() + themeDetail.getAscore());
                     }
-                    for (Integer empCountValue : taskStatisticsVo.getEmpCountValueTrendList())
-                        if (empCountValue < managerTask.getEmpCountValue()) {
-                            managerTaskScore1.setBscore(managerTaskScore1.getBscore() + managerTask.getEmpCountNegScore());
-                        }
-                    themeDetailList.add(managerTaskScore1);
+                    if (themeDetail.getBscore() > 0) {
+                        themeNew.setBposScore(themeNew.getBposScore() + themeDetail.getBscore());
+                    } else {
+                        themeNew.setBnegScore(themeNew.getBnegScore() + themeDetail.getBscore());
+                    }
                 }
-                if (YesNoEnum.YES.getCode() == managerTask.getRatioTaskFlag()) {
-                    ThemeDetail managerTaskScore1 = new ThemeDetail();
-                    managerTaskScore1 = (ThemeDetail) BeanCopyUtil.copyBean(themeDetail, managerTaskScore1);
-                    managerTaskScore1.setManagerTaskType(ManagerTaskEnum.TASK_TYPE_RATIO.getMessage());
-                    managerTaskScore1.setManagerTaskIndex(managerTask.getRatioValue() + "%/" + ManagerTaskEnum.getMessageByCode(managerTask.getRatioCycle()));
-                    TaskStatisticsVo taskStatisticsVo;
-                    if (ManagerTaskEnum.TASK_DAY.getCode() == managerTask.getRatioCycle()) { // 这个月有多少天，按天统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "1", managerTaskEmp.getEmpId());
-                    } else if (ManagerTaskEnum.TASK_WEEK.getCode() == managerTask.getRatioCycle()) { // 这个月有多少周，按周统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "2", managerTaskEmp.getEmpId());
-                    } else { // 按整个月统计
-                        taskStatisticsVo = queryTaskStatistics(frontTaskDate.getTime(), "4", managerTaskEmp.getEmpId());
-                    }
-                    for (int i = 0; i < taskStatisticsVo.getRatioValueTrendList().size(); i++) {
-                        double ratioValue = taskStatisticsVo.getRatioValueTrendList().get(i);
-                        if (managerTask.getRatioNegScore() == 0) {
-                            managerTaskScore1.setScoreNegType("差额扣分");
-                            if (ratioValue > 0 && ratioValue < managerTask.getRatioValue() / 100) { // （扣分/奖分）< 目标比例值  表示比例任务未完成，需扣分
-                                // 扣分规则：已奖分 * 目标比例 – 已扣分值
-                                double deduct = taskStatisticsVo.getAwardValueTrendList().get(i) * managerTask.getRatioValue() / 100;
-                                int d = (int) (taskStatisticsVo.getDeductValueTrendList().get(i) - deduct);
-                                managerTaskScore1.setBscore(managerTaskScore1.getBscore() + d);
-                            }
-                        } else {
-                            managerTaskScore1.setScoreNegType("未完成扣分：" + managerTask.getRatioNegScore());
-                            if (ratioValue > 0 && ratioValue < managerTask.getRatioValue()) {
-                                managerTaskScore1.setBscore(managerTaskScore1.getBscore() + managerTask.getRatioNegScore());
-                            }
-                        }
-                    }
-                    themeDetailList.add(managerTaskScore1);
-                }
+                themeRepository.save(themeNew);
             }
-            themeDetailListA.addAll(themeDetailList);
-            themeNew.setEmpCount(themeDetailList.size());
-            for (ThemeDetail themeDetail : themeDetailList) {
-                if (themeDetail.getAscore() > 0) {
-                    themeNew.setAposScore(themeNew.getAposScore() + themeDetail.getAscore());
-                } else {
-                    themeNew.setAnegScore(themeNew.getAnegScore() + themeDetail.getAscore());
-                }
-                if (themeDetail.getBscore() > 0) {
-                    themeNew.setBposScore(themeNew.getBposScore() + themeDetail.getBscore());
-                } else {
-                    themeNew.setBnegScore(themeNew.getBnegScore() + themeDetail.getBscore());
-                }
-            }
-            themeRepository.save(themeNew);
         }
 
         themeDetailRepository.saveAll(themeDetailListA);

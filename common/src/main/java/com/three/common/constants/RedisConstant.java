@@ -6,6 +6,6 @@ package com.three.common.constants;
  */
 public interface RedisConstant {
 
-    String ORGANIZATION = "org_";
-    String EMPLOYEE = "emp_";
+    String ORGANIZATION = "org:";
+    String EMPLOYEE = "emp:";
 }

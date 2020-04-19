@@ -17,14 +17,26 @@ public class MyManagerTaskVo {
     @ApiModelProperty("奖分任务已完成值")
     private Integer scoreAwardCompleted = 0; // 奖分任务已完成值
 
+    @ApiModelProperty("奖分任务要求值")
+    private Integer scoreAwardNeeded = 0; // 奖分任务要求值
+
     @ApiModelProperty("扣分任务已完成值")
     private Integer scoreDeductCompleted = 0; // 扣分任务已完成值
+
+    @ApiModelProperty("扣分任务要求值")
+    private Integer scoreDeductNeeded = 0; // 扣分任务要求值
 
     @ApiModelProperty("人次任务已完成值")
     private Integer empCountValueCompleted = 0; // 人次任务已完成值
 
+    @ApiModelProperty("人次任务要求值")
+    private Integer empCountValueNeeded = 0; // 人次任务要求值
+
     @ApiModelProperty("比例任务已完成值")
     private Double ratioValueCompleted = 0.0; // 比例任务已完成值
+
+    @ApiModelProperty("比例任务要求值")
+    private Double ratioValueNeeded = 1.0; // 比例任务要求值
 
     @ApiModelProperty("比例任务奖分值")
     private Integer ratioTaskAwardScore = 0; // 比例任务奖分值

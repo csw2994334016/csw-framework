@@ -13,6 +13,7 @@ import com.three.user.entity.User;
 import com.three.user.repository.AuthorityRepository;
 import com.three.user.service.EmployeeService;
 import com.three.user.service.OrganizationService;
+import com.three.user.service.RedisService;
 import com.three.user.service.UserService;
 import com.three.user.vo.MenuVo;
 import com.three.common.vo.JsonResult;
@@ -42,7 +43,7 @@ public class SysController {
     private AuthorityRepository authorityRepository;
 
     @Autowired
-    private EmployeeService employeeService;
+    private RedisService redisService;
 
     @Autowired
     private OrganizationService organizationService;
@@ -62,7 +63,7 @@ public class SysController {
     @ApiOperation(value = "重新加载组织机构-人员redis缓存")
     @GetMapping("/sys/reLoadOrgEmpRedis")
     public JsonResult reLoadOrgEmpRedis() {
-        employeeService.reLoadOrgEmpRedis();
+        redisService.reLoadOrgEmpRedis();
         return JsonResult.ok("成功重新加载组织机构-人员redis缓存");
     }
 

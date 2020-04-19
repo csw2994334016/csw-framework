@@ -1,8 +1,5 @@
 package com.three.user.service;
 
-import com.three.common.auth.LoginUser;
-import com.three.common.auth.SysOrganization;
-import com.three.common.constants.RedisConstant;
 import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.BusinessException;
@@ -23,14 +20,12 @@ import com.three.user.vo.OrgVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by csw on 2019-09-25.
@@ -48,7 +43,7 @@ public class OrganizationService extends BaseService<Organization, String> {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private RedisTemplate<Object, Object> redisTemplate;
+    private RedisService redisService;
 
     @Transactional
     public void create(OrganizationParam organizationParam) {
@@ -90,7 +85,8 @@ public class OrganizationService extends BaseService<Organization, String> {
             organizationRepository.save(organization);
         }
 
-        addOrganizationRedis(organization);
+        // 新增缓存
+        redisService.addOrganizationRedis(organization);
     }
 
     private Organization setParentOrg(Organization organization) {
@@ -130,7 +126,8 @@ public class OrganizationService extends BaseService<Organization, String> {
             organizationRepository.save(organization);
         }
 
-        updateOrganizationRedis(organization);
+        // 更新缓存
+        redisService.updateOrganizationRedis(organization);
     }
 
     @Transactional
@@ -170,9 +167,8 @@ public class OrganizationService extends BaseService<Organization, String> {
 
         organizationRepository.saveAll(organizationList);
 
-        for (Organization organization : organizationList) {
-            updateOrganizationRedis(organization);
-        }
+        // 删除缓存
+        organizationList.forEach(organization -> redisService.deleteOrganizationRedis(organization));
     }
 
     public PageResult<Organization> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
@@ -258,54 +254,8 @@ public class OrganizationService extends BaseService<Organization, String> {
         organization.setSort(sort);
         organizationRepository.save(organization);
         organizationRepository.save(organization1);
-    }
-
-    public void updateOrganizationRedis(Organization organization) {
-        CompletableFuture.runAsync(() -> {
-            SysOrganization sysOrganization = new SysOrganization();
-            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(organization, sysOrganization);
-            deleteRedis(sysOrganization);
-            addRedis(sysOrganization);
-        });
-    }
-
-    private void addOrganizationRedis(Organization organization) {
-        CompletableFuture.runAsync(() -> {
-            SysOrganization sysOrganization = new SysOrganization();
-            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(organization, sysOrganization);
-            addRedis(sysOrganization);
-        });
-    }
-
-    private void deleteOrganizationRedis(Organization organization) {
-        CompletableFuture.runAsync(() -> {
-            SysOrganization sysOrganization = new SysOrganization();
-            sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(organization, sysOrganization);
-            deleteRedis(sysOrganization);
-        });
-    }
-
-    private void deleteRedis(SysOrganization sysOrganization) {
-        try {
-            String key = StringUtil.getRedisKey(RedisConstant.ORGANIZATION, sysOrganization.getId());
-            // 存在缓存，则删除
-            Boolean hasKey = redisTemplate.hasKey(key);
-            if (hasKey != null && hasKey) {
-                redisTemplate.delete(key);
-                log.info("从redis中删除组织机构：{}", sysOrganization.getOrgName());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addRedis(SysOrganization sysOrganization) {
-        try {
-            String key = StringUtil.getRedisKey(RedisConstant.ORGANIZATION, sysOrganization.getId());
-            redisTemplate.opsForValue().set(key, sysOrganization);
-            log.info("从redis中新组织机构：{}", sysOrganization.getOrgName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // 更新缓存
+        redisService.updateOrganizationRedis(organization);
+        redisService.updateOrganizationRedis(organization1);
     }
 }
