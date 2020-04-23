@@ -1,7 +1,8 @@
 package com.three.points.param;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
@@ -9,7 +10,8 @@ import javax.validation.constraints.NotBlank;
  * Created by csw on 2019-09-29.
  * Description:
  */
-@Data
+@Getter
+@Setter
 public class AwardPrivilegeParam {
 
     private String id;

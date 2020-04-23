@@ -12,6 +12,14 @@ public abstract class AbstractFileService {
     public abstract FileInfoRepository getFileInfoRepository();
 
     public FileInfo upload(MultipartFile file) throws Exception {
+        if (file.getOriginalFilename() == null) {
+            throw new NullPointerException("上传文件名称不可以为空");
+        }
+
+        if (!file.getOriginalFilename().contains(".")) {
+            throw new IllegalArgumentException("缺少后缀名");
+        }
+
         FileInfo fileInfo = FileInfoService.getFileInfo(file);
 
         // 先根据文件md5查询记录
@@ -19,14 +27,6 @@ public abstract class AbstractFileService {
 
         if (oldFileInfo != null) {// 如果已存在文件，避免重复上传同一个文件
             return oldFileInfo;
-        }
-
-        if (file.getOriginalFilename() == null) {
-            throw new NullPointerException("上传文件名称不可以为空");
-        }
-
-        if (!file.getOriginalFilename().contains(".")) {
-            throw new IllegalArgumentException("缺少后缀名");
         }
 
         boolean saveOk = uploadFile(file, fileInfo);

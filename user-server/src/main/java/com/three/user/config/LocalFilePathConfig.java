@@ -19,14 +19,14 @@ public class LocalFilePathConfig {
 	/**
 	 * 上传文件存储在本地的根路径
 	 */
-	@Value("${file.local.path}")
-	private String localFilePath;
+	@Value("${file.prefix}")
+	private String filePrefix;
 
 	/**
 	 * url前缀
 	 */
-	@Value("${file.local.prefix}")
-	public String localFilePrefix;
+	@Value("${file.urlPrefix}")
+	public String urlPrefix;
 
 	@Bean
 	public WebMvcConfigurer webMvcConfigurerAdapter() {
@@ -37,8 +37,8 @@ public class LocalFilePathConfig {
 			 */
 			@Override
 			public void addResourceHandlers(ResourceHandlerRegistry registry) {
-				registry.addResourceHandler(localFilePrefix + "/**")
-						.addResourceLocations(ResourceUtils.FILE_URL_PREFIX + localFilePath + File.separator);
+				registry.addResourceHandler(urlPrefix + "/**")
+						.addResourceLocations(ResourceUtils.FILE_URL_PREFIX + filePrefix + File.separator);
 			}
 
 		};

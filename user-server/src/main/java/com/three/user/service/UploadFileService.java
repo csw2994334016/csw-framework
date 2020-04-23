@@ -1,7 +1,6 @@
 package com.three.user.service;
 
 import com.three.common.utils.FileUtil;
-import com.three.common.utils.FtpOperationUtil;
 import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.jpa.file.repository.FileInfoRepository;
 import com.three.resource_jpa.jpa.file.service.AbstractFileService;
@@ -16,22 +15,26 @@ import java.time.LocalDate;
 @Service
 public class UploadFileService extends AbstractFileService {
 
-    @Value("${file.ftp.hostname}")
-    private String hostname;
+//    @Value("${file.ftp.hostname}")
+//    private String hostname;
+//
+//    @Value("${file.ftp.username}")
+//    private String username;
+//
+//    @Value("${file.ftp.password}")
+//    private String password;
 
-    @Value("${file.ftp.username}")
-    private String username;
-
-    @Value("${file.ftp.password}")
-    private String password;
-
-    @Value("${file.local.urlPrefix}")
-    private String urlPrefix;
     /**
      * 上传文件存储在本地的根路径
      */
     @Value("${file.local.path}")
-    private String localFilePath;
+    private String fileLocalPath;
+
+    @Value("${file.urlPrefix}")
+    private String urlPrefix;
+
+    @Value("${file.prefix}")
+    private String prefix;
 
     @Autowired
     private FileInfoRepository fileInfoRepository;
@@ -46,19 +49,21 @@ public class UploadFileService extends AbstractFileService {
         int index = fileInfo.getName().lastIndexOf(".");
         // 文件扩展名
         String fileSuffix = fileInfo.getName().substring(index);
+        // 文件名
+        String fileName = fileInfo.getName().substring(0, index);
 
-        String filePath = "/" + LocalDate.now().toString().replace("-", "/");
+        String addPath = "/" + LocalDate.now().toString().replace("-", "/");
 
-        String suffix = filePath + "/" + fileInfo.getName().substring(0, index) + System.currentTimeMillis() + fileSuffix;
+        String suffix = addPath + "/" + fileName + System.currentTimeMillis() + fileSuffix;
 
-        String path = localFilePath + suffix;
-        String url = urlPrefix + suffix;
-        fileInfo.setPath(path);
+        String savePath = fileLocalPath + prefix + suffix;
+        String url = urlPrefix + prefix + suffix;
+        fileInfo.setPath(savePath);
         fileInfo.setUrl(url);
 
         fileInfo.setOrganizationId(LoginUserUtil.getLoginUserFirstOrganizationId());
 
-        return FileUtil.saveFile(file, path);
+        return FileUtil.saveFile(file, savePath);
 //        return FtpOperationUtil.upload(hostname, username, password, path, file.getInputStream());
     }
 

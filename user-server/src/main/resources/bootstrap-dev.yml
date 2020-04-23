@@ -98,10 +98,9 @@ hystrix:
 # 上传文件配置
 file:
   local:
-#    path: D:/localFile
-    prefix: /head_img
-    path: /var/www/html/userfile/head_img
-    urlPrefix: http://47.96.21.5:8011/userfile${file.local.prefix}
+    path: D:/localFile
+  prefix: /head_img
+  urlPrefix: http://47.96.21.5:8080
   ftp:
     hostname: 47.96.21.5
     username:
