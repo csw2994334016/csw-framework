@@ -321,6 +321,7 @@ public class EmployeeService extends BaseService<Employee, String> {
     public void updatePicture(Employee employee, FileInfo fileInfo) {
         employee.setPicture(fileInfo.getUrl());
         employeeRepository.save(employee);
-
+        // 更新缓存
+        redisService.updateEmployeeRedis(employee);
     }
 }
