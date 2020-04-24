@@ -172,12 +172,19 @@ public class EmployeeController {
 
     @LogAnnotation(module = "上传头像")
     @ApiOperation(value = "上传头像", notes = "")
-    @ApiImplicitParam(name = "file", value = "图片", required = true, dataType = "MultipartFile")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "员工ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "file", value = "图片", required = true, dataType = "MultipartFile")
+    })
     @PostMapping("/uploadHeadPortrait")
-    public JsonData<FileInfo> uploadHeadPortrait(@RequestParam(value = "file", required = true) MultipartFile file) {
+    public JsonData<FileInfo> uploadHeadPortrait(@RequestParam(required = true) String id, @RequestParam(value = "file", required = true) MultipartFile file) {
         FileInfo fileInfo;
         try {
-            fileInfo = uploadFileService.upload(file);
+            // 查找员工
+            Employee employee = employeeService.findById(id);
+            fileInfo = uploadFileService.upload(id, file);
+            // 设置员工的头像地址
+            employeeService.updatePicture(employee, fileInfo);
         } catch (Exception e) {
             throw new BusinessException("上传头像失败：" + e.getMessage());
         }

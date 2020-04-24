@@ -100,7 +100,7 @@ file:
   local:
     path: D:/localFile
   prefix: /head_img
-  urlPrefix: http://47.96.21.5:8080
+  urlPrefix: http://47.96.21.5:80
   ftp:
     hostname: 47.96.21.5
     username:

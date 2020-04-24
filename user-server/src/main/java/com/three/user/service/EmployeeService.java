@@ -5,6 +5,7 @@ import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
+import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Employee;
 import com.three.user.entity.Organization;
@@ -314,5 +315,12 @@ public class EmployeeService extends BaseService<Employee, String> {
             throw new BusinessException("该员工没有user账号，请联系管理员");
         }
         return user.getRoles();
+    }
+
+    @Transactional
+    public void updatePicture(Employee employee, FileInfo fileInfo) {
+        employee.setPicture(fileInfo.getUrl());
+        employeeRepository.save(employee);
+
     }
 }

@@ -77,13 +77,4 @@ public class FileUtil {
 
         return false;
     }
-
-	public static boolean saveFileToServer(MultipartFile file, String path) {
-		try {
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
 }

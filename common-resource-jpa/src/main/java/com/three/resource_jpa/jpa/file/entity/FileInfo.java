@@ -44,6 +44,8 @@ public class FileInfo implements Serializable {
 
     private String source; // 文件来源
 
+    private String empId; // 文件属于哪个用户
+
     @Column(nullable = false, columnDefinition = "int(2) default 1 comment '记录状态：1=正常；2=锁定；3=删除'")
     @ApiModelProperty("记录状态：1=正常；2=锁定；3=删除")
     private Integer status = StatusEnum.OK.getCode(); // 记录状态：1=正常；2=锁定；3=删除

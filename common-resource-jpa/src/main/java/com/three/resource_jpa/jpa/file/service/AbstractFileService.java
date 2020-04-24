@@ -1,5 +1,6 @@
 package com.three.resource_jpa.jpa.file.service;
 
+import com.three.common.utils.StringUtil;
 import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.jpa.file.repository.FileInfoRepository;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,7 +12,7 @@ public abstract class AbstractFileService {
 
     public abstract FileInfoRepository getFileInfoRepository();
 
-    public FileInfo upload(MultipartFile file) throws Exception {
+    public FileInfo upload(String id, MultipartFile file) throws Exception {
         if (file.getOriginalFilename() == null) {
             throw new NullPointerException("上传文件名称不可以为空");
         }
@@ -21,15 +22,16 @@ public abstract class AbstractFileService {
         }
 
         FileInfo fileInfo = FileInfoService.getFileInfo(file);
+        fileInfo.setEmpId(id);
 
         // 先根据文件md5查询记录
         FileInfo oldFileInfo = getFileInfoRepository().findByMd5(fileInfo.getMd5());
 
-        if (oldFileInfo != null) {// 如果已存在文件，避免重复上传同一个文件
+        if (oldFileInfo != null) {// 如果已存在文件，则避免重复上传同一个文件
             return oldFileInfo;
         }
 
-        boolean saveOk = uploadFile(file, fileInfo);
+        boolean saveOk = uploadFile(file, fileInfo); // 将文件存储到磁盘上
 
         if (saveOk) {
             getFileInfoRepository().save(fileInfo);// 将文件信息保存到数据库
