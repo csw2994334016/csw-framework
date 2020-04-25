@@ -22,18 +22,16 @@ public class MyExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Map<String, Object> errorHandler(Exception ex) {
         Map<String, Object> map = new HashMap<>();
+        map.put("code", 500);
         // 根据不同错误获取错误信息
         if (ex instanceof IException) {
-            map.put("code", ((IException) ex).getCode());
             map.put("msg", ex.getMessage());
             logger.error(ex.getMessage(), ex);
         } else if (ex instanceof NullPointerException) {
-            map.put("code", 500);
             map.put("msg", ex.getMessage());
             logger.error(ex.getMessage(), ex);
         } else {
             String message = ex.getMessage();
-            map.put("code", 500);
             map.put("msg", message == null || message.trim().isEmpty() ? "未知错误" : message);
             map.put("details", message);
             logger.error(ex.getMessage(), ex);

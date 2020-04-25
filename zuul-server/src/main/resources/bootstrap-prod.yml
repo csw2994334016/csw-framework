@@ -19,6 +19,9 @@ security:
       user-info-uri: http://127.0.0.1:8084/three-auth-server/user-me
       prefer-token-info: false
 zuul:
+  SendErrorFilter:
+    error:
+      disable: true
   ignored-services: '*'
   sensitiveHeaders:
   routes:
