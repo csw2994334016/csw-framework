@@ -20,11 +20,11 @@ public class MySendErrorFilter extends SendErrorFilter {
             RequestContext ctx = RequestContext.getCurrentContext();
             // 直接复用异常处理类
             ExceptionHolder exception = findZuulException(ctx.getThrowable());
-            log.info("异常信息:{}", exception.getThrowable().getMessage());
+            log.info("异常信息:{}", exception.getThrowable().getCause().getMessage());
             // 这里可对不同异常返回不同的错误码
             ctx.getResponse().setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             ctx.getResponse().setStatus(HttpStatus.OK.value());
-            ctx.getResponse().getOutputStream().write(("{\"code\":500,\"msg\":\"服务异常：" + exception.getThrowable().getCause().getMessage() + "\"}").getBytes());
+            ctx.getResponse().getOutputStream().write(("{\"code\":500,\"msg\":\"zuul调用服务失败：" + exception.getThrowable().getCause().getMessage() + "\"}").getBytes());
 
         } catch (Exception ex) {
             ReflectionUtils.rethrowRuntimeException(ex);

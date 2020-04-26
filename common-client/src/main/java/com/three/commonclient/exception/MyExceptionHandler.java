@@ -24,18 +24,14 @@ public class MyExceptionHandler {
         Map<String, Object> map = new HashMap<>();
         map.put("code", 500);
         // 根据不同错误获取错误信息
-        if (ex instanceof IException) {
+        if (ex instanceof IException) { // 自定义异常
             map.put("msg", ex.getMessage());
-            logger.error(ex.getMessage(), ex);
         } else if (ex instanceof NullPointerException) {
-            map.put("msg", ex.getMessage());
+            map.put("msg", "空指针异常："+ ex.getMessage());
             logger.error(ex.getMessage(), ex);
         } else {
-            String message = ex.getMessage();
-            map.put("msg", message == null || message.trim().isEmpty() ? "未知错误" : message);
-            map.put("details", message);
+            map.put("msg", ex.getMessage());
             logger.error(ex.getMessage(), ex);
-            ex.printStackTrace();
         }
         return map;
     }
