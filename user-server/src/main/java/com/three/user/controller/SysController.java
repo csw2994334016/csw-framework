@@ -11,12 +11,11 @@ import com.three.user.entity.Organization;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
 import com.three.user.repository.AuthorityRepository;
-import com.three.user.service.EmployeeService;
 import com.three.user.service.OrganizationService;
 import com.three.user.service.RedisService;
 import com.three.user.service.UserService;
-import com.three.user.vo.MenuVo;
 import com.three.common.vo.JsonResult;
+import com.three.user.vo.MenuVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by csw on 2019/04/05.
@@ -56,8 +57,26 @@ public class SysController {
 
     @ApiOperation(value = "获取左侧菜单信息")
     @GetMapping("/sys/menuInfo")
-    public JsonData<List<MenuVo>> menuInfo() {
-        return new JsonData<>(userService.getMenuInfo()).success();
+    public JsonData<List<Map>> menuInfo() {
+        List<MenuVo> menuVo1List = userService.getMenuInfo();
+        List<Map> mapList = new ArrayList<>();
+        changeToMap(menuVo1List, mapList);
+        return new JsonData<>(mapList).success();
+    }
+
+    private void changeToMap(List<MenuVo> menuVoList, List<Map> mapList) {
+        for (MenuVo menuVo : menuVoList) {
+            Map<Object, Object> map = new HashMap<>();
+            map.put("path", menuVo.getPath());
+            map.put("name", menuVo.getName());
+            map.put("icon", menuVo.getIcon());
+            if (menuVo.getChildren().size() > 0) {
+                List<Map> mapList1 = new ArrayList<>();
+                changeToMap(menuVo.getChildren(), mapList1);
+                map.put("children", mapList1);
+            }
+            mapList.add(map);
+        }
     }
 
     @ApiOperation(value = "重新加载组织机构-人员redis缓存")

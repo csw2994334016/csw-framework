@@ -36,6 +36,9 @@ public class AuthorityService extends BaseService<Authority, String> {
         Authority authority = new Authority();
         authority = (Authority) BeanCopyUtil.copyBean(authorityParam, authority);
 
+        // 设置权限parentIds
+        authority.setParentIds(setParentIds(authorityParam));
+
         authorityRepository.save(authority);
     }
 
@@ -46,7 +49,19 @@ public class AuthorityService extends BaseService<Authority, String> {
         Authority authority = getEntityById(authorityRepository, authorityParam.getId());
         authority = (Authority) BeanCopyUtil.copyBean(authorityParam, authority);
 
+        // 设置权限parentIds
+        authority.setParentIds(setParentIds(authorityParam));
+
         authorityRepository.save(authority);
+    }
+
+    private String setParentIds(AuthorityParam authorityParam) {
+        String parentIds = null;
+        if (StringUtil.isNotBlank(authorityParam.getParentId()) && !"-1".equals(authorityParam.getParentId())) {
+            Authority parent = getEntityById(authorityRepository, authorityParam.getParentId());
+            parentIds = StringUtil.isNotBlank(parent.getParentIds()) ? parent.getParentIds() + "," + parent.getId() : parent.getId();
+        }
+        return parentIds;
     }
 
     @Transactional
@@ -117,7 +132,7 @@ public class AuthorityService extends BaseService<Authority, String> {
         List<Authority> authTreeVoList = new ArrayList<>();
         List<Authority> authorityList;
         if (StringUtil.isNotBlank(authorityName)) {
-            authorityList = authorityRepository.findAllByStatusAndAuthorityNameLike(code, authorityName);
+            authorityList = authorityRepository.findAllByStatusAndAuthorityNameLike(code, "%" + authorityName + "%");
         } else {
             authorityList = authorityRepository.findAllByStatus(code);
         }

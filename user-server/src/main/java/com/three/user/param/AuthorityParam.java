@@ -3,6 +3,8 @@ package com.three.user.param;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * Created by csw on 2018/9/14.
  * Description:
@@ -23,5 +25,6 @@ public class AuthorityParam {
 
     private Integer sort = 0;
 
+    @NotBlank(message = "父级权限不可以为空，默认为'-1'")
     private String parentId = "-1";
 }

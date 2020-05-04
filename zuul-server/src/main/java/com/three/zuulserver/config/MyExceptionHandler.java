@@ -1,5 +1,6 @@
 package com.three.zuulserver.config;
 
+import com.three.common.utils.ThrowableUtil;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,12 +26,15 @@ public class MyExceptionHandler {
         if (exception instanceof FeignException) {
             log.error("feignClient调用异常", exception);
             map.put("msg", "feignClient调用异常：" + exception.getMessage());
+            map.put("details", ThrowableUtil.getStackTrace(exception));
         } else if (exception instanceof IllegalArgumentException) {
             log.error("错误请求异常", exception);
             map.put("msg", "错误请求异常：" + exception.getMessage());
+            map.put("details", ThrowableUtil.getStackTrace(exception));
         } else if (exception != null) {
             log.error("未知异常", exception);
             map.put("msg", "未知异常：" + exception);
+            map.put("details", ThrowableUtil.getStackTrace(exception));
         }
         return map;
     }

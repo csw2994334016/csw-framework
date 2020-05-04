@@ -1,5 +1,6 @@
 package com.three.commonclient.exception;
 
+import com.three.common.utils.ThrowableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,9 +29,11 @@ public class MyExceptionHandler {
             map.put("msg", ex.getMessage());
         } else if (ex instanceof NullPointerException) {
             map.put("msg", "空指针异常："+ ex.getMessage());
+            map.put("details", ThrowableUtil.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
         } else {
             map.put("msg", ex.getMessage());
+            map.put("details", ThrowableUtil.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
         }
         return map;

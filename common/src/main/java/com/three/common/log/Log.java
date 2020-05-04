@@ -35,6 +35,7 @@ public class Log implements Serializable {
      * 备注记录失败原因
      */
     private String message;
+    private String exceptionDetail; // 异常详情
     /**
      * 是否执行成功
      */

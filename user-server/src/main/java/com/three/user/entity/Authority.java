@@ -58,7 +58,7 @@ public class Authority implements Serializable {
     @ApiModelProperty("菜单/接口父权限ID")
     private String parentId;
 
-    @Column(columnDefinition = "varchar(800) comment '菜单/接口父权限IDS'")
+    @Column(columnDefinition = "varchar(2000) comment '菜单/接口父权限IDS'")
     @ApiModelProperty("菜单/接口父权限IDS")
     private String parentIds;
 

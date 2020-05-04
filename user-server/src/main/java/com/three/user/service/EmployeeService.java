@@ -244,17 +244,16 @@ public class EmployeeService extends BaseService<Employee, String> {
     public void updatePsw(String oldPsw, String newPsw) {
         LoginUser loginUser = LoginUserUtil.getLoginUser();
         if (loginUser != null) {
-            String finalOldPsw = new BCryptPasswordEncoder().encode(oldPsw);
-            String finalNewPsw = new BCryptPasswordEncoder().encode(newPsw);
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             Optional<User> optionalUser = userRepository.findById(loginUser.getId());
             if (!optionalUser.isPresent()) {
-                throw new BusinessException("数据库中不存在当前用户");
+                throw new BusinessException("当前登录用户不存在");
             }
             User user = optionalUser.get();
-            if (!finalOldPsw.equals(user.getPassword())) {
+            if (!encoder.matches(oldPsw, user.getPassword())) {
                 throw new BusinessException("旧密码不正确");
             }
-            user.setPassword(finalNewPsw);
+            user.setPassword(encoder.encode(newPsw));
             userRepository.save(user);
         } else {
             throw new BusinessException("当前用户不存在");

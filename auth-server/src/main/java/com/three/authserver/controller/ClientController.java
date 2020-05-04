@@ -75,24 +75,24 @@ public class ClientController {
     @ApiOperation(value = "修改客户端密码")
     @ApiImplicitParam(name = "ChangePwdParam", value = "密码信息", required = true, dataType = "changePwdParam")
     @PutMapping("/updateSecret")
-    public JsonResult updateSecret(ChangePwdParam changePwdParam) {
+    public JsonResult updateSecret(@RequestBody ChangePwdParam changePwdParam) {
         BeanValidator.check(changePwdParam);
 
-        ClientDetails clientDetails = getAndCheckClient(changePwdParam.getClientId(), true);
-        checkSystemClient(changePwdParam.getClientId());
+        ClientDetails clientDetails = getAndCheckClient(changePwdParam.getClient_id(), true);
+        checkSystemClient(changePwdParam.getClient_id());
 
         // 新密码与确认密码是否一致
         if (!StringUtils.equals(changePwdParam.getNewPwd(), changePwdParam.getRePwd())) {
             throw new ParameterException("新密码与确认密码不一致");
         }
         // 原始密码是否正确
-        if (!clientDetails.getClientSecret().equals(passwordEncoder.encode(changePwdParam.getOldPwd()))) {
+        if (!passwordEncoder.matches(changePwdParam.getOldPwd(), clientDetails.getClientSecret())) {
             throw new ParameterException("原始密码不正确");
         }
 
         String secret = passwordEncoder.encode(changePwdParam.getNewPwd());
-        clientDetailsService.updateClientSecret(changePwdParam.getClientId(), secret);
-        log.info("修改客户端密码：{},{}", changePwdParam.getClientId(), secret);
+        clientDetailsService.updateClientSecret(changePwdParam.getClient_id(), secret);
+        log.info("修改客户端密码：{},{}", changePwdParam.getClient_id(), secret);
         return JsonResult.ok("修改客户端密码成功");
     }
 

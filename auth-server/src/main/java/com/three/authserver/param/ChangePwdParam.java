@@ -11,8 +11,8 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ChangePwdParam {
 
-    @NotBlank(message = "ID不可以为空")
-    private String clientId;
+    @NotBlank(message = "client_id不可以为空")
+    private String client_id;
 
     @NotBlank(message = "旧密码不可以为空")
     private String oldPwd;

@@ -5,6 +5,7 @@ import com.three.common.log.Log;
 import com.three.common.log.LogAnnotation;
 import com.three.common.log.LogQueue;
 import com.three.common.utils.LogUtil;
+import com.three.common.utils.ThrowableUtil;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -77,6 +78,7 @@ public class LogAop {
         } catch (Exception e) { // 方法执行失败
             log.setFlag(Boolean.FALSE);
             log.setMessage(e.getMessage()); // 备注记录失败原因
+            log.setExceptionDetail(ThrowableUtil.getStackTrace(e));
             currentTime = System.currentTimeMillis() - currentTime;
             throw e;
         } finally {

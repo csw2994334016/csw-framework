@@ -7,8 +7,10 @@ import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.resource_jpa.jpa.base.service.BaseService;
+import com.three.user.entity.Authority;
 import com.three.user.entity.Employee;
 import com.three.user.entity.Organization;
+import com.three.user.repository.AuthorityRepository;
 import com.three.user.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,26 @@ public class RedisService extends BaseService {
             List<Employee> employeeList = employeeRepository.findAllByStatusAndOrganizationId(StatusEnum.OK.getCode(), organization.getId());
             employeeList.forEach(this::updateEmployeeRedis);
         }
+
+//        List<Authority> authorityList = authorityService.findAllAuthTree(StatusEnum.OK.getCode(), null);
+//        for (Authority authority : authorityList) {
+//            if (authority.getChildren().size() >0) {
+//                setParentIds(authority, authority.getChildren());
+//            }
+//        }
+//        authorityRepository.saveAll(authorityList);
     }
+
+    private void setParentIds(Authority parent, List<Authority> children) {
+        for (Authority authority : children) {
+            String parentIds = StringUtil.isNotBlank(parent.getParentIds()) ? parent.getParentIds() + "," + parent.getId() : parent.getId();
+            authority.setParentIds(parentIds);
+            if (authority.getChildren().size() >0) {
+                setParentIds(authority, authority.getChildren());
+            }
+        }
+    }
+
 
     // ------以下是人员redis缓存操作------
     public void updateEmployeeRedis(Employee employee) {

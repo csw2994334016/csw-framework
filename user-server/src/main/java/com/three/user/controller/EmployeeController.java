@@ -29,7 +29,7 @@ import java.util.Set;
  * Description:
  */
 
-@Api(value = "员工信息", tags = "员工信息")
+@Api(value = "成员管理", tags = "成员管理")
 @RestController
 @RequestMapping("/sys/employees")
 public class EmployeeController {

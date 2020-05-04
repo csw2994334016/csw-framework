@@ -17,6 +17,8 @@ public class MenuVo {
     private String name;
     private String icon;
     private String url;
+    private String path;
     private Integer sort;
     private List<MenuVo> subMenus = new ArrayList<>();
+    private List<MenuVo> children = new ArrayList<>();
 }

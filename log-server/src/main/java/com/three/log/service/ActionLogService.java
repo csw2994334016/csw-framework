@@ -43,6 +43,7 @@ public class ActionLogService extends BaseService<ActionLog, Long> {
         actionLog.setUsername(log.getUsername());
         actionLog.setLogType(log.getFlag() ? LogEnum.INFO.getCode() : LogEnum.ERROR.getCode());
         actionLog.setMessage(log.getMessage());
+        actionLog.setExceptionDetail(log.getExceptionDetail());
         actionLog.setTime(log.getTime());
         actionLog.setDescription(log.getModule());
         actionLog.setMethod(log.getMethod());

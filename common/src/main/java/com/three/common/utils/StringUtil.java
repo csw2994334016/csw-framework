@@ -122,7 +122,7 @@ public class StringUtil {
 
     public static Date getStrToDate(String time) {
         try {
-            return sdf.parse(time);
+            return sdf1.parse(time);
         } catch (ParseException e) {
             e.printStackTrace();
         }
