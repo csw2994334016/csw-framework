@@ -1,5 +1,6 @@
 package com.three.user.param;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -27,4 +28,10 @@ public class AuthorityParam {
 
     @NotBlank(message = "父级权限不可以为空，默认为'-1'")
     private String parentId = "-1";
+
+    @ApiModelProperty("组件名称")
+    private String compName;
+
+    @ApiModelProperty("组件路径")
+    private String compPath;
 }

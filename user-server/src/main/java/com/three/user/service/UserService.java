@@ -104,6 +104,8 @@ public class UserService extends BaseService<User, String> {
                     menuVo.setUrl(sysAuthority.getAuthorityUrl());
                     menuVo.setPath(sysAuthority.getAuthorityUrl());
                     menuVo.setSort(sysAuthority.getSort());
+                    menuVo.setCompName(sysAuthority.getCompName());
+                    menuVo.setCompPath(sysAuthority.getCompPath());
                     menuVoMap.put(menuVo.getId(), menuVo);
                     if ("-1".equals(menuVo.getParentId())) {
                         menuVo.setUrl("javascript:;");

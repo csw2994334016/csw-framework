@@ -21,4 +21,6 @@ public class MenuVo {
     private Integer sort;
     private List<MenuVo> subMenus = new ArrayList<>();
     private List<MenuVo> children = new ArrayList<>();
+    private String compName;
+    private String compPath;
 }

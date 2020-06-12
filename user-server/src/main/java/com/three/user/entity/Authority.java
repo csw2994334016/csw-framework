@@ -54,6 +54,14 @@ public class Authority implements Serializable {
     @ApiModelProperty("菜单/接口权限图标")
     private String authorityIcon;
 
+    @Column(columnDefinition = "varchar(255) comment '组件名称'")
+    @ApiModelProperty("组件名称")
+    private String compName;
+
+    @Column(columnDefinition = "varchar(255) comment '组件路径'")
+    @ApiModelProperty("组件路径")
+    private String compPath;
+
     @Column(nullable = false, columnDefinition = "varchar(36) default '-1' comment '菜单/接口父权限ID'")
     @ApiModelProperty("菜单/接口父权限ID")
     private String parentId;

@@ -70,6 +70,12 @@ public class SysController {
             map.put("path", menuVo.getPath());
             map.put("name", menuVo.getName());
             map.put("icon", menuVo.getIcon());
+            if (menuVo.getCompName() != null) {
+                map.put("compName", menuVo.getCompName());
+            }
+            if (menuVo.getCompPath() != null) {
+                map.put("compPath", menuVo.getCompPath());
+            }
             if (menuVo.getChildren().size() > 0) {
                 List<Map> mapList1 = new ArrayList<>();
                 changeToMap(menuVo.getChildren(), mapList1);
