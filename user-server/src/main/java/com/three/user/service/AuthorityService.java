@@ -12,6 +12,7 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.commonclient.utils.BeanValidator;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.common.vo.PageResult;
+import com.three.user.vo.AuthTreeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -152,10 +153,14 @@ public class AuthorityService extends BaseService<Authority, String> {
                 voParent.getChildren().add(entry.getValue());
             }
         }
-        authTreeVoList.sort(Comparator.comparing(Authority::getSort));
-        for (Authority vo : authTreeVoList) {
-            vo.getChildren().sort(Comparator.comparing(Authority::getSort));
-        }
+        sortAuthTreeVoList(authTreeVoList);
         return authTreeVoList;
+    }
+
+    private void sortAuthTreeVoList(List<Authority> authTreeVoList) {
+        authTreeVoList.sort(Comparator.comparing(Authority::getSort));
+        for (Authority authority : authTreeVoList) {
+            sortAuthTreeVoList(authority.getChildren());
+        }
     }
 }

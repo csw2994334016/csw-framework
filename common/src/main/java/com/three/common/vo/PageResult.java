@@ -1,5 +1,6 @@
 package com.three.common.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class PageResult<T> {
     private List<T> data; // 当前数据, bootstrapTable是rows
 
     public PageResult() {
+        this.data = new ArrayList<>();
     }
 
     public PageResult(List<T> rows) {

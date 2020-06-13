@@ -11,11 +11,17 @@ public class ThemeDetailDailyVo {
     @ApiModelProperty("奖扣时间")
     private Date themeDate; // 奖扣时间
 
+    @ApiModelProperty("积分类型")
+    private Integer themeType; // 积分类型
+
     @ApiModelProperty("事件名称")
     private String eventName; // 事件名称
 
     @ApiModelProperty("人员Id")
     private String empId; // 人员Id
+
+    @ApiModelProperty("员工工号")
+    private String empNum; // 员工工号
 
     @ApiModelProperty("人员姓名")
     private String empFullName; // 人员姓名
@@ -42,6 +48,21 @@ public class ThemeDetailDailyVo {
         this.themeDate = themeDate;
         this.eventName = eventName;
         this.empId = empId;
+        this.empFullName = empFullName;
+        this.empOrgId = empOrgId;
+        this.empOrgName = empOrgName;
+        this.ascore = ascore;
+        this.bscore = bscore;
+        this.attnName = attnName;
+        this.auditName = auditName;
+    }
+
+    public ThemeDetailDailyVo(Date themeDate, Integer themeType, String eventName, String empId, String empNum, String empFullName, String empOrgId, String empOrgName, Integer ascore, Integer bscore, String attnName, String auditName) {
+        this.themeDate = themeDate;
+        this.themeType = themeType;
+        this.eventName = eventName;
+        this.empId = empId;
+        this.empNum = empNum;
         this.empFullName = empFullName;
         this.empOrgId = empOrgId;
         this.empOrgName = empOrgName;

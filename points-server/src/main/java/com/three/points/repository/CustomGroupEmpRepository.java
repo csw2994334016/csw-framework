@@ -14,4 +14,6 @@ public interface CustomGroupEmpRepository extends JpaRepository<CustomGroupEmp, 
     void deleteByGroupId(String id);
 
     List<CustomGroupEmp> findAllByGroupId(String customGroupId);
+
+    List<CustomGroupEmp> findAllByEmpId(String empId);
 }

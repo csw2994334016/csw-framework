@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by csw on 2020/04/12.
@@ -19,4 +20,6 @@ public interface CustomReportGroupRepository extends JpaRepository<CustomReportG
             "from CustomReportGroup rg left join CustomGroup g on rg.groupId = g.id " +
             "where rg.reportId = :id ")
     List<ReportGroupVo> findByReportId(String id);
+
+    List<CustomReportGroup> findAllByGroupIdIn(Set<String> groupIdSet);
 }

@@ -5,12 +5,11 @@ import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.vo.JsonData;
+import com.three.common.vo.PageResult;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
-import com.three.user.entity.Authority;
-import com.three.user.entity.Organization;
-import com.three.user.entity.Role;
-import com.three.user.entity.User;
+import com.three.user.entity.*;
 import com.three.user.repository.AuthorityRepository;
+import com.three.user.service.EmployeeService;
 import com.three.user.service.OrganizationService;
 import com.three.user.service.RedisService;
 import com.three.user.service.UserService;
@@ -21,12 +20,10 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by csw on 2019/04/05.
@@ -48,6 +45,9 @@ public class SysController {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private EmployeeService employeeService;
 
     @ApiOperation(value = "获取个人信息")
     @GetMapping("/sys/userInfo")
@@ -147,5 +147,16 @@ public class SysController {
             sysAuthorityList.add(sysAuthority);
         }
         return sysAuthorityList;
+    }
+
+    @ApiOperation(value = "根据组织机构Id查找用户Id（内部接口）")
+    @GetMapping(value = "/internal/findEmpIdSetByOrgId")
+    Set<String> findSysEmployeeSet(@RequestParam() String orgId, @RequestParam() String containChildFlag) {
+        Set<String> empIdSet = new HashSet<>();
+        PageResult<Employee> pageResult = employeeService.query(null, StatusEnum.OK.getCode(), orgId, null, containChildFlag, "0", "0");
+        for (Employee employee : pageResult.getData()) {
+            empIdSet.add(employee.getId());
+        }
+        return empIdSet;
     }
 }

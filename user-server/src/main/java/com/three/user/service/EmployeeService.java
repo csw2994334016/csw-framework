@@ -194,7 +194,6 @@ public class EmployeeService extends BaseService<Employee, String> {
                 predicateList1.add(criteriaBuilder.or(p1));
                 predicateList1.add(criteriaBuilder.or(p2));
                 Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
-
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
             return predicate;

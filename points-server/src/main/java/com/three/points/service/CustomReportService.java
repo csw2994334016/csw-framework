@@ -2,8 +2,11 @@ package com.three.points.service;
 
 import com.three.common.enums.StatusEnum;
 import com.three.commonclient.exception.ParameterException;
+import com.three.points.entity.CustomGroupEmp;
 import com.three.points.entity.CustomReport;
 import com.three.points.entity.CustomReportGroup;
+import com.three.points.repository.CustomGroupEmpRepository;
+import com.three.points.repository.CustomGroupRepository;
 import com.three.points.repository.CustomReportGroupRepository;
 import com.three.points.repository.CustomReportRepository;
 import com.three.points.param.CustomReportParam;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.Sort;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +43,9 @@ public class CustomReportService extends BaseService<CustomReport, String> {
 
     @Autowired
     private CustomReportGroupRepository customReportGroupRepository;
+
+    @Autowired
+    private CustomGroupEmpRepository customGroupEmpRepository;
 
     @Transactional
     public void create(CustomReportParam customReportParam) {
@@ -87,7 +94,7 @@ public class CustomReportService extends BaseService<CustomReport, String> {
         if (StringUtil.isNotBlank(customReportParam.getCustomGroupIds())) {
             List<CustomReportGroup> customReportGroupList = new ArrayList<>();
             Set<String> groupIdSet = StringUtil.getStrToIdSet1(customReportParam.getCustomGroupIds());
-            for (String groupId : groupIdSet){
+            for (String groupId : groupIdSet) {
                 CustomReportGroup customReportGroup = new CustomReportGroup();
                 customReportGroup.setReportId(customReport.getId());
                 customReportGroup.setGroupId(groupId);
@@ -137,5 +144,23 @@ public class CustomReportService extends BaseService<CustomReport, String> {
 
     public List<ReportGroupVo> findGroupsById(String id) {
         return customReportGroupRepository.findByReportId(id);
+    }
+
+    public List<CustomReport> queryMyReport(String empId) {
+        String loginUserEmpId = LoginUserUtil.getLoginUserEmpId();
+        if (StringUtil.isBlank(empId)) {
+            empId = loginUserEmpId;
+        }
+        List<CustomGroupEmp> customGroupEmpList = customGroupEmpRepository.findAllByEmpId(empId);
+        Set<String> groupIdSet = new HashSet<>();
+        for (CustomGroupEmp customGroupEmp : customGroupEmpList) {
+            groupIdSet.add(customGroupEmp.getGroupId());
+        }
+        List<CustomReportGroup> customReportGroupList = customReportGroupRepository.findAllByGroupIdIn(groupIdSet);
+        Set<String> reportIdSet = new HashSet<>();
+        for (CustomReportGroup customReportGroup : customReportGroupList) {
+            reportIdSet.add(customReportGroup.getReportId());
+        }
+        return customReportRepository.findAllByIdIn(reportIdSet);
     }
 }

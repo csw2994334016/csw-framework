@@ -85,7 +85,7 @@ public class QuartzJobController {
             @ApiImplicitParam(name = "ids", value = "任务ids", required = true, dataType = "String")
     })
     @PutMapping("/execute")
-    public JsonResult executeJob(String ids) {
+    public JsonResult executeJob(@RequestParam(required = true) String ids) {
         quartzJobService.executeJob(ids);
         return JsonResult.ok("请查看执行日志");
     }

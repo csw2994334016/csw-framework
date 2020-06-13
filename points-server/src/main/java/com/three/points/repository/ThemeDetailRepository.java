@@ -49,6 +49,17 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
             "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
     List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(int status, String empId, int themeStatus, Date stM, Date etM, Sort sort);
 
+    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
+            "from ThemeDetail td left join Theme t on td.themeId = t.id where td.status = :status and td.empId = :empId and " +
+            "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
+    List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDate(int status, String empId, int themeStatus, Date stM, Date etM);
+
+    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, t.themeType, td.eventName, td.empId, td.empNum, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
+            "from ThemeDetail td left join Theme t on td.themeId = t.id where td.status = :status and " +
+            "t.themeStatus = :themeStatus and td.empOrgId = :empOrgId and td.themeDate >= :stM and td.themeDate <= :etM " +
+            "and (:searchValue is null or td.empFullName like concat('%', :searchValue, '%') or td.empNum like concat('%', :searchValue, '%'))")
+    List<ThemeDetailDailyVo> findAllByStatusAndEmpOrgIgAndEmpIdAndThemeStatusAndThemeDateSort(int status, String empOrgId, String searchValue, int themeStatus, Date stM, Date etM, Sort createDate);
+
     @Query("select new com.three.points.vo.ThemeDetailEventViewVo(td.id, td.empId, td.empFullName, td.themeDate, td.themeName, td.eventName, td.modifyFlag, td.ascore, td.bscore, " +
             "td.prizeFlag, t.recorderName, t.attnName, t.auditName, t.themeStatus, t.id, td.remark, td.eventTypeName, t.aposScore, t.anegScore, t.bposScore, t.bnegScore) " +
             "from ThemeDetail td, Theme t where td.themeId = t.id and td.themeType = :themeType and  td.status = :status and (:themeStatus is null or t.themeStatus = :themeStatus) and td.themeDate >= :stM and td.themeDate <= :etM and" +

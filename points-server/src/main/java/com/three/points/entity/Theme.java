@@ -175,7 +175,7 @@ public class Theme implements Serializable {
 
     public void setSysAdminInfo() {
         Date date = new Date();
-        String name = "系统机器人";
+        String name = "系统管理员";
         this.setRecorderName(name);
         this.setSubmitterDate(date);
         this.setAttnName(name);

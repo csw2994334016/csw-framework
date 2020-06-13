@@ -458,25 +458,27 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
         Date nextTaskDate = DateUtil.offsetMonth(curTaskDate, 1);
         for (ManagerTask curManagerTask : curManagerTaskList) {
             if (StringUtil.isBlank(curManagerTask.getNextTaskId())) {
-                // 生成下个月管理任务
-                ManagerTask nextManagerTask = new ManagerTask();
-                nextManagerTask = (ManagerTask) BeanCopyUtil.copyBean(curManagerTask, nextManagerTask, Arrays.asList("id"));
-                nextManagerTask.setTaskDate(nextTaskDate);
-                nextManagerTask = managerTaskRepository.save(nextManagerTask);
-                // 当月任务记录下月任务id
-                curManagerTask.setNextTaskId(nextManagerTask.getId());
-                managerTaskRepository.save(curManagerTask);
-                // 生成下个月管理任务的人员配置
-                List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(curManagerTask.getId());
-                List<ManagerTaskEmp> nextManagerTaskEmpList = new ArrayList<>();
-                for (ManagerTaskEmp managerTaskEmp : managerTaskEmpList) {
-                    ManagerTaskEmp nextManagerTaskEmp = new ManagerTaskEmp();
-                    nextManagerTaskEmp = (ManagerTaskEmp) BeanCopyUtil.copyBean(managerTaskEmp, nextManagerTaskEmp, Arrays.asList("id"));
-                    nextManagerTaskEmp.setTaskId(nextManagerTask.getId());
-                    nextManagerTaskEmp.setTaskDate(nextManagerTask.getTaskDate());
-                    nextManagerTaskEmpList.add(nextManagerTaskEmp);
+                if (StringUtil.isBlank(curManagerTask.getNextTaskId())) {
+                    // 生成下个月管理任务
+                    ManagerTask nextManagerTask = new ManagerTask();
+                    nextManagerTask = (ManagerTask) BeanCopyUtil.copyBean(curManagerTask, nextManagerTask, Arrays.asList("id"));
+                    nextManagerTask.setTaskDate(nextTaskDate);
+                    nextManagerTask = managerTaskRepository.save(nextManagerTask);
+                    // 当月任务记录下月任务id
+                    curManagerTask.setNextTaskId(nextManagerTask.getId());
+                    managerTaskRepository.save(curManagerTask);
+                    // 生成下个月管理任务的人员配置
+                    List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(curManagerTask.getId());
+                    List<ManagerTaskEmp> nextManagerTaskEmpList = new ArrayList<>();
+                    for (ManagerTaskEmp managerTaskEmp : managerTaskEmpList) {
+                        ManagerTaskEmp nextManagerTaskEmp = new ManagerTaskEmp();
+                        nextManagerTaskEmp = (ManagerTaskEmp) BeanCopyUtil.copyBean(managerTaskEmp, nextManagerTaskEmp, Arrays.asList("id"));
+                        nextManagerTaskEmp.setTaskId(nextManagerTask.getId());
+                        nextManagerTaskEmp.setTaskDate(nextManagerTask.getTaskDate());
+                        nextManagerTaskEmpList.add(nextManagerTaskEmp);
+                    }
+                    managerTaskEmpRepository.saveAll(nextManagerTaskEmpList);
                 }
-                managerTaskEmpRepository.saveAll(nextManagerTaskEmpList);
             }
         }
     }

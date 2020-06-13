@@ -120,12 +120,16 @@ public class UserService extends BaseService<User, String> {
                     parent.setUrl("javascript:;");
                 }
             }
-            menuVoList.sort(Comparator.comparing(MenuVo::getSort));
-            for (MenuVo menuVo : menuVoList) {
-                menuVo.getChildren().sort(Comparator.comparing(MenuVo::getSort));
-            }
+            sortMenuVoList(menuVoList);
         }
         return menuVoList;
+    }
+
+    private void sortMenuVoList(List<MenuVo> menuVoList) {
+        menuVoList.sort(Comparator.comparing(MenuVo::getSort));
+        for (MenuVo menuVo : menuVoList) {
+            sortMenuVoList(menuVo.getChildren());
+        }
     }
 
     public User findByUsername(String username) {

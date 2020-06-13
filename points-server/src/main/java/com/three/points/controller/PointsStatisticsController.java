@@ -30,7 +30,7 @@ public class PointsStatisticsController {
             @ApiImplicitParam(name = "orgId", value = "左侧选择组织机构Id", dataType = "String"),
             @ApiImplicitParam(name = "themeDateSt", value = "奖扣时间开始(月份，时间戳，毫秒)", dataType = "Long"),
             @ApiImplicitParam(name = "themeDateEt", value = "奖扣时间结束(月份，时间戳，毫秒),默认为当前时间", dataType = "Long"),
-            @ApiImplicitParam(name = "searchValue", value = "搜索人员（姓名/工号/手机号）", dataType = "String")
+            @ApiImplicitParam(name = "searchValue", value = "搜索人员（姓名/工号）", dataType = "String")
     })
     @GetMapping("/themeDetailStatistics")
     public PageResult<PointsStatisticsVo> themeDetailStatistics(Integer page, Integer limit, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {

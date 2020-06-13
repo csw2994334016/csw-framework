@@ -1,5 +1,6 @@
 package com.three.points.controller;
 
+import com.three.common.vo.PageQuery;
 import com.three.points.entity.CustomReport;
 import com.three.points.param.CustomReportParam;
 import com.three.points.service.CustomReportService;
@@ -8,6 +9,8 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.JsonData;
 import com.three.common.vo.PageResult;
+import com.three.points.service.PointsStatisticsService;
+import com.three.points.vo.PointsRankVo;
 import com.three.points.vo.ReportGroupVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,6 +33,9 @@ public class CustomReportController {
 
     @Autowired
     private CustomReportService customReportService;
+
+    @Autowired
+    private PointsStatisticsService pointsStatisticsService;
 
     @LogAnnotation(module = "添加自定义报表")
     @ApiOperation(value = "添加自定义报表")
@@ -76,10 +82,22 @@ public class CustomReportController {
         return new JsonData<>(customReportService.findById(id)).success();
     }
 
-    @ApiOperation(value = "查询自定义报表包含分组信息", notes = "")
+    @ApiOperation(value = "查询自定义报表分组信息", notes = "")
     @ApiImplicitParam(name = "id", value = "自定义报表信息id", required = true, dataType = "String")
     @GetMapping("/findGroupsById")
     public JsonData<List<ReportGroupVo>> findGroupsById(@RequestParam(required = true) String id) {
         return new JsonData<>(customReportService.findGroupsById(id)).success();
+    }
+
+    @ApiOperation(value = "自定义报表排名预览", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "groupId", value = "自定义分组信息id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "themeDateSt", value = "开始时间(月份，时间戳，毫秒),默认为当前时间", dataType = "Long"),
+            @ApiImplicitParam(name = "themeDateEt", value = "结束时间(月份，时间戳，毫秒),默认为当前时间", dataType = "Long"),
+            @ApiImplicitParam(name = "cumulativeFlag", value = "累计排名标志，默认0=不按累计分，1=按累计积分", dataType = "String"),
+    })
+    @GetMapping("/findRankByGroupId")
+    public PageResult<PointsRankVo> findRankByGroupId(@RequestParam(required = true) String groupId, Long themeDateSt, Long themeDateEt, @RequestParam(defaultValue = "0") String cumulativeFlag) {
+        return pointsStatisticsService.findRankByGroupId(groupId, themeDateSt, themeDateEt, cumulativeFlag);
     }
 }
