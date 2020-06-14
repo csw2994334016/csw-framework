@@ -103,9 +103,9 @@ public class PointsStatisticsService {
         return findRankByEmpIds(empIdSet, themeDateSt, themeDateEt, cumulativeFlag);
     }
 
-    public PageResult<PointsRankVo> queryOrgRank(String orgId, Long themeDateSt, Long themeDateEt, String containChildFlag) {
+    public PageResult<PointsRankVo> queryOrgRank(String orgId, Long themeDateSt, Long themeDateEt, String containChildFlag, String cumulativeFlag) {
         Set<String> empIdSet = userClient.findSysEmployeeSet(orgId, containChildFlag);
-        return findRankByEmpIds(empIdSet, themeDateSt, themeDateEt, null);
+        return findRankByEmpIds(empIdSet, themeDateSt, themeDateEt, cumulativeFlag);
     }
 
     private PageResult<PointsRankVo> findRankByEmpIds(Set<String> empIdSet, Long themeDateSt, Long themeDateEt, String cumulativeFlag) {

@@ -205,6 +205,31 @@ public class EmployeeService extends BaseService<Employee, String> {
         }
     }
 
+    public PageResult<Employee> queryEmpByOrgId(int code, String orgId, String containChildFlag) {
+        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        Specification<Employee> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicateList = Lists.newArrayList();
+
+            predicateList.add(criteriaBuilder.equal(root.get("status"), code));
+
+            // 按组织机构查询人员信息
+            if (StringUtil.isNotBlank(orgId)) {
+                List<Organization> organizationList = new ArrayList<>();
+                organizationList.add(organizationService.findById(orgId));
+                if ("1".equals(containChildFlag)) { // 不包含子部门人员
+                    organizationList.addAll(organizationService.findChildOrganizationListByOrgId(orgId));
+                }
+                Set<String> orgIdSet = new HashSet<>();
+                if (organizationList.size() > 0) {
+                    organizationList.forEach(e -> orgIdSet.add(e.getId()));
+                    predicateList.add(root.get("organizationId").in(orgIdSet));
+                }
+            }
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
+        };
+        return query(employeeRepository, sort, specification);
+    }
+
     @Transactional
     public void assignRole(String id, String roleIds) {
         if (StringUtil.isBlank(roleIds)) {

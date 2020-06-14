@@ -10,5 +10,5 @@ public interface ServiceConstant {
     String USER_SERVICE = "user-server";
     String POINTS_SERVICE = "points-server";
     String AUTH_SERVER = "auth-server";
-    String LOG_SERVER = "log-server";
+    String LOG_SERVER = "develop-server";
 }

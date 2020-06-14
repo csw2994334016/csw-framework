@@ -153,7 +153,7 @@ public class SysController {
     @GetMapping(value = "/internal/findEmpIdSetByOrgId")
     Set<String> findSysEmployeeSet(@RequestParam() String orgId, @RequestParam() String containChildFlag) {
         Set<String> empIdSet = new HashSet<>();
-        PageResult<Employee> pageResult = employeeService.query(null, StatusEnum.OK.getCode(), orgId, null, containChildFlag, "0", "0");
+        PageResult<Employee> pageResult = employeeService.queryEmpByOrgId(StatusEnum.OK.getCode(), orgId, containChildFlag);
         for (Employee employee : pageResult.getData()) {
             empIdSet.add(employee.getId());
         }

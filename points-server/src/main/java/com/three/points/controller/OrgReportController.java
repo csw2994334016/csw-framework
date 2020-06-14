@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -32,9 +33,10 @@ public class OrgReportController {
             @ApiImplicitParam(name = "themeDateSt", value = "开始时间(月份，时间戳，毫秒),默认为当前时间", dataType = "Long"),
             @ApiImplicitParam(name = "themeDateEt", value = "结束时间(月份，时间戳，毫秒),默认为当前时间", dataType = "Long"),
             @ApiImplicitParam(name = "containChildFlag", value = "包含子级部门人员标记：0=不包含；1=包含（默认0）", defaultValue = "0", dataType = "String"),
+            @ApiImplicitParam(name = "cumulativeFlag", value = "累计排名标志，默认0=不按累计分，1=按累计积分", dataType = "String")
     })
     @GetMapping("/queryOrgRank")
-    public PageResult<PointsRankVo> queryOrgRank(String orgId, Long themeDateSt, Long themeDateEt, String containChildFlag) {
-        return pointsStatisticsService.queryOrgRank(orgId, themeDateSt, themeDateEt, containChildFlag);
+    public PageResult<PointsRankVo> queryOrgRank(String orgId, Long themeDateSt, Long themeDateEt, String containChildFlag, @RequestParam(defaultValue = "0") String cumulativeFlag) {
+        return pointsStatisticsService.queryOrgRank(orgId, themeDateSt, themeDateEt, containChildFlag, cumulativeFlag);
     }
 }

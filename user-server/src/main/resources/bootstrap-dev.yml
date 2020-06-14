@@ -98,9 +98,9 @@ hystrix:
 # 上传文件配置
 file:
   local:
-    path: D:/localFile
+    path: D:/nginx-1.14.2/one_points_web
   prefix: /head_img
-  urlPrefix: http://47.96.21.5:80
+  urlPrefix: http://x24hwc.natappfree.cc
   ftp:
     hostname: 47.96.21.5
     username:
