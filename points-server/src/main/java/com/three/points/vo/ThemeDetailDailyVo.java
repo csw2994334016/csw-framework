@@ -57,6 +57,20 @@ public class ThemeDetailDailyVo {
         this.auditName = auditName;
     }
 
+    public ThemeDetailDailyVo(Date themeDate, String eventName, String empId, String empNum, String empFullName, String empOrgId, String empOrgName, Integer ascore, Integer bscore, String attnName, String auditName) {
+        this.themeDate = themeDate;
+        this.eventName = eventName;
+        this.empId = empId;
+        this.empNum = empNum;
+        this.empFullName = empFullName;
+        this.empOrgId = empOrgId;
+        this.empOrgName = empOrgName;
+        this.ascore = ascore;
+        this.bscore = bscore;
+        this.attnName = attnName;
+        this.auditName = auditName;
+    }
+
     public ThemeDetailDailyVo(Date themeDate, Integer themeType, String eventName, String empId, String empNum, String empFullName, String empOrgId, String empOrgName, Integer ascore, Integer bscore, String attnName, String auditName) {
         this.themeDate = themeDate;
         this.themeType = themeType;

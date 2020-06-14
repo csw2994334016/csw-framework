@@ -1,4 +1,4 @@
-package com.three.log.entity;
+package com.three.develop.entity;
 
 import com.three.common.enums.StatusEnum;
 import lombok.Data;

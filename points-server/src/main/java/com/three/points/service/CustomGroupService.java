@@ -133,6 +133,7 @@ public class CustomGroupService extends BaseService<CustomGroup, String> {
             customGroupEmp.setGroupId(customGroup.getId());
             customGroupEmp.setEmpId(customGroupEmpParam1.getEmpId());
             customGroupEmp.setEmpNum(customGroupEmpParam1.getEmpNum());
+            customGroupEmp.setEmpPicture(customGroupEmpParam1.getEmpPicture());
             customGroupEmp.setEmpFullName(customGroupEmpParam1.getEmpFullName());
             customGroupEmp.setEmpOrgId(customGroupEmpParam1.getEmpOrgId());
             customGroupEmp.setEmpOrgName(customGroupEmpParam1.getEmpOrgName());

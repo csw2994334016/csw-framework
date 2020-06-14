@@ -14,6 +14,9 @@ public class JsonData<T> {
 
     private T data;
 
+    public JsonData() {
+    }
+
     public JsonData(T data) {
         this.code = ResultCodeEnum.SUCCESS.getCode();
         this.msg = ResultCodeEnum.SUCCESS.getMessage();

@@ -1,4 +1,4 @@
-package com.three.log.config;
+package com.three.develop.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;

@@ -103,10 +103,18 @@ public class ManagerTaskEmpService extends BaseService<ManagerTaskEmp, String> {
     }
 
     private String getTaskIndex(ManagerTask managerTask) {
-        return "奖分:" + managerTask.getScoreAwardMin() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getScoreCycle()) +
-                " 扣分:" + managerTask.getScoreDeductMin() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getScoreCycle()) +
-                " 人次:" + managerTask.getEmpCountValue() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getEmpCountCycle()) +
-                " 比例:" + managerTask.getRatioValue() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getRatioCycle());
+        String re = "";
+        if (managerTask.getScoreCycle() != null) {
+            re += "奖分:" + managerTask.getScoreAwardMin() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getScoreCycle()) +
+                    " 扣分:" + managerTask.getScoreDeductMin() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getScoreCycle());
+        }
+        if (managerTask.getEmpCountCycle() != null) {
+            re += " 人次:" + managerTask.getEmpCountValue() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getEmpCountCycle());
+        }
+        if (managerTask.getRatioCycle() != null) {
+            re += " 比例:" + managerTask.getRatioValue() + "/" + ManagerTaskEnum.getMessageByCode(managerTask.getRatioCycle());
+        }
+        return re;
     }
 
     public ManagerTaskEmp findById(String id) {

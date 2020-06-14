@@ -504,11 +504,28 @@ public class ManagerTaskService extends BaseService<ManagerTask, String> {
      * @param firstOrganizationId
      */
     @Transactional
-    public void settleManagerTask(String name, String method, String firstOrganizationId) {
+    public void settleManagerTask(String name, String method, String firstOrganizationId, Long monthDate) {
         Date frontTaskDate = DateUtil.beginOfMonth(DateUtil.offsetMonth(new Date(), -1));
+        if (monthDate != null) {
+            frontTaskDate = DateUtil.beginOfMonth(new Date(monthDate));
+        }
         // 查找管理任务、及配置的人员，根据管理任务设置：天/周/月，统计每个人的任务完成情况，进行考核结算
         List<ThemeDetail> themeDetailListA = new ArrayList<>();
+        if (StringUtil.isBlank(firstOrganizationId)) {
+            firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
+        }
         List<ManagerTask> managerTaskList = findManagerTaskListByTaskDate(frontTaskDate, firstOrganizationId);
+        // 判断管理任务是否已经结算过了
+        List<String> taskNameList = new ArrayList<>();
+        for (ManagerTask managerTask : managerTaskList) {
+            List<ThemeDetail> themeDetailList = themeDetailRepository.findAllByManagerTaskId(managerTask.getId());
+            if (themeDetailList.size() > 0) {
+                taskNameList.add(managerTask.getTaskName());
+            }
+        }
+        if (taskNameList.size() > 0) {
+            throw new BusinessException(DateUtil.format(frontTaskDate, "yyyy-MM-dd") + "月份管理任务已经结算，不允许重复结算：" + taskNameList.toString());
+        }
         for (ManagerTask managerTask : managerTaskList) {
             List<ManagerTaskEmp> managerTaskEmpList = managerTaskEmpRepository.findAllByTaskId(managerTask.getId());
             if (managerTaskEmpList.size() > 0) {

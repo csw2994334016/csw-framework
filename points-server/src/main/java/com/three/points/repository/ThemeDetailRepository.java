@@ -49,7 +49,7 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
             "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
     List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDateSort(int status, String empId, int themeStatus, Date stM, Date etM, Sort sort);
 
-    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
+    @Query("select new com.three.points.vo.ThemeDetailDailyVo(td.themeDate, td.eventName, td.empId, td.empNum, td.empFullName, td.empOrgId, td.empOrgName, td.ascore, td.bscore, t.attnName, t.auditName) " +
             "from ThemeDetail td left join Theme t on td.themeId = t.id where td.status = :status and td.empId = :empId and " +
             "t.themeStatus = :themeStatus and td.themeDate >= :stM and td.themeDate <= :etM")
     List<ThemeDetailDailyVo> findAllByStatusAndEmpIdAndThemeStatusAndThemeDate(int status, String empId, int themeStatus, Date stM, Date etM);
@@ -84,4 +84,5 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
             "t.themeStatus = :themeStatus and td.managerTaskDate = :stM and td.themeType = :themeType")
     List<ManagerTaskScoreVo> findAllByManagerTaskScoreSort(int status, String empId, int themeStatus, Date stM, int themeType, Sort sort);
 
+    List<ThemeDetail> findAllByManagerTaskId(String managerTaskId);
 }

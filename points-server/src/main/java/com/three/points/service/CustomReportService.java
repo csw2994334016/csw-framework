@@ -15,6 +15,7 @@ import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
+import com.three.points.vo.CustomReportVo;
 import com.three.points.vo.ReportGroupVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
@@ -98,6 +99,7 @@ public class CustomReportService extends BaseService<CustomReport, String> {
                 CustomReportGroup customReportGroup = new CustomReportGroup();
                 customReportGroup.setReportId(customReport.getId());
                 customReportGroup.setGroupId(groupId);
+                customReportGroupList.add(customReportGroup);
             }
             customReportGroupRepository.saveAll(customReportGroupList);
         }
@@ -138,11 +140,16 @@ public class CustomReportService extends BaseService<CustomReport, String> {
         }
     }
 
-    public CustomReport findById(String id) {
-        return getEntityById(customReportRepository, id);
+    public CustomReportVo findById(String id) {
+        CustomReport customReport = getEntityById(customReportRepository, id);
+        CustomReportVo customReportVo = new CustomReportVo();
+        customReportVo = (CustomReportVo) BeanCopyUtil.copyBean(customReport, customReportVo);
+        List<ReportGroupVo> reportGroupVoList = findGroupsById(id);
+        customReportVo.setReportGroupVoList(reportGroupVoList);
+        return customReportVo;
     }
 
-    public List<ReportGroupVo> findGroupsById(String id) {
+    private List<ReportGroupVo> findGroupsById(String id) {
         return customReportGroupRepository.findByReportId(id);
     }
 

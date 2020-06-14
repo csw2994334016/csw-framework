@@ -28,9 +28,6 @@ zuul:
     three-auth-server:
       path: /three-auth-server/**
       serviceId: auth-server
-    three-log-server:
-      path: /three-log-server/**
-      serviceId: log-server
     three-develop-server:
       path: /three-develop-server/**
       serviceId: develop-server

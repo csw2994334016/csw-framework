@@ -1,7 +1,7 @@
-package com.three.log.repository;
+package com.three.develop.repository;
 
+import com.three.develop.entity.ActionLog;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
-import com.three.log.entity.ActionLog;
 
 /**
  * Created by csw on 2019/03/31.

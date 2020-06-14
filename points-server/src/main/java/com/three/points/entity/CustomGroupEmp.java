@@ -45,6 +45,10 @@ public class CustomGroupEmp implements Serializable {
     @ApiModelProperty("人员姓名")
     private String empFullName; // 人员姓名
 
+    @Column(name = "emp_picture", columnDefinition = "varchar(255) comment '人员头像'")
+    @ApiModelProperty("人员头像")
+    private String empPicture; // 人员头像
+
     @Column(name = "emp_org_id", nullable = false, columnDefinition = "varchar(36) comment '人员部门Id'")
     @ApiModelProperty("人员部门Id")
     private String empOrgId; // 人员部门Id

@@ -1,4 +1,4 @@
-package com.three.log.config;
+package com.three.develop.config;
 
 import com.three.common.log.LogQueue;
 import org.springframework.amqp.core.Queue;

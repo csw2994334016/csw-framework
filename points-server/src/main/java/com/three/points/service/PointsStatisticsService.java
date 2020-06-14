@@ -1,10 +1,13 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
+import com.three.common.auth.SysEmployee;
+import com.three.common.constants.RedisConstant;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
+import com.three.commonclient.exception.BusinessException;
 import com.three.points.entity.CustomGroupEmp;
 import com.three.points.enums.ThemeStatusEnum;
 import com.three.points.enums.ThemeTypeEnum;
@@ -17,6 +20,7 @@ import com.three.points.vo.ThemeDetailDailyVo;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,6 +37,9 @@ public class PointsStatisticsService {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
 
     public PageResult<PointsStatisticsVo> themeDetailStatistics(PageQuery pageQuery, int code, String orgId, Long themeDateSt, Long themeDateEt, String searchValue) {
         // 根据orgId和searchValue确定统计人员
@@ -113,22 +120,25 @@ public class PointsStatisticsService {
         // 按人员分组
         Map<String, PointsRankVo> empRankMap = new HashMap<>();
         for (String empId : empIdSet) {
+            SysEmployee sysEmployee = (SysEmployee) redisTemplate.opsForValue().get(StringUtil.getRedisKey(RedisConstant.EMPLOYEE, empId));
             if (empRankMap.get(empId) == null) {
                 PointsRankVo pointsRankVo = new PointsRankVo(empId);
+                if (sysEmployee != null) {
+                    pointsRankVo.setEmpNum(sysEmployee.getEmpNum());
+                    pointsRankVo.setEmpFullName(sysEmployee.getFullName());
+                    pointsRankVo.setEmpOrgName(sysEmployee.getOrgName());
+                }
                 empRankMap.put(empId, pointsRankVo);
             }
             PointsRankVo pointsRankVo = empRankMap.get(empId);
             // 日常奖扣得分信息
             List<ThemeDetailDailyVo> themeDetailDailyVoList = themeDetailRepository.findAllByStatusAndEmpIdAndThemeStatusAndThemeDate(StatusEnum.OK.getCode(), empId, ThemeStatusEnum.SUCCESS.getCode(), st, et);
             for (ThemeDetailDailyVo themeDetailDailyVo : themeDetailDailyVoList) {
-                pointsRankVo.setEmpNum(themeDetailDailyVo.getEmpNum());
-                pointsRankVo.setEmpFullName(themeDetailDailyVo.getEmpFullName());
-                pointsRankVo.setEmpOrgName(themeDetailDailyVo.getEmpOrgName());
                 pointsRankVo.setBscoreAll(pointsRankVo.getBscoreAll() + themeDetailDailyVo.getBscore());
             }
         }
         List<PointsRankVo> pointsRankVoList = new ArrayList<>(empRankMap.values());
-        pointsRankVoList.sort(Comparator.comparing(PointsRankVo::getBscoreAll));
+        pointsRankVoList.sort(Comparator.comparing(PointsRankVo::getBscoreAll).reversed());
         for (int i = 0; i < pointsRankVoList.size(); i++) {
             pointsRankVoList.get(i).setSort(i + 1);
         }

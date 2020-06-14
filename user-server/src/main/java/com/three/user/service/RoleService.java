@@ -160,6 +160,12 @@ public class RoleService extends BaseService<Role, String> {
         for (AuthTreeVo vo : authTreeVoList) {
             vo.setExpand(Boolean.TRUE);
             vo.getChildren().sort(Comparator.comparing(AuthTreeVo::getSort));
+            for (AuthTreeVo vo2 : vo.getChildren()) {
+                vo2.getChildren().sort(Comparator.comparing(AuthTreeVo::getSort));
+                for (AuthTreeVo vo3 : vo.getChildren()) {
+                    vo3.getChildren().sort(Comparator.comparing(AuthTreeVo::getSort));
+                }
+            }
         }
         return authTreeVoList;
     }

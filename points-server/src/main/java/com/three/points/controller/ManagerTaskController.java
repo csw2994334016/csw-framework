@@ -48,4 +48,12 @@ public class ManagerTaskController {
     public JsonData<ManagerTask> findById(@RequestParam(required = true) String id) {
         return new JsonData<>(managerTaskService.findById(id)).success();
     }
+
+    @ApiOperation(value = "管理任务结算", notes = "")
+    @ApiImplicitParam(name = "monthDate", value = "管理任务日期（精确到月份）", dataType = "Long")
+    @GetMapping("/settleManagerTask")
+    public JsonData settleManagerTask(Long monthDate) {
+        managerTaskService.settleManagerTask(null, null, null, monthDate);
+        return new JsonData<>().success("管理任务结算成功");
+    }
 }

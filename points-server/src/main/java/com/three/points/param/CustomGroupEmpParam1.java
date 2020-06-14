@@ -22,6 +22,9 @@ public class CustomGroupEmpParam1 {
     @ApiModelProperty("人员姓名")
     private String empFullName; // 人员姓名
 
+    @ApiModelProperty("人员头像")
+    private String empPicture; // 人员头像
+
     @NotBlank(message = "人员部门Id不可以为空")
     @ApiModelProperty("人员部门Id")
     private String empOrgId; // 人员部门Id

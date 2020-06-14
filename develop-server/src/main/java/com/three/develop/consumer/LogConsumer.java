@@ -1,8 +1,8 @@
-package com.three.log.consumer;
+package com.three.develop.consumer;
 
 import com.three.common.log.Log;
 import com.three.common.log.LogQueue;
-import com.three.log.service.ActionLogService;
+import com.three.develop.service.ActionLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

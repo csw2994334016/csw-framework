@@ -58,7 +58,7 @@ public class SysController {
     @ApiOperation(value = "管理任务结算（内部接口）")
     @GetMapping(value = "/internal/settleManagerTask")
     JsonResult settleManagerTask(String name, String method, String firstOrganizationId) {
-        managerTaskService.settleManagerTask(name, method, firstOrganizationId);
+        managerTaskService.settleManagerTask(name, method, firstOrganizationId, null);
         return JsonResult.ok("管理任务结算成功");
     }
 }

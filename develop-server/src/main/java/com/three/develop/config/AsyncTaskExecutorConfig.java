@@ -1,4 +1,4 @@
-package com.three.log.config;
+package com.three.develop.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -30,16 +30,16 @@ spring:
       maxPoolPreparedStatementPerConnectionSize: 20 # 开启poolPreparedStatements后生效
       filters: stat,wall # 配置扩展插件，常用的插件有=>stat:监控统计 wall:防御sql注入
       connectionProperties: 'druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000' # 通过connectProperties属性来打开mergeSql功能;慢SQL记录
-#  rabbitmq:
-#    host: 127.0.0.1
-#    port: 5672
-#    username: cloud-dev
-#    password: cloud-dev
-#    virtual-host: /
-#    listener:
-#      simple:
-#        concurrency: 20
-#        max-concurrency: 50
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: cloud-dev
+    password: cloud-dev
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 20
+        max-concurrency: 50
   mvc:
     servlet:
       load-on-startup: 1

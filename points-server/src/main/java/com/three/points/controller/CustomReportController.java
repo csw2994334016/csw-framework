@@ -10,6 +10,7 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.JsonData;
 import com.three.common.vo.PageResult;
 import com.three.points.service.PointsStatisticsService;
+import com.three.points.vo.CustomReportVo;
 import com.three.points.vo.PointsRankVo;
 import com.three.points.vo.ReportGroupVo;
 import io.swagger.annotations.Api;
@@ -78,15 +79,8 @@ public class CustomReportController {
     @ApiOperation(value = "查询自定义报表（根据ID查找）", notes = "")
     @ApiImplicitParam(name = "id", value = "自定义报表信息id", required = true, dataType = "String")
     @GetMapping("/findById")
-    public JsonData<CustomReport> findById(@RequestParam(required = true) String id) {
+    public JsonData<CustomReportVo> findById(@RequestParam(required = true) String id) {
         return new JsonData<>(customReportService.findById(id)).success();
-    }
-
-    @ApiOperation(value = "查询自定义报表分组信息", notes = "")
-    @ApiImplicitParam(name = "id", value = "自定义报表信息id", required = true, dataType = "String")
-    @GetMapping("/findGroupsById")
-    public JsonData<List<ReportGroupVo>> findGroupsById(@RequestParam(required = true) String id) {
-        return new JsonData<>(customReportService.findGroupsById(id)).success();
     }
 
     @ApiOperation(value = "自定义报表排名预览", notes = "")

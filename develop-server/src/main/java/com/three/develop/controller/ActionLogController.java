@@ -1,4 +1,4 @@
-package com.three.log.controller;
+package com.three.develop.controller;
 
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.Log;
@@ -7,8 +7,8 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.commonclient.utils.BeanValidator;
-import com.three.log.entity.ActionLog;
-import com.three.log.service.ActionLogService;
+import com.three.develop.entity.ActionLog;
+import com.three.develop.service.ActionLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
