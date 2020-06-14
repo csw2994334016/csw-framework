@@ -1,6 +1,7 @@
 package com.three.points.service;
 
 import com.three.common.auth.SysEmployee;
+import com.three.common.auth.SysOrganization;
 import com.three.points.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,5 +53,20 @@ public class PointsService {
     @Transactional
     public void changeThemeDetailEmpInfo(SysEmployee sysEmployee) {
         themeDetailRepository.updateEmpInfoByEmpId(sysEmployee.getEmpNum(), sysEmployee.getFullName(), sysEmployee.getOrganizationId(), sysEmployee.getOrgName(), sysEmployee.getId());
+    }
+
+    @Transactional
+    public void changeCustomGroupOrgInfo(SysOrganization sysOrganization) {
+        customGroupRepository.updateOrgInfoByEmpId(sysOrganization.getOrgName(), sysOrganization.getId());
+    }
+
+    @Transactional
+    public void changeManagerTaskOrgInfo(SysOrganization sysOrganization) {
+        managerTaskEmpRepository.updateOrgInfoByEmpId(sysOrganization.getOrgName(), sysOrganization.getId());
+    }
+
+    @Transactional
+    public void changeThemeDetailOrgInfo(SysOrganization sysOrganization) {
+        themeDetailRepository.updateOrgInfoByEmpId(sysOrganization.getOrgName(), sysOrganization.getId());
     }
 }

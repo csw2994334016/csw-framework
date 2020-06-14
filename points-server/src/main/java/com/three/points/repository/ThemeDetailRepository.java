@@ -90,4 +90,8 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
     @Modifying(clearAutomatically = true)
     @Query("update ThemeDetail t set t.empNum = :empNum, t.empFullName = :fullName, t.empOrgId = :organizationId, t.empOrgName = :orgName where t.empId = :id")
     void updateEmpInfoByEmpId(String empNum, String fullName, String organizationId, String orgName, String id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update ThemeDetail t set t.empOrgName = :orgName where t.empOrgId = :id")
+    void updateOrgInfoByEmpId(String orgName, String id);
 }

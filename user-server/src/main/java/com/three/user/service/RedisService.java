@@ -135,6 +135,7 @@ public class RedisService extends BaseService {
         CompletableFuture.runAsync(() -> {
             SysOrganization sysOrganization = new SysOrganization();
             sysOrganization = (SysOrganization) BeanCopyUtil.copyBean(organization, sysOrganization);
+            sysMqClient.sendOrganizationMsg(sysOrganization);
             deleteRedis(sysOrganization);
             addRedis(sysOrganization);
         });

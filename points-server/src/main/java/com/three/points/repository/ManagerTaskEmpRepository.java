@@ -32,4 +32,8 @@ public interface ManagerTaskEmpRepository extends BaseRepository<ManagerTaskEmp,
     @Modifying(clearAutomatically = true)
     @Query("update ManagerTaskEmp t set t.empNum = :empNum, t.empFullName = :fullName, t.empCellName = :cellNum, t.titleLevel = :titleLevel, t.gender = :gender, t.empOrgId = :organizationId, t.empOrgName = :orgName where t.empId = :id")
     void updateEmpInfoByEmpId(String empNum, String fullName, String cellNum, String titleLevel, String gender, String organizationId, String orgName, String id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update ManagerTaskEmp t set t.empOrgName = :orgName where t.empOrgId = :id")
+    void updateOrgInfoByEmpId(String orgName, String id);
 }
