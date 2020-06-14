@@ -6,6 +6,7 @@ import com.three.common.constants.RedisConstant;
 import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
+import com.three.resource_jpa.autoconfig.SysMqClient;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Employee;
@@ -36,6 +37,9 @@ public class RedisService extends BaseService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private SysMqClient sysMqClient;
 
     // 重新加载组织结构-人员信息缓存
     public void reLoadOrgEmpRedis() {
@@ -76,6 +80,8 @@ public class RedisService extends BaseService {
             try {
                 SysEmployee sysEmployee = new SysEmployee();
                 sysEmployee = (SysEmployee) BeanCopyUtil.copyBean(employee, sysEmployee);
+                // 人员信息更新消息
+                sysMqClient.sendEmployeeMsg(sysEmployee);
                 deleteRedis(sysEmployee);
                 addRedis(sysEmployee);
             } catch (Exception e) {

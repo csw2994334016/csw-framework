@@ -2,6 +2,8 @@ package com.three.points.repository;
 
 import com.three.points.entity.ManagerTaskEmp;
 import com.three.resource_jpa.jpa.base.repository.BaseRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
 import java.util.List;
@@ -26,4 +28,8 @@ public interface ManagerTaskEmpRepository extends BaseRepository<ManagerTaskEmp,
     ManagerTaskEmp findAllByOrganizationIdAndTaskDateAndEmpId(String firstOrganizationId, Date taskDate, String empId);
 
     void deleteAllByTaskId(String id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update ManagerTaskEmp t set t.empNum = :empNum, t.empFullName = :fullName, t.empCellName = :cellNum, t.titleLevel = :titleLevel, t.gender = :gender, t.empOrgId = :organizationId, t.empOrgName = :orgName where t.empId = :id")
+    void updateEmpInfoByEmpId(String empNum, String fullName, String cellNum, String titleLevel, String gender, String organizationId, String orgName, String id);
 }

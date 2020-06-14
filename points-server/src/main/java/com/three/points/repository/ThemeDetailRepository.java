@@ -8,6 +8,7 @@ import com.three.resource_jpa.jpa.base.repository.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -85,4 +86,8 @@ public interface ThemeDetailRepository extends BaseRepository<ThemeDetail, Strin
     List<ManagerTaskScoreVo> findAllByManagerTaskScoreSort(int status, String empId, int themeStatus, Date stM, int themeType, Sort sort);
 
     List<ThemeDetail> findAllByManagerTaskId(String managerTaskId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update ThemeDetail t set t.empNum = :empNum, t.empFullName = :fullName, t.empOrgId = :organizationId, t.empOrgName = :orgName where t.empId = :id")
+    void updateEmpInfoByEmpId(String empNum, String fullName, String organizationId, String orgName, String id);
 }

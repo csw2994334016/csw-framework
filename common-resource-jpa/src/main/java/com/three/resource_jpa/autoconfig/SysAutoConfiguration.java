@@ -1,6 +1,7 @@
 package com.three.resource_jpa.autoconfig;
 
 import com.three.common.log.LogQueue;
+import com.three.common.log.SysQueue;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * 日志自动配置
  */
 @Configuration
-public class LogAutoConfiguration {
+public class SysAutoConfiguration {
 
     /**
      * 声明队列<br>
@@ -25,6 +26,16 @@ public class LogAutoConfiguration {
         return new Queue(LogQueue.LOG_QUEUE);
     }
 
+    @Bean
+    public Queue employeeQueue() {
+        return new Queue(SysQueue.EMPLOYEE_QUEUE);
+    }
+
+    @Bean
+    public Queue organizationQueue() {
+        return new Queue(SysQueue.ORGANIZATION_QUEUE);
+    }
+
     @Autowired
     private AmqpTemplate amqpTemplate;
 
@@ -33,8 +44,8 @@ public class LogAutoConfiguration {
      * 2018.07.29添加
      */
     @Bean
-    public LogMqClient logMqClient() {
-        return new LogMqClient(amqpTemplate);
+    public SysMqClient sysMqClient() {
+        return new SysMqClient(amqpTemplate);
     }
 
 }

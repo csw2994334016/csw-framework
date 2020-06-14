@@ -5,6 +5,7 @@ import com.three.common.auth.LoginUser;
 import com.three.common.enums.AdminEnum;
 import com.three.commonclient.exception.BusinessException;
 import com.three.commonclient.exception.ParameterException;
+import com.three.resource_jpa.autoconfig.SysMqClient;
 import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.Employee;

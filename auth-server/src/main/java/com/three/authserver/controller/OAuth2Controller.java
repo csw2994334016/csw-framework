@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -115,9 +114,6 @@ public class OAuth2Controller {
     @Autowired
     private LogClient logClient;
 
-//    @Autowired
-//    private LogMqClient logMqClient;
-
     /**
      * 退出日志
      *
@@ -136,11 +132,6 @@ public class OAuth2Controller {
             }
 
         });
-
-        // 调整为mq的方式记录退出日志
-//        Log log = Log.builder().module("退出登录").username(username).message("successfully").flag(Boolean.TRUE).build();
-//        LogUtil.setLogRequestInfo(log);
-//        logMqClient.sendLogMsg(log);
     }
 
 }
