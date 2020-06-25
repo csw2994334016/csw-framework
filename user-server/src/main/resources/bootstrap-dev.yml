@@ -100,7 +100,7 @@ file:
   local:
     path: D:/nginx-1.14.2/one_points_web
   prefix: /head_img
-  urlPrefix: http://x24hwc.natappfree.cc
+  urlPrefix: http://cswcsw.nat300.top
   ftp:
     hostname: 47.96.21.5
     username:
