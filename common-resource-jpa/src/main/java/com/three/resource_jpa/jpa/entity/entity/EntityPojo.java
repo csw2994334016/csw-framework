@@ -1,4 +1,4 @@
-package ${package}.entity;
+package com.three.resource_jpa.jpa.entity.entity;
 
 import com.three.common.enums.StatusEnum;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,54 +12,52 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.util.Date;
-<#if hasTimestamp>
-import java.sql.Timestamp;
-</#if>
-<#if hasBigDecimal>
-import java.math.BigDecimal;
-</#if>
 
 /**
- * Created by ${author} on ${date}.
- * Description: ${menuName}
+ * Created by  on 2020-06-26.
+ * Description: 实体管理
  */
 
 @Getter
 @Setter
 @Entity
-@Table(name = "${tableName}")
+@Table(name = "three_entity_pojo")
 @EntityListeners(AuditingEntityListener.class)
-public class ${className} implements Serializable {
-<#if columns??>
+public class EntityPojo implements Serializable {
 
-    <#if strategy = 'IDENTITY'>
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    </#if>
-    <#if strategy = 'GUID'>
     @Id
     @GeneratedValue(generator = "system-guid")
     @GenericGenerator(name = "system-guid", strategy = "guid")
     @Column(name = "id", columnDefinition = "varchar(36) comment '主键ID'")
     @ApiModelProperty("主键ID")
     private String id;
-    </#if>
 
 
-    <#list columns as column>
-        <#if column.columnName != 'id'>
-            <#if column.columnKey = 'text'>
+    @Column(name = "entity_name", nullable = false, columnDefinition = "varchar(255) comment '实体类名称'")
+    @ApiModelProperty("实体类名称")
+    private String entityName; // 实体类名称
+
+    @Column(name = "entity_package_name", nullable = false, columnDefinition = "varchar(255) comment '实体类包全名称'")
+    @ApiModelProperty("实体类包全名称")
+    private String entityPackageName; // 实体类包全名称
+
     @Lob
-            </#if>
-            <#if column.columnKey = 'UNI' || column.isNullable == false || column.changeColumnType??>
-    @Column(name = "${column.changeColumnName}"<#if column.columnKey = 'UNI'>, unique = true</#if><#if column.isNullable == false>, nullable = false</#if><#if column.columnKey = 'text'>, columnDefinition = "text comment '${column.columnComment}'"</#if><#if column.changeColumnType?? && column.columnKey != 'text'>, columnDefinition = "${column.changeColumnType}<#if column.columnLength??>(${column.columnLength})</#if> comment '${column.columnComment}'"</#if>)
-            </#if>
-    @ApiModelProperty("${column.columnComment}")
-    private ${column.columnType} ${column.columnName};<#if column.columnComment != ''> // ${column.columnComment}</#if>
+    @Column(name = "entity_code", columnDefinition = "text comment '实体类代码'")
+    @ApiModelProperty("实体类代码")
+    private String entityCode; // 实体类代码
 
-        </#if>
-    </#list>
+    @Column(name = "entity_table_name", columnDefinition = "varchar(255) comment '实体表名'")
+    @ApiModelProperty("实体表名")
+    private String entityTableName; // 实体表名
+
+    @Column(name = "version", nullable = false, columnDefinition = "int(11) default 1 comment '版本'")
+    @ApiModelProperty("版本")
+    private Integer version = 1; // 版本
+
+    @Column(name = "meta_flag", nullable = false, columnDefinition = "int(1) comment '实体标记：1=实体；0=虚拟实体'")
+    @ApiModelProperty("实体标记：1=实体；0=虚拟实体")
+    private Integer metaFlag; // 实体标记：1=实体；0=虚拟实体
+
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
     @ApiModelProperty("描述/备注")
@@ -76,7 +74,6 @@ public class ${className} implements Serializable {
     @LastModifiedDate
     @ApiModelProperty("修改时间")
     private Date updateDate; // 修改时间
-</#if>
 
 
 }

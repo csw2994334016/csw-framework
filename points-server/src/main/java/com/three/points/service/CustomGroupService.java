@@ -1,7 +1,7 @@
 package com.three.points.service;
 
 import com.three.common.enums.StatusEnum;
-import com.three.commonclient.exception.ParameterException;
+import com.three.common.exception.ParameterException;
 import com.three.points.entity.CustomGroup;
 import com.three.points.entity.CustomGroupEmp;
 import com.three.points.param.CustomGroupEmpParam;
@@ -13,7 +13,7 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;

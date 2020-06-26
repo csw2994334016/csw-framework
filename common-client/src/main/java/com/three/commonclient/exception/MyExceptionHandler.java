@@ -1,5 +1,6 @@
 package com.three.commonclient.exception;
 
+import com.three.common.exception.IException;
 import com.three.common.utils.ThrowableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

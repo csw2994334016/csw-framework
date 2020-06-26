@@ -1,10 +1,8 @@
 package com.three.points.service;
 
 import com.google.common.collect.Lists;
-import com.three.common.auth.LoginUser;
-import com.three.common.enums.AdminEnum;
 import com.three.common.enums.StatusEnum;
-import com.three.commonclient.exception.ParameterException;
+import com.three.common.exception.ParameterException;
 import com.three.points.entity.Event;
 import com.three.points.entity.EventType;
 import com.three.points.repository.EventRepository;
@@ -14,7 +12,7 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.points.vo.EventTypeVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;

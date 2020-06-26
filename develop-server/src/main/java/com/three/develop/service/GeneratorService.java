@@ -1,6 +1,6 @@
 package com.three.develop.service;
 
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import com.three.develop.param.ColumnInfo;
 import com.three.develop.param.GenConfig;
 import com.three.develop.utils.GenUtil;

@@ -9,7 +9,6 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
 import com.three.user.vo.OrgVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

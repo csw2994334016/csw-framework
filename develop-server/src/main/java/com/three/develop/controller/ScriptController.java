@@ -5,7 +5,7 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.resource_jpa.jpa.script.entity.Script;
 import com.three.resource_jpa.jpa.script.param.ScriptParam;
 import com.three.resource_jpa.jpa.script.service.ScriptService;

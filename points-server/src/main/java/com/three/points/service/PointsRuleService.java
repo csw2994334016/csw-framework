@@ -1,7 +1,7 @@
 package com.three.points.service;
 
 import com.three.common.enums.StatusEnum;
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import com.three.points.entity.PointsRule;
 import com.three.points.entity.PointsRuleEmpCount;
 import com.three.points.param.PointsRuleEmpCountParam;
@@ -9,7 +9,7 @@ import com.three.points.repository.PointsRuleEmpCountRepository;
 import com.three.points.repository.PointsRuleRepository;
 import com.three.points.param.PointsRuleParam;
 import com.three.common.utils.BeanCopyUtil;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;

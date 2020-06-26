@@ -1,7 +1,7 @@
 package com.three.user.controller;
 
 import com.three.common.vo.JsonData;
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import com.three.resource_jpa.jpa.file.entity.FileInfo;
 import com.three.resource_jpa.jpa.file.service.FileInfoService;
 import com.three.user.entity.Employee;
@@ -13,11 +13,10 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.user.service.UploadFileService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

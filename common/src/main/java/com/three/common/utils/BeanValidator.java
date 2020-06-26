@@ -1,9 +1,9 @@
-package com.three.commonclient.utils;
+package com.three.common.utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.three.commonclient.exception.ParameterException;
+import com.three.common.exception.ParameterException;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.ConstraintViolation;

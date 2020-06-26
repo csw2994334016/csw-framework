@@ -1,8 +1,6 @@
 package com.three.user.service;
 
-import com.three.common.enums.AdminEnum;
-import com.three.commonclient.exception.ParameterException;
-import com.three.resource_jpa.resource.utils.LoginUserUtil;
+import com.three.common.exception.ParameterException;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
 import com.three.user.entity.User;
@@ -13,9 +11,9 @@ import com.three.user.repository.UserRepository;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import com.three.common.utils.BeanCopyUtil;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.common.utils.StringUtil;
 import com.google.common.base.Preconditions;
 import com.three.user.vo.AuthTreeVo;

@@ -1,14 +1,12 @@
 package com.three.user.service;
 
 import com.google.common.base.Preconditions;
-import com.three.common.auth.SysAuthority;
 import com.three.common.auth.LoginUser;
 import com.three.common.auth.SysRole;
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.*;
 import com.three.user.param.UserParam;
-import com.three.user.repository.AuthorityRepository;
 import com.three.user.repository.RoleRepository;
 import com.three.user.repository.UserRepository;
 import com.three.user.vo.MenuVo;
@@ -17,7 +15,7 @@ import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.common.utils.BeanCopyUtil;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.common.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

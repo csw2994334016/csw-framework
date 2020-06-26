@@ -1,6 +1,6 @@
 package com.three.commonclient.utils;
 
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;

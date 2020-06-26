@@ -5,7 +5,7 @@ import com.three.common.log.LogAnnotation;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.develop.entity.QuartzJob;
 import com.three.develop.param.QuartzJobParam;
 import com.three.develop.service.QuartzJobService;
@@ -94,9 +94,9 @@ public class QuartzJobController {
     private TestService testService;
 
     @PostMapping("/test")
-    public JsonResult test(String name, String method) {
-        String re = (String) testService.test(name, method);
-        return JsonResult.ok("执行成功：" + re);
+    public JsonResult test(@RequestParam(required = true) String id, String sql) {
+
+        return testService.test(id, sql);
     }
 
 }

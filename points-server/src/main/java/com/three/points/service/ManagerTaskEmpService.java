@@ -1,17 +1,14 @@
 package com.three.points.service;
 
 import cn.hutool.core.date.DateUtil;
-import com.three.common.utils.DateUtils;
 import com.three.points.entity.ManagerTask;
 import com.three.points.entity.ManagerTaskEmp;
 import com.three.points.enums.ManagerTaskEnum;
 import com.three.points.repository.ManagerTaskEmpRepository;
-import com.three.points.param.ManagerTaskEmpParam;
 import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
 import com.three.points.repository.ManagerTaskRepository;
 import com.three.points.vo.ManagerTaskEmpVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;

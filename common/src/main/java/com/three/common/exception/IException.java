@@ -1,4 +1,4 @@
-package com.three.commonclient.exception;
+package com.three.common.exception;
 
 /**
  * 自定义异常基类

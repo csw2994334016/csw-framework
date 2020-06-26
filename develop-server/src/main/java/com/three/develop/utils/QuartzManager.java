@@ -1,6 +1,6 @@
 package com.three.develop.utils;
 
-import com.three.commonclient.exception.BusinessException;
+import com.three.common.exception.BusinessException;
 import com.three.develop.constants.Job;
 import com.three.develop.entity.QuartzJob;
 import com.three.develop.enums.JobStatusEnum;

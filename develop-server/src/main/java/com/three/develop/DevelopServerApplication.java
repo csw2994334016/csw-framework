@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableAsync
 @EnableSwagger2
 @EnableJpaRepositories("com.three.develop")
-@EntityScan("com.three.develop")
+@EntityScan("com.three.develop.entity")
 public class DevelopServerApplication {
 
     public static void main(String[] args) {

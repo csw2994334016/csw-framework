@@ -1,12 +1,11 @@
 package com.three.points.service;
 
 import com.three.common.enums.StatusEnum;
-import com.three.commonclient.exception.ParameterException;
+import com.three.common.exception.ParameterException;
 import com.three.points.entity.CustomGroupEmp;
 import com.three.points.entity.CustomReport;
 import com.three.points.entity.CustomReportGroup;
 import com.three.points.repository.CustomGroupEmpRepository;
-import com.three.points.repository.CustomGroupRepository;
 import com.three.points.repository.CustomReportGroupRepository;
 import com.three.points.repository.CustomReportRepository;
 import com.three.points.param.CustomReportParam;
@@ -14,7 +13,7 @@ import com.three.common.utils.BeanCopyUtil;
 import com.three.common.utils.StringUtil;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
-import com.three.commonclient.utils.BeanValidator;
+import com.three.common.utils.BeanValidator;
 import com.three.points.vo.CustomReportVo;
 import com.three.points.vo.ReportGroupVo;
 import com.three.resource_jpa.jpa.base.service.BaseService;

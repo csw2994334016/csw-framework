@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 @Configuration
 @ComponentScan("com.three.resource_jpa")
-@EnableJpaRepositories(basePackages = {"com.three.resource_jpa.jpa.script", "com.three.resource_jpa.jpa.file"})
-@EntityScan(basePackages = {"com.three.resource_jpa.jpa.script", "com.three.resource_jpa.jpa.file"})
+@EnableJpaRepositories(basePackages = {"com.three.resource_jpa.jpa.script", "com.three.resource_jpa.jpa.file", "com.three.resource_jpa.jpa.entity"})
+@EntityScan(basePackages = {"com.three.resource_jpa.jpa.script", "com.three.resource_jpa.jpa.file", "com.three.resource_jpa.jpa.entity"})
 public class ComponentScanConfig {
 }
