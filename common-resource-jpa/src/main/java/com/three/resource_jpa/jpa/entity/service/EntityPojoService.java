@@ -69,7 +69,6 @@ public class EntityPojoService extends BaseService<EntityPojo, String> {
             entityPojo.setStatus(code);
             entityPojoList.add(entityPojo);
         }
-
         entityPojoRepository.saveAll(entityPojoList);
     }
 
@@ -98,5 +97,16 @@ public class EntityPojoService extends BaseService<EntityPojo, String> {
         entityField = (EntityField) BeanCopyUtil.copyBean(entityFieldParam, entityField);
 
         entityFieldRepository.save(entityField);
+    }
+
+    @Transactional
+    public void deleteField(String ids) {
+        Set<String> idSet = StringUtil.getStrToIdSet1(ids);
+        List<EntityField> entityFieldList = new ArrayList<>();
+        for (String id : idSet) {
+            EntityField entityField = entityFieldRepository.findById(id).get();
+            entityFieldList.add(entityField);
+        }
+        entityFieldRepository.deleteAll(entityFieldList);
     }
 }

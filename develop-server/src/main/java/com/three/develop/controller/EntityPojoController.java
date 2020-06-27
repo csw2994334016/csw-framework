@@ -92,4 +92,13 @@ public class EntityPojoController {
         entityPojoService.saveField(entityFieldParam);
         return JsonResult.ok("实体字段保存成功");
     }
+
+    @LogAnnotation(module = "develop-server删除实体设置字段")
+    @ApiOperation(value = "develop-server删除实体设置字段")
+    @ApiImplicitParam(name = "ids", value = "实体设置字段信息ids", required = true, dataType = "String")
+    @DeleteMapping("/deleteField")
+    public JsonResult deleteField(@RequestParam(required = true) String ids) {
+        entityPojoService.deleteField(ids);
+        return JsonResult.ok("实体字段删除成功");
+    }
 }

@@ -22,6 +22,9 @@ public class EntityPojoParam {
     @ApiModelProperty("实体类名称")
     private String entityName; // 实体类名称
 
+    @ApiModelProperty("实体表名")
+    private String entityTableName; // 实体表名
+
     @NotBlank(message = "实体类包全名称不可以为空")
     @ApiModelProperty("实体类包全名称")
     private String entityPackageName; // 实体类包全名称
