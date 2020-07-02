@@ -1,9 +1,9 @@
 package com.three.resource_jpa.jpa.entity.service;
 
-import com.three.common.enums.StatusEnum;
 import com.three.common.utils.BeanValidator;
 import com.three.resource_jpa.jpa.entity.entity.EntityField;
 import com.three.resource_jpa.jpa.entity.entity.EntityPojo;
+import com.three.resource_jpa.jpa.entity.enums.MetaEnum;
 import com.three.resource_jpa.jpa.entity.param.EntityFieldParam;
 import com.three.resource_jpa.jpa.entity.repository.EntityFieldRepository;
 import com.three.resource_jpa.jpa.entity.repository.EntityPojoRepository;
@@ -108,5 +108,19 @@ public class EntityPojoService extends BaseService<EntityPojo, String> {
             entityFieldList.add(entityField);
         }
         entityFieldRepository.deleteAll(entityFieldList);
+    }
+
+    @Transactional
+    public void generateCode(String id) {
+
+        EntityPojo entityPojo = getEntityById(entityPojoRepository, id);
+        List<EntityField> entityFieldList = entityFieldRepository.findAllByEntityPojoId(entityPojo.getId());
+        if (MetaEnum.ENTITY.getCode() == entityPojo.getMetaFlag()) {
+
+        } else if (MetaEnum.POJO.getCode() == entityPojo.getMetaFlag()){
+
+        } else {
+
+        }
     }
 }

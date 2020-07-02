@@ -101,4 +101,13 @@ public class EntityPojoController {
         entityPojoService.deleteField(ids);
         return JsonResult.ok("实体字段删除成功");
     }
+
+    @LogAnnotation(module = "develop-server生成代码")
+    @ApiOperation(value = "develop-server生成代码")
+    @ApiImplicitParam(name = "id", value = "实体信息id", required = true, dataType = "String")
+    @DeleteMapping("/generateCode")
+    public JsonResult generateCode(@RequestParam(required = true) String id) {
+        entityPojoService.generateCode(id);
+        return JsonResult.ok("代码生成成功");
+    }
 }
