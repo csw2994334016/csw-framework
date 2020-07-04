@@ -37,7 +37,6 @@ public class EntityFieldParam {
     @ApiModelProperty("是否空值：1=可空；0=不可空")
     private Integer nullFlag; // 是否空值：1=可空；0=不可空
 
-    @NotNull(message = "长度不可以为空")
     @ApiModelProperty("长度")
     private Integer columnLength; // 长度
 

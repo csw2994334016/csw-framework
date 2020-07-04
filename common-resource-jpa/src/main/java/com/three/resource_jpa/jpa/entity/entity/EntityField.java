@@ -51,7 +51,7 @@ public class EntityField implements Serializable {
 
     @Column(name = "null_flag", columnDefinition = "int(1) default 1 comment '是否空值：1=可空；0=不可空'")
     @ApiModelProperty("是否空值：1=可空；0=不可空")
-    private Integer nullFlag; // 是否空值：1=可空；0=不可空
+    private Integer nullFlag = 1; // 是否空值：1=可空；0=不可空
 
     @Column(name = "column_length", columnDefinition = "int(11) comment '长度'")
     @ApiModelProperty("长度")
@@ -60,6 +60,10 @@ public class EntityField implements Serializable {
     @Column(name = "column_comment", columnDefinition = "varchar(255) comment '描述'")
     @ApiModelProperty("描述")
     private String columnComment; // 描述
+
+    @Column(name = "default_value", columnDefinition = "int(11) comment '默认值'")
+    @ApiModelProperty("默认值")
+    private Integer defaultValue; // 默认值
 
     @Column(nullable = false, columnDefinition = "int(2) default 1 comment '记录状态：1=正常；2=锁定；3=删除'")
     @ApiModelProperty("记录状态：1=正常；2=锁定；3=删除")

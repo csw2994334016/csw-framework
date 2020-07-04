@@ -105,9 +105,16 @@ public class EntityPojoController {
     @LogAnnotation(module = "develop-server生成代码")
     @ApiOperation(value = "develop-server生成代码")
     @ApiImplicitParam(name = "id", value = "实体信息id", required = true, dataType = "String")
-    @DeleteMapping("/generateCode")
+    @PutMapping("/generateCode")
     public JsonResult generateCode(@RequestParam(required = true) String id) {
         entityPojoService.generateCode(id);
         return JsonResult.ok("代码生成成功");
+    }
+
+    @ApiOperation(value = "develop-server查看代码")
+    @ApiImplicitParam(name = "id", value = "实体信息id", required = true, dataType = "String")
+    @GetMapping("/findCode")
+    public JsonData<EntityPojo> findCode(@RequestParam(required = true) String id) {
+        return new JsonData<>(entityPojoService.findCode(id));
     }
 }

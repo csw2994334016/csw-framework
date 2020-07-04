@@ -11,4 +11,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EntityPojoRepository extends BaseRepository<EntityPojo, String> {
 
+    int countByEntityNameAndStatus(String entityName, int code);
+
+    int countByEntityTableNameAndStatus(String entityTableName, int code);
+
+    int countByEntityNameAndStatusAndIdNot(String entityName, int code, String id);
+
+    int countByEntityTableNameAndStatusAndIdNot(String entityTableName, int code, String id);
 }

@@ -14,4 +14,8 @@ import java.util.List;
 public interface EntityFieldRepository extends BaseRepository<EntityField, String> {
 
     List<EntityField> findAllByEntityPojoId(String entityPojoId);
+
+    int countByColumnNameAndIdNot(String columnName, String id);
+
+    int countByColumnName(String columnName);
 }

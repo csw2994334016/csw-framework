@@ -54,9 +54,9 @@ public class EntityPojo implements Serializable {
     @ApiModelProperty("版本")
     private Integer version = 1; // 版本
 
-    @Column(name = "meta_flag", nullable = false, columnDefinition = "int(1) comment '实体标记：1=实体；0=虚拟实体'")
+    @Column(name = "meta_flag", nullable = false, columnDefinition = "int(1) default 1 comment '实体标记：1=实体；0=虚拟实体'")
     @ApiModelProperty("实体标记：1=实体；0=虚拟实体")
-    private Integer metaFlag; // 实体标记：1=实体；0=虚拟实体
+    private Integer metaFlag = 1; // 实体标记：1=实体；0=虚拟实体
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
