@@ -4,6 +4,7 @@ import com.three.common.enums.StatusEnum;
 import com.three.common.exception.BusinessException;
 import com.three.common.exception.ParameterException;
 import com.three.common.utils.BeanValidator;
+import com.three.resource_jpa.jpa.base.service.PojoService;
 import com.three.resource_jpa.jpa.entity.entity.EntityField;
 import com.three.resource_jpa.jpa.entity.entity.EntityPojo;
 import com.three.resource_jpa.jpa.entity.enums.MetaEnum;
@@ -44,6 +45,9 @@ public class EntityPojoService extends BaseService<EntityPojo, String> {
 
     @Autowired
     private EntityFieldRepository entityFieldRepository;
+
+    @Autowired
+    private PojoService pojoService;
 
     @Transactional
     public void create(EntityPojoParam entityPojoParam) {
@@ -178,6 +182,10 @@ public class EntityPojoService extends BaseService<EntityPojo, String> {
             }
         }
 
+        EntityPojo entityPojo = findById(entityFieldParam.getEntityPojoId());
+        entityPojo.setVersion(entityPojo.getVersion() + 1);
+        entityPojoRepository.save(entityPojo);
+
         EntityField entityField = new EntityField();
         entityField = (EntityField) BeanCopyUtil.copyBean(entityFieldParam, entityField);
 
@@ -234,14 +242,16 @@ public class EntityPojoService extends BaseService<EntityPojo, String> {
         String code;
         if (MetaEnum.ENTITY.getCode() == entityPojo.getMetaFlag()) {
             code = EntityGenUtil.generateCode(genConfig, columnInfoList, "Entity");
-            // 更新数据库Schema
+            // 添加Entity class、更新数据库Schema
+            pojoService.addEntity(entityPojo.getEntityPackageName(), code, entityPojo.getVersion());
         } else if (MetaEnum.POJO.getCode() == entityPojo.getMetaFlag()) {
             code = EntityGenUtil.generateCode(genConfig, columnInfoList, "Pojo");
+            // 添加Pojo class
+            pojoService.addPojo(entityPojo.getEntityPackageName(), code, entityPojo.getVersion());
         } else {
             throw new BusinessException("该方法只能生成实体或者虚拟实体的Java代码");
         }
         entityPojo.setEntityCode(code);
-        entityPojo.setVersion(entityPojo.getVersion() + 1);
         entityPojoRepository.save(entityPojo);
     }
 
