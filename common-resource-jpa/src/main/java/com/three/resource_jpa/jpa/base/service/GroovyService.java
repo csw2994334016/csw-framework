@@ -1,6 +1,7 @@
 package com.three.resource_jpa.jpa.base.service;
 
 import com.google.common.base.Preconditions;
+import com.three.common.enums.StatusEnum;
 import com.three.resource_jpa.jpa.script.entity.Script;
 import com.three.resource_jpa.jpa.script.repository.ScriptRepository;
 import groovy.lang.GroovyClassLoader;
@@ -26,9 +27,9 @@ public class GroovyService {
     private ScriptRepository scriptRepository;
 
     private Script getScriptByName(String name) {
-        Preconditions.checkNotNull(name, "查找脚本，name不可以为：" + name);
-        Script script = scriptRepository.findByName(name);
-        Preconditions.checkNotNull(script, "查找脚本（name：" + name + ")不存在");
+        Preconditions.checkNotNull(name, "查找脚本，脚本名称不可以为：" + name);
+        Script script = scriptRepository.findByScriptNameAndStatus(name, StatusEnum.OK.getCode());
+        Preconditions.checkNotNull(script, "查找脚本（脚本名称：" + name + ")不存在");
         return script;
     }
 
@@ -46,7 +47,7 @@ public class GroovyService {
         Script script = getScriptByName(scriptName);
 
         try {
-            Class clazz = getClass(scriptName, script.getCode(), script.getVersion());
+            Class clazz = getClass(scriptName, script.getScriptCode(), script.getVersion());
             GroovyObject instance = (GroovyObject) clazz.newInstance();
 
             try {
@@ -72,12 +73,12 @@ public class GroovyService {
         }
     }
 
-    private Class getClass(String scriptName, String code, String version) {
+    private Class getClass(String scriptName, String code, Integer version) {
         addClass(scriptName, code, version);
         return groovyClassCache.get(scriptName);
     }
 
-    private void addClass(String scriptName, String code, String version) {
+    private void addClass(String scriptName, String code, Integer version) {
         String currentKey = generateKey(scriptName, version);
         if (groovyClassCache.get(currentKey) == null) {
             GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
@@ -87,7 +88,7 @@ public class GroovyService {
         }
     }
 
-    private String generateKey(String scriptName, String version) {
+    private String generateKey(String scriptName, Integer version) {
         return generateKeyPrefix(scriptName) + version;
     }
 

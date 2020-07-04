@@ -9,7 +9,11 @@ import org.springframework.stereotype.Repository;
  * Description:
  */
 @Repository
-public interface ScriptRepository extends BaseRepository<Script, Long> {
+public interface ScriptRepository extends BaseRepository<Script, String> {
 
-    Script findByName(String name);
+    Script findByScriptNameAndStatus(String name, int code);
+
+    int countByScriptNameAndStatus(String scriptName, int code);
+
+    int countByScriptNameAndStatusAndIdNot(String scriptName, int code, String id);
 }

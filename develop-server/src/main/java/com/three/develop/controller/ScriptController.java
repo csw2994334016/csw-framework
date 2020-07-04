@@ -2,6 +2,7 @@ package com.three.develop.controller;
 
 import com.three.common.enums.StatusEnum;
 import com.three.common.log.LogAnnotation;
+import com.three.common.vo.JsonData;
 import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
@@ -60,9 +61,27 @@ public class ScriptController {
     })
     @GetMapping("/query")
     public PageResult<Script> query(Integer page, Integer limit, String searchValue) {
-        PageQuery pageQuery = new PageQuery(page, limit);
-        BeanValidator.check(pageQuery);
-        return scriptService.query(pageQuery, StatusEnum.OK.getCode(), searchValue);
+        if (page != null && limit != null) {
+            return scriptService.query(new PageQuery(page, limit), StatusEnum.OK.getCode(), searchValue);
+        } else {
+            return scriptService.query(null, StatusEnum.OK.getCode(), searchValue);
+        }
+    }
+
+    @ApiOperation(value = "develop-server查看脚本代码")
+    @ApiImplicitParam(name = "id", value = "脚本信息id", required = true, dataType = "String")
+    @GetMapping("/findCode")
+    public JsonData<Script> findCode(@RequestParam(required = true) String id) {
+        return new JsonData<>(scriptService.findCode(id));
+    }
+
+    @LogAnnotation(module = "develop-server保存脚本代码")
+    @ApiOperation(value = "develop-server保存脚本代码")
+    @ApiImplicitParam(name = "scriptParam", value = "develop-server脚本信息", required = true, dataType = "ScriptParam")
+    @PutMapping("/saveCode")
+    public JsonResult saveCode(@RequestBody ScriptParam scriptParam) {
+        scriptService.saveCode(scriptParam);
+        return JsonResult.ok("保存成功");
     }
 
 }
