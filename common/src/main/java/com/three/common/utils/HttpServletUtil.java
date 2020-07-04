@@ -6,6 +6,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by csw on 2019/03/22.
@@ -61,5 +63,16 @@ public class HttpServletUtil {
      */
     public static Integer getParameterInt(String param, Integer defaultValue) {
         return Integer.valueOf(getParameter(param, String.valueOf(defaultValue)));
+    }
+
+    public static Map<Object, Object> getParamMap() {
+        Map<Object, Object> map = new HashMap<>();
+        Map<String, String[]> parameterMap = getRequest().getParameterMap();
+        if (parameterMap != null && parameterMap.size() > 0) {
+            for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+                map.put(entry.getKey(), entry.getValue()[0]);
+            }
+        }
+        return map;
     }
 }

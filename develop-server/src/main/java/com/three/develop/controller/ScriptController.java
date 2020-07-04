@@ -7,6 +7,7 @@ import com.three.common.vo.JsonResult;
 import com.three.common.vo.PageQuery;
 import com.three.common.vo.PageResult;
 import com.three.common.utils.BeanValidator;
+import com.three.resource_jpa.jpa.base.service.DataApiServiceExecutor;
 import com.three.resource_jpa.jpa.script.entity.Script;
 import com.three.resource_jpa.jpa.script.param.ScriptParam;
 import com.three.resource_jpa.jpa.script.service.ScriptService;
@@ -16,6 +17,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Api(value = "脚本管理", tags = "脚本管理")

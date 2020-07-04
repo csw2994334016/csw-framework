@@ -41,6 +41,11 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
                 if (configAttribute.getAttribute().trim().equals(ga.getAuthority())) {
                     return;
                 }
+                if (ga.getAuthority().equals("post:/dataApi/{scriptName}")) {
+                    if (configAttribute.getAttribute().trim().startsWith("post:/dataApi/")) {
+                        return;
+                    }
+                }
             }
         }
         throw new AccessDeniedException("对不起！您没有访问权限！");
