@@ -47,8 +47,8 @@ public class DynamicQueryService {
                 }
             }
             if (params.get("page") != null && params.get("limit") != null) {
-                int pageNumber = (int) params.get("page");
-                int pageSize = (int) params.get("limit");
+                int pageNumber = Integer.valueOf(params.get("page").toString());
+                int pageSize = Integer.valueOf(params.get("limit").toString());
                 int startPosition = (pageNumber - 1) * pageSize;
                 query.setFirstResult(startPosition).setMaxResults(pageSize);
             }
