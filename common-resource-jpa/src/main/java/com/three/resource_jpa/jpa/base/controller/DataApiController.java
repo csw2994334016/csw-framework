@@ -23,6 +23,6 @@ public class DataApiController {
     @PostMapping("/dataApi/{scriptName}")
     public JsonResult execute(@PathVariable(name = "scriptName", required = true) String scriptName) {
         Map<Object, Object> params = HttpServletUtil.getParamMap();
-        return dataApiServiceExecutor.submitRequest(params, scriptName);
+        return dataApiServiceExecutor.submitRequest(scriptName, params);
     }
 }

@@ -12,11 +12,11 @@ public class DataApiServiceExecutor {
     @Autowired
     private GroovyService groovyService;
 
-    public JsonResult submitRequest(Map<Object, Object> params, String scriptName) {
+    public JsonResult submitRequest(String scriptName, Map<Object, Object> params) {
         JsonResult jsonResult = JsonResult.ok();
 
-        Object object = groovyService.exec(scriptName, "execute", params);
+        Object result = groovyService.exec(scriptName, params);
 
-        return jsonResult.put("data", object);
+        return jsonResult.put("data", result);
     }
 }

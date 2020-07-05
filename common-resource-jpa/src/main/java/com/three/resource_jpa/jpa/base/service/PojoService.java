@@ -56,7 +56,6 @@ public class PojoService {
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
         StandardServiceRegistry serviceRegistry = sessionFactory.getSessionFactoryOptions().getServiceRegistry();
         MetadataSources metadataSources = new MetadataSources(serviceRegistry);
-        sessionFactory.getSessionFactoryOptions();
         // 添加注解实体类
         metadataSources.addAnnotatedClass(clazz);
         Thread.currentThread().setContextClassLoader(clazz.getClassLoader());
@@ -78,7 +77,7 @@ public class PojoService {
         pojoVersionMap.remove(className);
     }
 
-    private Class getPojo(String className) {
+    public Class getPojo(String className) {
         try {
             return groovyClassLoader.loadClass(className);
         } catch (ClassNotFoundException e) {

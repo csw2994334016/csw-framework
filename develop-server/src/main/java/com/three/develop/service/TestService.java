@@ -37,8 +37,8 @@ public class TestService {
 //        Class clazz = pojoService.getPojo(entityPojo.getEntityPackageName());
 
 
-        List resultList = dynamicQueryService.nativeQueryPagingListModel(sql);
+//        List resultList = dynamicQueryService.nativeQueryListMap(sql);
 
-        return JsonResult.ok("执行成功").put("data", resultList);
+        return JsonResult.ok("执行成功").put("data", null);
     }
 }

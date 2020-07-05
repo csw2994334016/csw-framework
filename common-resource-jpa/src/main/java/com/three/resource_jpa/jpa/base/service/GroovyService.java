@@ -6,11 +6,11 @@ import com.three.common.exception.BusinessException;
 import com.three.resource_jpa.jpa.script.entity.Script;
 import com.three.resource_jpa.jpa.script.repository.ScriptRepository;
 import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,11 +41,10 @@ public class GroovyService {
      * 用于调用指定Groovy脚本中的指定方法
      *
      * @param scriptName 脚本名称
-     * @param methodName 方法名称
      * @param params     方法参数
      * @return Object       方法返回值
      */
-    public Object exec(String scriptName, String methodName, Map<Object, Object> params) {
+    public Object exec(String scriptName, Map<Object, Object> params) {
         Object res;
 
         Script script = getScriptByName(scriptName);
@@ -58,12 +57,7 @@ public class GroovyService {
                 throw new BusinessException("脚本没有实现DataApiService接口");
             }
 
-            try {
-                res = dataApiService.execute(params);
-            } catch (Exception e) {
-                log.error("执行方法[{}]出现异常：{}", methodName, e.getMessage());
-                throw new RuntimeException("方法[" + methodName + "]出现异常：" + e.getMessage());
-            }
+            res = dataApiService.execute(params);
 
         } catch (Exception e1) {
             log.error("执行脚本[{}]出现异常：{}", scriptName, e1.getMessage());
