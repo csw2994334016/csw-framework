@@ -58,7 +58,7 @@ public class ExecutionJob extends QuartzJobBean {
                 logger.info("定时任务[{}]在SpringContextHolder中不存在：{}，继续查找groovy脚本执行任务", quartzJob.getJobName(), e.getMessage());
                 log.setMessage("定时任务[" + quartzJob.getJobName() + "]在SpringContextHolder中不存在：" + e.getMessage() + "，继续查找groovy脚本执行任务");
                 GroovyService groovyService = (GroovyService) SpringContextHolder.getBean("groovyService");
-                groovyService.exec(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
+                groovyService.exec(quartzJob.getBeanName(), quartzJob.getMethodName(), null);
                 excFlag = true;
             }
             if (!excFlag) {
