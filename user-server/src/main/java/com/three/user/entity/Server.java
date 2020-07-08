@@ -1,4 +1,4 @@
-package ${package}.entity;
+package com.three.user.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -11,54 +11,39 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.util.Date;
-<#if hasTimestamp>
-import java.sql.Timestamp;
-</#if>
-<#if hasBigDecimal>
-import java.math.BigDecimal;
-</#if>
 
 /**
- * Created by ${author} on ${date}.
- * Description: ${menuName}
+ * Created by csw on 2020-07-06.
+ * Description: 服务信息
  */
 
 @Getter
 @Setter
 @Entity
-@Table(name = "${tableName}")
+@Table(name = "sys_server")
 @EntityListeners(AuditingEntityListener.class)
-public class ${className} implements Serializable {
-<#if columns??>
+public class Server implements Serializable {
 
-    <#if strategy = 'IDENTITY'>
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    </#if>
-    <#if strategy = 'GUID'>
     @Id
     @GeneratedValue(generator = "system-guid")
     @GenericGenerator(name = "system-guid", strategy = "guid")
     @Column(name = "id", columnDefinition = "varchar(36) comment '主键ID'")
     @ApiModelProperty("主键ID")
     private String id;
-    </#if>
 
 
-    <#list columns as column>
-        <#if column.columnName != 'id'>
-            <#if column.columnKey = 'text'>
-    @Lob
-            </#if>
-            <#if column.columnKey = 'UNI' || column.isNullable == false || column.changeColumnType??>
-    @Column(name = "${column.changeColumnName}"<#if column.columnKey = 'UNI'>, unique = true</#if><#if column.isNullable == false>, nullable = false</#if><#if column.columnKey = 'text'>, columnDefinition = "text comment '${column.columnComment}'"</#if><#if column.changeColumnType?? && column.columnKey != 'text'>, columnDefinition = "${column.changeColumnType}<#if column.columnLength??>(${column.columnLength})</#if> comment '${column.columnComment}'"</#if>)
-            </#if>
-    @ApiModelProperty("${column.columnComment}")
-    private ${column.columnType} ${column.columnName};
+    @Column(name = "server_id", unique = true, nullable = false, columnDefinition = "varchar(50) comment '服务ID'")
+    @ApiModelProperty("服务ID")
+    private String serverId;
 
-        </#if>
-    </#list>
+    @Column(name = "server_name", nullable = false, columnDefinition = "varchar(255) comment '服务名称'")
+    @ApiModelProperty("服务名称")
+    private String serverName;
+
+    @Column(name = "server_type", nullable = false, columnDefinition = "int(2) default 1 comment '服务类型：1=业务服务；2=基础服务'")
+    @ApiModelProperty("服务类型：1=业务服务；2=基础服务")
+    private Integer serverType = 1;
+
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
     @ApiModelProperty("描述/备注")
@@ -75,7 +60,6 @@ public class ${className} implements Serializable {
     @LastModifiedDate
     @ApiModelProperty("修改时间")
     private Date updateDate;
-</#if>
 
 
 }

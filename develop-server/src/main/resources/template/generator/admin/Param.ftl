@@ -32,7 +32,7 @@ public class ${className}Param {
                 </#if>
             </#if>
     @ApiModelProperty("${column.columnComment}")
-    private ${column.columnType} ${column.columnName};<#if column.columnComment != ''> // ${column.columnComment}</#if>
+    private ${column.columnType} ${column.columnName};
         </#if>
 
     </#list>
@@ -40,6 +40,6 @@ public class ${className}Param {
 
     @Size(max = 500, message = "描述/备注不超过500个字")
     @ApiModelProperty("描述/备注(不超过500个字)")
-    private String remark; // 描述/备注
+    private String remark;
 
 }
