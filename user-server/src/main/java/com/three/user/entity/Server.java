@@ -8,7 +8,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -43,6 +45,10 @@ public class Server implements Serializable {
     @Column(name = "server_type", nullable = false, columnDefinition = "int(2) default 1 comment '服务类型：1=业务服务；2=基础服务'")
     @ApiModelProperty("服务类型：1=业务服务；2=基础服务")
     private Integer serverType = 1;
+
+    @Column(name = "package_pre", columnDefinition = "varchar(255) comment '包名前缀'")
+    @ApiModelProperty("包名前缀")
+    private String packagePre;
 
 
     @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")

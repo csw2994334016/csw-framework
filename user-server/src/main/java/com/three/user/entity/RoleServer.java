@@ -20,9 +20,9 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "sys_server")
+@Table(name = "sys_role_server")
 @EntityListeners(AuditingEntityListener.class)
-public class UserServer implements Serializable {
+public class RoleServer implements Serializable {
 
     @Id
     @GeneratedValue(generator = "system-guid")
@@ -31,32 +31,13 @@ public class UserServer implements Serializable {
     @ApiModelProperty("主键ID")
     private String id;
 
-    @Column(name = "server_id", nullable = false, columnDefinition = "varchar(36) comment '用户ID'")
-    @ApiModelProperty("用户ID")
-    private String userId;
+    @Column(name = "role_id", nullable = false, columnDefinition = "varchar(36) comment '角色ID'")
+    @ApiModelProperty("角色ID")
+    private String roleId;
 
     @Column(name = "server_id", nullable = false, columnDefinition = "varchar(36) comment '服务ID'")
     @ApiModelProperty("服务ID")
     private String serverId;
-
-
-
-    @Column(name = "server_name", nullable = false, columnDefinition = "varchar(255) comment '服务名称'")
-    @ApiModelProperty("服务名称")
-    private String serverName;
-
-    @Column(name = "server_type", nullable = false, columnDefinition = "int(2) default 1 comment '服务类型：1=业务服务；2=基础服务'")
-    @ApiModelProperty("服务类型：1=业务服务；2=基础服务")
-    private Integer serverType = 1;
-
-
-    @Column(name = "remark", columnDefinition = "varchar(500) comment '描述/备注'")
-    @ApiModelProperty("描述/备注")
-    private String remark;
-
-    @Column(name = "status", nullable = false, columnDefinition = "int(2) default 1 comment '记录状态：1=正常；2=锁定；3=删除'")
-    @ApiModelProperty("记录状态：1=正常；2=锁定；3=删除")
-    private Integer status = 1;
 
     @CreatedDate
     @ApiModelProperty("创建时间")
