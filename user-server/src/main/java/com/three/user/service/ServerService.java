@@ -74,7 +74,9 @@ public class ServerService extends BaseService<Server, String> {
             if (StringUtil.isNotBlank(searchValue)) {
                 List<Predicate> predicateList1 = new ArrayList<>();
                 Predicate p1 = criteriaBuilder.like(root.get("serverName"), "%" + searchValue + "%");
+                Predicate p2 = criteriaBuilder.equal(root.get("serverType"), 1);
                 predicateList1.add(criteriaBuilder.or(p1));
+                predicateList1.add(criteriaBuilder.and(p2));
                 Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
                 return criteriaQuery.where(predicate, predicate1).getRestriction();
             }
