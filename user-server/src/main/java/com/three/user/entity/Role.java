@@ -90,6 +90,9 @@ public class Role implements Serializable {
     @JsonIgnore
     private Set<Authority> authorities = new HashSet<>(0);
 
+    @Transient
+    private Set<String> serverIds = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

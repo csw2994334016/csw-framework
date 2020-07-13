@@ -26,6 +26,10 @@ public class ServerParam {
     @ApiModelProperty("服务名称")
     private String serverName;
 
+    @NotBlank(message = "包名前缀不可以为空")
+    @ApiModelProperty("包名前缀")
+    private String packagePre;
+
 
     @Size(max = 500, message = "描述/备注不超过500个字")
     @ApiModelProperty("描述/备注(不超过500个字)")

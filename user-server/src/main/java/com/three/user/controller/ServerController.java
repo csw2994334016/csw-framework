@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * Description:
  */
 
-@Api(value = "服务信息", tags = "服务信息")
+@Api(value = "服务管理", tags = "服务管理")
 @RestController
 @RequestMapping("/sys/service")
 public class ServerController {

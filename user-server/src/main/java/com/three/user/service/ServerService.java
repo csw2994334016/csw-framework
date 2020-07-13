@@ -69,18 +69,13 @@ public class ServerService extends BaseService<Server, String> {
         String firstOrganizationId = LoginUserUtil.getLoginUserFirstOrganizationId();
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         Specification<Server> specification = (root, criteriaQuery, criteriaBuilder) -> {
-            Specification<Server> codeAndOrganizationSpec = getCodeAndOrganizationSpec(code, firstOrganizationId);
+            Specification<Server> codeAndOrganizationSpec = getCodeAndSearchKeySpec(code, "serverName", searchValue);
+            List<Predicate> predicateList1 = new ArrayList<>();
             Predicate predicate = codeAndOrganizationSpec.toPredicate(root, criteriaQuery, criteriaBuilder);
-            if (StringUtil.isNotBlank(searchValue)) {
-                List<Predicate> predicateList1 = new ArrayList<>();
-                Predicate p1 = criteriaBuilder.like(root.get("serverName"), "%" + searchValue + "%");
-                Predicate p2 = criteriaBuilder.equal(root.get("serverType"), 1);
-                predicateList1.add(criteriaBuilder.or(p1));
-                predicateList1.add(criteriaBuilder.and(p2));
-                Predicate predicate1 = criteriaBuilder.or(predicateList1.toArray(new Predicate[0]));
-                return criteriaQuery.where(predicate, predicate1).getRestriction();
-            }
-            return predicate;
+            Predicate p2 = criteriaBuilder.equal(root.get("serverType"), 1);
+            predicateList1.add(criteriaBuilder.and(p2));
+            Predicate predicate1 = criteriaBuilder.and(predicateList1.toArray(new Predicate[0]));
+            return criteriaQuery.where(predicate, predicate1).getRestriction();
         };
         if (page != null && limit != null) {
             return query(serverRepository, new PageQuery(page, limit), sort, specification);

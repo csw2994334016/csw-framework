@@ -3,10 +3,12 @@ package com.three.user.service;
 import com.three.common.exception.ParameterException;
 import com.three.user.entity.Authority;
 import com.three.user.entity.Role;
+import com.three.user.entity.RoleServer;
 import com.three.user.entity.User;
 import com.three.user.param.RoleParam;
 import com.three.user.repository.AuthorityRepository;
 import com.three.user.repository.RoleRepository;
+import com.three.user.repository.RoleServerRepository;
 import com.three.user.repository.UserRepository;
 import com.three.resource_jpa.jpa.base.service.BaseService;
 import com.three.common.vo.PageQuery;
@@ -41,9 +43,19 @@ public class RoleService extends BaseService<Role, String> {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleServerRepository roleServerRepository;
+
     public PageResult<Role> query(PageQuery pageQuery, int code, String searchKey, String searchValue) {
         Sort sort = new Sort(Sort.Direction.ASC, "createDate");
-        return query(roleRepository, pageQuery, sort, code, searchKey, searchValue);
+        PageResult<Role> pageResult = query(roleRepository, pageQuery, sort, code, searchKey, searchValue);
+        for (Role role : pageResult.getData()) {
+            List<RoleServer> roleServerList = roleServerRepository.findAllByRoleId(role.getId());
+            roleServerList.forEach(e -> {
+                role.getServerIds().add(e.getServerId());
+            });
+        }
+        return pageResult;
     }
 
     public List<Role> findAll(int code) {
@@ -205,8 +217,25 @@ public class RoleService extends BaseService<Role, String> {
         userRepository.saveAll(userSet);
     }
 
+    @Transactional
+    public void assignRoleServer(String roleId, String serverIds) {
+        Role role = getEntityById(roleRepository, roleId);
+        Set<String> serverIdSet = StringUtil.getStrToIdSet1(serverIds);
+
+        List<RoleServer> roleServerList = roleServerRepository.findAllByRoleId(role.getId());
+        roleServerRepository.deleteAll(roleServerList);
+
+        List<RoleServer> roleServerList1 = new ArrayList<>();
+        for (String serverId : serverIdSet) {
+            RoleServer roleServer = new RoleServer();
+            roleServer.setRoleId(role.getId());
+            roleServer.setServerId(serverId);
+            roleServerList1.add(roleServer);
+        }
+        roleServerRepository.saveAll(roleServerList1);
+    }
+
     public Role getEntityById(String roleId) {
         return getEntityById(roleRepository, roleId);
     }
-
 }

@@ -27,14 +27,14 @@ public class PageResult<T> {
         this.data = rows;
         this.count = rows.size();
         this.code = 200;
-        this.msg = "";
+        this.msg = "操作成功";
     }
 
     public PageResult(long total, List<T> rows) {
         this.count = total;
         this.data = rows;
         this.code = 200;
-        this.msg = "";
+        this.msg = "操作成功";
     }
 
     public int getCode() {

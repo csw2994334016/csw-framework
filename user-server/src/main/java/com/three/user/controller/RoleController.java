@@ -113,9 +113,21 @@ public class RoleController {
             @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataType = "String"),
             @ApiImplicitParam(name = "userIds", value = "用户ids", dataType = "String")
     })
-    @PutMapping("/assignRoleUser")
+    @GetMapping("/assignRoleUser")
     public JsonResult assignRoleUser(String roleId, String userIds) {
         roleService.assignRoleUser(roleId, userIds);
+        return JsonResult.ok();
+    }
+
+    @LogAnnotation(module = "角色绑定服务")
+    @ApiOperation(value = "角色绑定服务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "serverIds", value = "服务ids", dataType = "String")
+    })
+    @GetMapping("/assignRoleServer")
+    public JsonResult assignRoleServer(String roleId, String serverIds) {
+        roleService.assignRoleServer(roleId, serverIds);
         return JsonResult.ok();
     }
 }
