@@ -238,4 +238,8 @@ public class RoleService extends BaseService<Role, String> {
     public Role getEntityById(String roleId) {
         return getEntityById(roleRepository, roleId);
     }
+
+    public List<RoleServer> findAllByRoleId(String roleId) {
+        return roleServerRepository.findAllByRoleId(roleId);
+    }
 }

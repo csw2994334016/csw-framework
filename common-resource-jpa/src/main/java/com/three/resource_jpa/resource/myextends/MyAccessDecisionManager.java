@@ -33,7 +33,10 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 
         // 对authentication进行判断，必须是登录用户
         LoginUser loginUser = LoginUserUtil.getLoginUser();
-        if (loginUser != null && AdminEnum.YES.getCode() == loginUser.getIsAdmin()) { // 用户是超级管理员
+        if (loginUser == null) {
+            throw new AccessDeniedException("对不起！您没有登录！");
+        }
+        if (AdminEnum.YES.getCode() == loginUser.getIsAdmin()) { // 用户是超级管理员
             return;
         }
         for (ConfigAttribute configAttribute : configAttributes) { // 本次访问需要的权限，进行逐个验证，是否在认证用户的权限列表里
@@ -41,9 +44,31 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
                 if (configAttribute.getAttribute().trim().equals(ga.getAuthority())) {
                     return;
                 }
+                // dataApi
                 if (ga.getAuthority().equals("post:/dataApi/{scriptName}")) {
                     if (configAttribute.getAttribute().trim().startsWith("post:/dataApi/")) {
                         return;
+                    }
+                }
+                String[] strings = ga.getAuthority().split("/");
+                if (strings.length >= 3) {
+                    // entityPojo
+                    if (strings[2].equals("entityPojo") && strings[1].equals("{serverId}")) {
+                        String[] strings1 = configAttribute.getAttribute().trim().split("/");
+                        if (strings1.length == strings.length) {
+                            if (strings1[2].equals("entityPojo") && loginUser.getServerIdSet().contains(strings1[1])) {
+                                return;
+                            }
+                        }
+                    }
+                    // scripts
+                    if (strings[2].equals("scripts") && strings[1].equals("{serverId}")) {
+                        String[] strings1 = configAttribute.getAttribute().trim().split("/");
+                        if (strings1.length == strings.length) {
+                            if (strings1[2].equals("scripts") && loginUser.getServerIdSet().contains(strings1[1])) {
+                                return;
+                            }
+                        }
                     }
                 }
             }

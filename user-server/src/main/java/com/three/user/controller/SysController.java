@@ -9,10 +9,7 @@ import com.three.common.vo.PageResult;
 import com.three.resource_jpa.resource.utils.LoginUserUtil;
 import com.three.user.entity.*;
 import com.three.user.repository.AuthorityRepository;
-import com.three.user.service.EmployeeService;
-import com.three.user.service.OrganizationService;
-import com.three.user.service.RedisService;
-import com.three.user.service.UserService;
+import com.three.user.service.*;
 import com.three.common.vo.JsonResult;
 import com.three.user.vo.MenuVo;
 import io.swagger.annotations.Api;
@@ -48,6 +45,12 @@ public class SysController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private ServerService serverService;
 
     @ApiOperation(value = "获取个人信息")
     @GetMapping("/sys/userInfo")
@@ -109,6 +112,11 @@ public class SysController {
                 SysAuthority sysAuthority = new SysAuthority();
                 sysAuthority = (SysAuthority) BeanCopyUtil.copyBean(authority, sysAuthority);
                 loginUser.getSysAuthorities().add(sysAuthority);
+            }
+            // 查找服务
+            List<RoleServer> roleServerList = roleService.findAllByRoleId(role.getId());
+            for (RoleServer roleServer : roleServerList) {
+                loginUser.getServerIdSet().add(serverService.findById(roleServer.getServerId()).getServerId());
             }
         }
 

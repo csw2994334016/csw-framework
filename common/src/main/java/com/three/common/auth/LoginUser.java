@@ -38,6 +38,8 @@ public class LoginUser {
 
     private SysEmployee sysEmployee;
 
+    private Set<String> serverIdSet = new HashSet<>();
+
     public LoginUser() {
     }
 

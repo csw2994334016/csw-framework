@@ -51,6 +51,8 @@ public class SysUser implements UserDetails {
 
     private SysEmployee sysEmployee;
 
+    private Set<String> serverIdSet;
+
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

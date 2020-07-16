@@ -31,6 +31,8 @@ public class SysUserService {
 
         sysUser.setSysEmployee(loginUser.getSysEmployee());
 
+        sysUser.setServerIdSet(loginUser.getServerIdSet());
+
         return sysUser;
     }
 
