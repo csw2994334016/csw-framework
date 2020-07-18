@@ -3,7 +3,7 @@ package com.three.develop.utils;
 import com.three.common.enums.LogEnum;
 import com.three.commonclient.utils.SpringContextHolder;
 import com.three.common.utils.ThrowableUtil;
-import com.three.resource_jpa.jpa.base.service.GroovyService;
+import com.three.resource_jpa.jpa.base.service.DataApiServiceExecutor;
 import com.three.develop.constants.Job;
 import com.three.develop.entity.QuartzJob;
 import com.three.develop.entity.QuartzJobLog;
@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -47,7 +48,6 @@ public class ExecutionJob extends QuartzJobBean {
         log.setCronExpression(quartzJob.getCronExpression());
         try {
             // 执行任务
-            boolean excFlag = false;
             logger.info("任务准备执行：{}", quartzJob.getJobName());
             try {
                 QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
@@ -57,14 +57,8 @@ public class ExecutionJob extends QuartzJobBean {
             } catch (Exception e) {
                 logger.info("定时任务[{}]在SpringContextHolder中不存在：{}，继续查找groovy脚本执行任务", quartzJob.getJobName(), e.getMessage());
                 log.setMessage("定时任务[" + quartzJob.getJobName() + "]在SpringContextHolder中不存在：" + e.getMessage() + "，继续查找groovy脚本执行任务");
-                GroovyService groovyService = (GroovyService) SpringContextHolder.getBean("groovyService");
-                groovyService.exec(quartzJob.getBeanName(), null);
-                excFlag = true;
-            }
-            if (!excFlag) {
-                QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
-                Future<?> future = executorService.submit(task);
-                future.get();
+                DataApiServiceExecutor dataApiServiceExecutor = (DataApiServiceExecutor) SpringContextHolder.getBean("dataApiServiceExecutor");
+                dataApiServiceExecutor.submitRequest(quartzJob.getBeanName(), new HashMap<>());
             }
             long times = System.currentTimeMillis() - startTime;
             log.setTime(times);

@@ -1,6 +1,7 @@
 package com.three.resource_jpa.jpa.base.service;
 
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Map;
 
 public interface DataApiService {
