@@ -27,19 +27,24 @@ public class QuartzJobLog implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "job_name")
     private String jobName; // 任务名称
 
+    @Column(name = "bean_name")
     private String beanName; // Bean名称
 
+    @Column(name = "method_name")
     private String methodName; // 方法名称
 
     private String params; // 参数
 
+    @Column(name = "cron_expression")
     private String cronExpression; // cron表达式
 
     /**
      * 日志状态：1成功，2失败
      */
+    @Column(name = "log_type")
     private Integer logType;
 
     private String message; // 执行消息
@@ -48,7 +53,7 @@ public class QuartzJobLog implements Serializable {
      * 异常详细
      */
     @Lob
-    @Column(columnDefinition = "text")
+    @Column(name = "exception_detail", columnDefinition = "text")
     private String exceptionDetail;
 
     /**
@@ -58,13 +63,15 @@ public class QuartzJobLog implements Serializable {
 
     private String remark;
 
-    @Column(nullable = false, length = 2, columnDefinition = "int default 1")
+    @Column(name = "status", nullable = false, length = 2, columnDefinition = "int default 1")
     private Integer status = StatusEnum.OK.getCode();
 
     @CreatedDate
+    @Column(name = "create_date", columnDefinition = "datetime comment '创建时间'")
     private Date createDate;
 
     @LastModifiedDate
+    @Column(name = "update_date", columnDefinition = "datetime comment '修改时间'")
     private Date updateDate;
 
     public void addMessage(String msg) {

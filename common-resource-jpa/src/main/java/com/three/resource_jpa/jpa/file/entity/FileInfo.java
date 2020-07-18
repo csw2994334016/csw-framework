@@ -32,6 +32,7 @@ public class FileInfo implements Serializable {
 
     private String name; // 原始文件名
 
+    @Column(name = "content_type")
     private String contentType; // 文件类型
 
     private String md5; // 文件md5值
@@ -44,6 +45,7 @@ public class FileInfo implements Serializable {
 
     private String source; // 文件来源
 
+    @Column(name = "emp_id")
     private String empId; // 文件属于哪个用户
 
     @Column(nullable = false, columnDefinition = "int(2) default 1 comment '记录状态：1=正常；2=锁定；3=删除'")
@@ -52,9 +54,11 @@ public class FileInfo implements Serializable {
 
     @CreatedDate
     @ApiModelProperty("创建时间")
+    @Column(name = "create_date", columnDefinition = "datetime comment '创建时间'")
     private Date createDate; // 创建时间
 
     @LastModifiedDate
     @ApiModelProperty("修改时间")
+    @Column(name = "update_date", columnDefinition = "datetime comment '修改时间'")
     private Date updateDate; // 修改时间
 }

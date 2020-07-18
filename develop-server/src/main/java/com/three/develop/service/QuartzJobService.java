@@ -106,6 +106,8 @@ public class QuartzJobService extends BaseService<QuartzJob, Long> {
             } else {
                 updateByResume(quartzJob);
             }
+            quartzJob.setJobStatus(status);
+            quartzJobRepository.save(quartzJob);
         }
     }
 

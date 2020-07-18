@@ -27,26 +27,27 @@ public class QuartzJob implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "job_name", unique = true, nullable = false)
     private String jobName; // 任务名称
 
+    @Column(name = "job_group")
     private String jobGroup; // 任务组名
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "bean_name", unique = true, nullable = false)
     private String beanName; // Bean名称
 
-    @Column(nullable = false)
+    @Column(name = "method_name", nullable = false)
     private String methodName; // 执行方法
 
     private String params; // 参数
 
-    @Column(nullable = false)
+    @Column(name = "cron_expression", nullable = false)
     private String cronExpression; // cron表达式
 
     /**
      * 任务执行状态，1：运行中；2：暂停
      */
-    @Column(nullable = false, length = 2, columnDefinition = "int default 2")
+    @Column(name = "job_status", nullable = false, length = 2, columnDefinition = "int default 2")
     private Integer jobStatus = JobStatusEnum.PAUSE.getCode();
 
 
@@ -56,8 +57,10 @@ public class QuartzJob implements Serializable {
     private Integer status = StatusEnum.OK.getCode();
 
     @CreatedDate
+    @Column(name = "create_date", columnDefinition = "datetime comment '创建时间'")
     private Date createDate;
 
     @LastModifiedDate
+    @Column(name = "update_date", columnDefinition = "datetime comment '修改时间'")
     private Date updateDate;
 }

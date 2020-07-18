@@ -70,10 +70,12 @@ public class ${className} implements Serializable {
 
     @CreatedDate
     @ApiModelProperty("创建时间")
+    @Column(name = "create_date", columnDefinition = "datetime comment '创建时间'")
     private Date createDate;
 
     @LastModifiedDate
     @ApiModelProperty("修改时间")
+    @Column(name = "update_date", columnDefinition = "datetime comment '修改时间'")
     private Date updateDate;
 </#if>
 

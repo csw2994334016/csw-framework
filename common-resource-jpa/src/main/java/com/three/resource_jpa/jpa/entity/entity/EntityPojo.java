@@ -63,16 +63,18 @@ public class EntityPojo implements Serializable {
     @ApiModelProperty("描述/备注")
     private String remark; // 描述/备注
 
-    @Column(nullable = false, columnDefinition = "int(2) default 1 comment '记录状态：1=正常；2=锁定；3=删除'")
+    @Column(name = "status", nullable = false, columnDefinition = "int(2) default 1 comment '记录状态：1=正常；2=锁定；3=删除'")
     @ApiModelProperty("记录状态：1=正常；2=锁定；3=删除")
     private Integer status = StatusEnum.OK.getCode(); // 记录状态：1=正常；2=锁定；3=删除
 
     @CreatedDate
     @ApiModelProperty("创建时间")
+    @Column(name = "create_date", columnDefinition = "datetime comment '创建时间'")
     private Date createDate; // 创建时间
 
     @LastModifiedDate
     @ApiModelProperty("修改时间")
+    @Column(name = "update_date", columnDefinition = "datetime comment '修改时间'")
     private Date updateDate; // 修改时间
 
 

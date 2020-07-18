@@ -49,6 +49,7 @@ public class ActionLog {
     /**
      * 日志状态：1成功，2失败
      */
+    @Column(name = "log_type")
     private Integer logType;
 
     private String message;
@@ -61,19 +62,22 @@ public class ActionLog {
     /**
      * 请求ip
      */
+    @Column(name = "ip_address")
     private String ipAddress;
 
+    @Column(name = "os_name")
     private String osName;
 
     private String device;
 
+    @Column(name = "browser_type")
     private String browserType;
 
     /**
      * 异常详细
      */
     @Lob
-    @Column(columnDefinition = "text")
+    @Column(name = "exception_detail", columnDefinition = "text")
     private String exceptionDetail;
 
 
@@ -81,6 +85,7 @@ public class ActionLog {
     private Integer status = StatusEnum.OK.getCode();
 
     @CreatedDate
+    @Column(name = "create_date", columnDefinition = "datetime comment '创建时间'")
     private Date createDate;
 
     public ActionLog(Integer logType, String message, Long time) {
